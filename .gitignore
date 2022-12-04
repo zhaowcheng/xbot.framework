@@ -10,12 +10,12 @@ __pycache__/
 # log files
 log/*
 !log/log_template.html
-!log/teport_template.html
+!log/report_template.html
 
 # testbed files
-testbed/
+testbed/*
 !testbed/testbed_template.xml
 
 # testset files
-testset/
+testset/*
 !testset/testset_template.xml
