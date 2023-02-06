@@ -11,10 +11,11 @@ import re
 import random
 import string
 
-from typing import Tuple, Any
+from typing import Tuple
 from datetime import datetime
-from paramiko import SSHClient, AutoAddPolicy, Channel
+from paramiko import SSHClient, AutoAddPolicy
 
+from lib import logger
 from lib.error import ShellError
 
 class SSH(object):
@@ -31,6 +32,7 @@ class SSH(object):
             LANG defaults to en_US.UTF-8 and cannot be changed.
             LANGUAGE defaults to en_US.UTF-8 and cannot be changed.
         """
+        self._logger = logger.ExtraAdapter(logger.get_logger())
         self._sshclient = SSHClient()
         self._sshclient.set_missing_host_key_policy(AutoAddPolicy())
         self._shells = {}
@@ -50,6 +52,8 @@ class SSH(object):
         """
         SSH to `host:port` with `user` and `password`.
         """
+        self._logger.extra = f'ssh://{user}@{host}:{port}'
+        self._logger.info('Connecting...')
         self._sshclient.connect(host, port, user, password)
         self._profile = self._mkprofile()
 
@@ -115,6 +119,7 @@ class SSH(object):
             >>> exec('y', expect="remove directory 'd2'?")  # d1 deleted
             >>> exec('y')  # d2 deleted
         """
+        self._logger.info(f"Command: '{cmd}', Expect: '{expect}'")
         data = f'{cmd}\necho $?' if expect == '0' else cmd
         caller = inspect.stack()[1]
         callermod = inspect.getmodulename(caller.filename)
