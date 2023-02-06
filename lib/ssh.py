@@ -57,7 +57,11 @@ class SSH(object):
         """
         Close the connection.
         """
-        for name in self._shells:
+        try:
+            self._sshclient.exec_command(f'/bin/rm {self._profile}')
+        except:
+            pass
+        for name in self.shell_names():
             self._shells.pop(name).close()
         self._sshclient.close()
 
@@ -120,23 +124,24 @@ class SSH(object):
             shell = self._sshclient.invoke_shell('builtin_ansi', 999, 999)
             shell.set_name(shname)
             self._shells[shname] = shell
-            data = f'source ${self._profile}\n${data}'
+            data = f'source {self._profile}\n{data}'
         shell = self._shells[shname]
         shell.send(data + '\r')
         result = _Result(self.PS1, cmd, expect)
         stime = datetime.now()
         while (datetime.now() - stime).seconds < timeout:
             if shell.recv_ready():
-                result.appendrs(shell.recv(1024))
+                result.appendrs(shell.recv(1024).decode(errors='ignore'))
                 if result.finished:
+                    if expect == '0' and result.rc != '0':
+                        d = {'Command': cmd, 'Expect': expect}
+                        msg = f"{d}\n{result.purers}"
+                        raise ShellError(msg) from None
                     return result.purers
             time.sleep(0.01)
         else:
-            if expect in ('0', ''):
-                prefix = 'Command timeout:'
-            else:
-                prefix = f"No '{expect}' found:"
-            msg = f'{prefix}\n{self.PS1}{cmd}\n{result.purers}'
+            d = {'Command': cmd, 'Expect': expect}
+            msg = f"Timeout: {d}\n{result.purers}"
             raise ShellError(msg) from None
 
     def _mkprofile(self) -> str:
@@ -148,13 +153,52 @@ class SSH(object):
         sftp = self._sshclient.open_sftp()
         with sftp.open(profile, 'w+') as fp:
             for k, v in self._shenvs.items():
-                fp.write(f'export {k}={v}\n')
+                fp.write(f'export {k}="{v}"\n')
         return profile
 
 
 class _Result(object):
     """
     Result of shell command.
+
+    example1(expect='', cached shell):
+        [sh@xbot]$ pwd                              <-- cmd
+        /home/xbot                                  <-- start & end & purers
+        [sh@xbot]$                                  <-- finished
+
+    example1(expect='', cached shell):
+        pwd                                         <-- cmd
+        /home/xbot                                  <-- start & end & purers
+        [sh@xbot]$                                  <-- finished
+
+    example2(expect='', non-cached shell):
+        [root@localhost ~]# source /tmp/DSXyqSkKeL  <-- shenvs
+        [sh@xbot]$ pwd                              <-- cmd
+        /home/xbot                                  <-- start & end & purers
+        [sh@xbot]$                                  <-- finished
+
+    example3(expect='0', non-cached shell):
+        [root@localhost ~]# source /tmp/DSXyqSkKeL  <-- shenvs
+        [sh@xbot]$ pwd                              <-- cmd
+        /home/xbot                                  <-- start & end & purers
+        [sh@xbot]$ echo $?                          <-- print rc
+        0                                           <-- rc
+        [sh@xbot]$                                  <-- finished
+
+    example4(expect='', cached shell):
+        [sh@xbot]$ echo -e 'line1\nline2\nline3'    <-- cmd
+        line1                                       <-- start <--+
+        line2                                                    +-- purers
+        line3                                       <-- end   <--+
+        [sh@xbot]$                                  <-- finished
+
+    example5(expect="'file1'?", chached shell):
+        [sh@xbot]$ rm -i file1 file2                <-- cmd
+        rm: remove regular empty file 'file1'?      <-- start & purers & finished
+
+    example6(expect='', cached shell, after example5):
+        [sh@xbot]$ y                                <-- cmd & end
+        [sh@xbot]$                                  <-- finished & start
     """
 
     def __init__(
@@ -216,8 +260,9 @@ class _Result(object):
         """
         self._rs += s
         self._start, self._end = self._locate_purers()
+        end = (self._end + 1) if self._end else self._end
         self._purers = '\n'.join(
-            self._rs.splitlines()[self._start:self._end]).strip()
+            self._rs.splitlines()[self._start:end]).strip()
         if self._expect == '0':
             self._rc = self._getrc()
 
@@ -227,10 +272,10 @@ class _Result(object):
         """
         if self._end == None:
             return ''
-        lines = self._rs.splitlines()[self._end:]
+        lines = self._rs.splitlines()[self._end+1:]
         if len(lines) < 3:
             return ''
-        ps1line = re.compile(f'.*?{self._ps1}.*')
+        ps1line = re.compile(f'.*?{re.escape(self._ps1)}.*')
         if not ps1line.match(lines[-1]):
             return ''
         rc = lines[-2]
@@ -243,20 +288,22 @@ class _Result(object):
         Locate the start and end line number of purers.
         """
         start, end = None, None
-        ps1line = re.compile(f'.*?{self._ps1}.*')
+        ps1line = re.compile(f'.*?{re.escape(self._ps1)}.*')
         for i, line in enumerate(self._rs.splitlines()):
             if (start is None) and (line == self._cmd):
-                start = i
+                start = i + 1
                 continue
             if ps1line.match(line) and \
                     line.endswith(self._cmd) and \
                     self._cmd.strip() != '':
-                start = i
+                start = i + 1
                 continue
             if ps1line.match(line):
                 if (' ' in self._cmd.strip()) and (start is None):
                     continue
                 else:
-                    end = i
+                    end = i - 1
                     break
         return start, end
+
+
