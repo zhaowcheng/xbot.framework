@@ -139,14 +139,14 @@ class SFTP(object):
                 if not self.exists(r):
                     self.makedirs(r)
 
-    def join(self, *paths):
+    def join(self, *paths: str) -> str:
         """
         Similar to os.path.join().
         """
         paths = [p.rstrip('/') for p in paths]
         return '/'.join(paths)
 
-    def normpath(self, path):
+    def normpath(self, path: str) -> str:
         """
         Similar to os.path.normpath().
         """
@@ -154,13 +154,13 @@ class SFTP(object):
         path = self.join(*segs)
         return path.rstrip('/')
 
-    def basename(self, path):
+    def basename(self, path: str) -> str:
         """
         Similar to os.path.basename().
         """
         return path.rsplit('/', 1)[-1]
 
-    def exists(self, path):
+    def exists(self, path: str) -> str:
         """
         Similar to os.path.exists().
         """
@@ -170,7 +170,7 @@ class SFTP(object):
         except FileNotFoundError:
             return False
 
-    def walk(self, path):
+    def walk(self, path: str):
         """
         Similar to os.walk().
         """
@@ -186,7 +186,7 @@ class SFTP(object):
             for w in self.walk(self.join(path, d)):
                 yield w
 
-    def makedirs(self, path):
+    def makedirs(self, path: str) -> str:
         """
         Similar to os.makedirs().
         """
@@ -197,7 +197,7 @@ class SFTP(object):
             if not self.exists(curpath):
                 self._sftpclient.mkdir(curpath)
 
-    def open(self, filepath, mode='r'):
+    def open(self, filepath: str, mode: str = 'r') -> paramiko.SFTPFile:
         """
         Similar to builtin open().
         """

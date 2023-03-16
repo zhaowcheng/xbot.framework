@@ -288,7 +288,7 @@ class _Result(object):
             return ''
         return rc
         
-    def _locate_purers(self):
+    def _locate_purers(self) -> Tuple:
         """
         Locate the start and end line number of purers.
         """

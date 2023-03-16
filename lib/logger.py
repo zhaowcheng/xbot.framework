@@ -33,7 +33,7 @@ if not ROOT_LOGGER.hasHandlers():
     ROOT_LOGGER.addHandler(stderr)
 
 
-def get_logger(name=''):
+def get_logger(name: str = ''):
     """
     For other modules.
     """
