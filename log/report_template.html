@@ -145,13 +145,15 @@
 
     <table id='result_table'>
         <tr id='header_row'>
-            <th>用例</th>
+            <th width="70%">用例</th>
+            <th>时长</th>
             <th>结果</th>
         </tr>
 
         {% for case in cases %}
         <tr class="{{case.class}}">
-            <td>{{case.path}}</td>
+            <td >{{case.path}}</td>
+            <td align='center'>{{case.duration}}</td>
             <td align='center'>
                 <a href="{{case.log}}" target="_blank">{{case.result}}</a>
             </td>
