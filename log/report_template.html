@@ -73,19 +73,19 @@
             padding: 0.3em;
         }
 
-        .passCase {
+        .PASS {
             background-color: rgba(88, 204, 73, 0.3) !important;
         }
 
-        .failCase {
+        .FAIL {
             background-color: rgba(249, 62, 62, .3) !important;
         }
 
-        .blockCase {
+        .BLOCK {
             background-color: rgba(252, 161, 48, .3) !important;
         }
 
-        .skipCase {
+        .SKIP {
             background-color: #979393a1 !important;
         }
 
@@ -102,29 +102,29 @@
             trs = document.getElementsByTagName("tr");
             for (var i = 1; i < trs.length; i++) {
                 tr = trs[i];
-                result = tr.querySelector("td:nth-child(2) > a").text;
+                result = tr.querySelector("td:nth-child(3) > a").text;
                 if (level == 0) {
                     tr.style.display = null;
                 } else if (level == 1) {
-                    if (result == '成功') {
+                    if (result == 'PASS') {
                         tr.style.display = null;
                     } else {
                         tr.style.display = 'none';
                     }
                 } else if (level == 2) {
-                    if (result == '失败') {
+                    if (result == 'FAIL') {
                         tr.style.display = null;
                     } else {
                         tr.style.display = 'none';
                     }
                 } else if (level == 3) {
-                    if (result == '阻塞') {
+                    if (result == 'BLOCK') {
                         tr.style.display = null;
                     } else {
                         tr.style.display = 'none';
                     }
                 } else if (level == 4) {
-                    if (result == '跳过') {
+                    if (result == 'SKIP') {
                         tr.style.display = null;
                     } else {
                         tr.style.display = 'none';
@@ -136,22 +136,22 @@
     </script>
 
     <div id='filter_button_line' style=" float: left;  width: 100%;">
-        <a class="all filter_button" href='javascript:filterCase(0)'>所有[{{allcnt}}]</a>
-        <a class="pass  filter_button" href='javascript:filterCase(1)'>成功[{{passcnt}}]</a>
-        <a class="fail  filter_button" href='javascript:filterCase(2)'>失败[{{failcnt}}]</a>
-        <a class="block  filter_button" href='javascript:filterCase(3)'>阻塞[{{blockcnt}}]</a>
-        <a class="skip  filter_button" href='javascript:filterCase(4)'>跳过[{{skipcnt}}]</a>
+        <a class="all filter_button" href='javascript:filterCase(0)'>ALL[{{allcnt}}]</a>
+        <a class="pass  filter_button" href='javascript:filterCase(1)'>PASS[{{passcnt}}]</a>
+        <a class="fail  filter_button" href='javascript:filterCase(2)'>FAIL[{{failcnt}}]</a>
+        <a class="block  filter_button" href='javascript:filterCase(3)'>BLOCK[{{blockcnt}}]</a>
+        <a class="skip  filter_button" href='javascript:filterCase(4)'>SKIP[{{skipcnt}}]</a>
     </div>
 
     <table id='result_table'>
         <tr id='header_row'>
-            <th width="70%">用例</th>
-            <th>时长</th>
+            <th width="60%">用例</th>
+            <th>时长[{{total_duration}}]</th>
             <th>结果</th>
         </tr>
 
         {% for case in cases %}
-        <tr class="{{case.class}}">
+        <tr class="{{case.result}}">
             <td >{{case.path}}</td>
             <td align='center'>{{case.duration}}</td>
             <td align='center'>

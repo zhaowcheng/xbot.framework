@@ -71,22 +71,6 @@
         .WARNING {
             color: orange;
         }
-
-        .Pass {
-            color: green;
-        }
-
-        .Fail {
-            color: red;
-        }
-
-        .Error {
-            color: red;
-        }
-
-        .Block {
-            color: orange
-        }
     </style>
 </head>
 
@@ -103,27 +87,27 @@
                     <th>用例编号</th>
                     <td id="caseid" colspan="2">{{caseid}}</td>
                     <td colspan="3" rowspan="5">
-                        <pre style="overflow-y: scroll;">{{casedesc}}</pre>
+                        <pre id="casedesc" style="overflow-y: scroll;">{{casedesc}}</pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre style="overflow-y: scroll;">{{envinfo}}</pre>
+                        <pre id="envinfo" style="overflow-y: scroll;">{{envinfo}}</pre>
                     </td>
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="caseresult" colspan="2" class="{{caseresult}}">{{caseresult}}</td>
+                    <td id="result" colspan="2">{{result}}</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td colspan="2">{{starttime}}</td>
+                    <td id="starttime" colspan="2">{{starttime}}</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td colspan="2">{{endtime}}</td>
+                    <td id="endtime" colspan="2">{{endtime}}</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
-                    <td id="case_duration" colspan="2">{{duration}}</td>
+                    <td id="duration" colspan="2">{{duration}}</td>
                 </tr>
             </table>
         </div>
