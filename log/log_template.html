@@ -113,11 +113,11 @@
         </div>
 
         <div style="position: relative; margin-top: 30px;">
-            {% if suite_setup_records %}
+            {% for stage, records in stage_records.items() %}
             <div>
-                <button onclick="javascript:switchElementDisplayState('suite_setup')">suite_setup</button>
+                <button onclick="javascript:switchElementDisplayState('{{stage}}')">{{stage}}</button>
             </div>
-            <div id="suite_setup">
+            <div id="{{stage}}">
                 <table>
                     <tr>
                         <th class="asctime">Time</th>
@@ -125,7 +125,7 @@
                         <th class="modname">Module</th>
                         <th class="message">Message</th>
                     </tr>
-                    {% for record in suite_setup_records %}
+                    {% for record in records %}
                     <tr class="{{record.levelname}}">
                         <td>{{record.asctime}}</td>
                         <td>{{record.levelname}}</td>
@@ -141,121 +141,7 @@
                     {% endfor %}
                 </table>
             </div>
-            {% endif %}
-
-            <div>
-                <button onclick="javascript:switchElementDisplayState('setup')">setup</button>
-            </div>
-            <div id="setup">
-                <table>
-                    <tr>
-                        <th class="asctime">Time</th>
-                        <th class="levelname">Level</th>
-                        <th class="modname">Module</th>
-                        <th class="message">Message</th>
-                    </tr>
-                    {% for record in setup_records %}
-                    <tr class="{{record.levelname}}">
-                        <td>{{record.asctime}}</td>
-                        <td>{{record.levelname}}</td>
-                        <td>{{record.module}}</td>
-                        <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
-                            {% if 'result' in record and 'content' in record.result %}
-                            <pre id='{{record.asctime}}'
-                                style="display: none;font-family: monospace;">{{record.result.content.replace('<','&lt').replace('>','&gt')}}</pre>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-
-            <div>
-                <button onclick="javascript:switchElementDisplayState('process')">process</button>
-            </div>
-            <div id="process">
-                <table>
-                    <tr>
-                        <th class="asctime">Time</th>
-                        <th class="levelname">Level</th>
-                        <th class="modname">Module</th>
-                        <th class="message">Message</th>
-                    </tr>
-                    {% for record in process_records %}
-                    <tr class="{{record.levelname}}">
-                        <td>{{record.asctime}}</td>
-                        <td>{{record.levelname}}</td>
-                        <td>{{record.module}}</td>
-                        <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
-                            {% if 'result' in record and 'content' in record.result %}
-                            <pre id='{{record.asctime}}'
-                                style="display: none;font-family: monospace">{{record.result.content.replace('<','&lt').replace('>','&gt')}}</pre>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-
-            <div>
-                <button onclick="javascript:switchElementDisplayState('teardown')">teardown</button>
-            </div>
-            <div id="teardown">
-                <table>
-                    <tr>
-                        <th class="asctime">Time</th>
-                        <th class="levelname">Level</th>
-                        <th class="modname">Module</th>
-                        <th class="message">Message</th>
-                    </tr>
-                    {% for record in teardown_records %}
-                    <tr class="{{record.levelname}}">
-                        <td>{{record.asctime}}</td>
-                        <td>{{record.levelname}}</td>
-                        <td>{{record.module}}</td>
-                        <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
-                            {% if 'result' in record and 'content' in record.result %}
-                            <pre id='{{record.asctime}}'
-                                style="display: none;font-family: monospace">{{record.result.content.replace('<','&lt').replace('>','&gt')}}</pre>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-
-            {% if suite_teardown_records %}
-            <div>
-                <button onclick="javascript:switchElementDisplayState('suite_teardown')">suite_teardown</button>
-            </div>
-            <div id="suite_teardown">
-                <table>
-                    <tr>
-                        <th class="asctime">Time</th>
-                        <th class="levelname">Level</th>
-                        <th class="modname">Module</th>
-                        <th class="message">Message</th>
-                    </tr>
-                    {% for record in suite_teardown_records %}
-                    <tr class="{{record.levelname}}">
-                        <td>{{record.asctime}}</td>
-                        <td>{{record.levelname}}</td>
-                        <td>{{record.module}}</td>
-                        <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
-                            {% if 'result' in record and 'content' in record.result %}
-                            <pre id='{{record.asctime}}'
-                                style="display: none;font-family: monospace;">{{record.result.content.replace('<','&lt').replace('>','&gt')}}</pre>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% endif %}
+            {% endfor %}
         </div>
     </div>
 </body>

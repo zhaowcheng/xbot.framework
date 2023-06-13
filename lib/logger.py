@@ -18,7 +18,6 @@ class StdoutFilter(logging.Filter):
 
 ROOT_LOGGER = logging.getLogger('xbot')
 if not ROOT_LOGGER.hasHandlers():
-    # init
     ROOT_LOGGER.setLevel('DEBUG')
     stdout = logging.StreamHandler(sys.stdout)
     stdout.addFilter(StdoutFilter())
@@ -68,14 +67,12 @@ class CaseLogHandler(logging.Handler):
     """
     def __init__(self, level=logging.NOTSET):
         super().__init__(level)
-        self.records = {
-            'suite_setup': [],
+        self.stage_records = {
             'setup': [],
             'process': [],
             'teardown': [],
-            'suite_teardown': []
         }
         self.stage = 'setup'
 
     def emit(self, record):
-        self.records[self.stage].append(record.__dict__)
+        self.stage_records[self.stage].append(record.__dict__)

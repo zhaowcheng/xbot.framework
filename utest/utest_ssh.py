@@ -2,9 +2,10 @@
 
 
 import unittest
-import threading
+import shutil
 import sys
 import os
+import invoke
 sys.path.append(os.path.abspath(f'{__file__}/../..'))
 
 from lib.ssh import SSH
@@ -13,66 +14,86 @@ from lib.error import ShellError
 
 class TestSSH(unittest.TestCase):
 
-    HOST = ''
+    HOST = '192.168.70.12'
     PORT = 22
-    USER = ''
-    PWD = ''
+    USER = 'highgo'
+    PWD = 'iflow@123'
 
-    ssh = SSH()
+    LHOME = os.environ.get('HOME') or os.environ['HOMEPATH']
+    LPUTDIR = os.path.join(LHOME, 'lputdir')
+    LGETDIR = os.path.join(LHOME, 'lgetdir')
+    RPUTDIR = '/tmp/rputgetdir'
+    RGETDIR = RPUTDIR
 
-    def setenv(self, name: str, value: str) -> None:
-        self.ssh.exec(f'export {name}="{value}"')
-
-    def getenv(self, name: str) -> str:
-        return self.ssh.exec(f'echo ${name}')
+    ssh = None
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.ssh.connect(cls.HOST, cls.USER, cls.PWD, cls.PORT)
+        cls.ssh = SSH(cls.HOST, cls.USER, cls.PWD, cls.PORT)
+        if not cls.ssh.exists(cls.RPUTDIR):
+            cls.ssh.makedirs(cls.RPUTDIR)
+        os.makedirs(os.path.join(cls.LPUTDIR, 'dir', 'subdir'))
+        os.system('whoami > %s' % os.path.join(cls.LPUTDIR, 'file'))
+        os.system('whoami > %s' % os.path.join(cls.LPUTDIR, 'dir', 'subfile'))
 
     @classmethod
     def tearDownClass(cls) -> None:
+        shutil.rmtree(cls.LPUTDIR)
+        shutil.rmtree(cls.LGETDIR)
         cls.ssh.close()
 
     def test_cmd_whoami(self):
-        self.ssh.exec('whoami', expect=self.USER)
+        self.assertEqual(self.ssh.exec('whoami'), self.USER)
 
     def test_cmd_interact(self):
-        self.ssh.exec("read -p 'input: '", expect='input:')
-        self.ssh.exec('hello')
+        self.ssh.exec("read -p 'input: '", prompts={'input:': 'hello'})
 
-    def test_expect_0(self):
-        self.ssh.exec('cd /home', expect='0')
-        with self.assertRaises(ShellError):
-            self.ssh.exec('cd /errpath', expect='0')
+    def test_cmd_timeout(self):
+        with self.assertRaises(invoke.exceptions.CommandTimedOut):
+            self.ssh.exec('sleep 3', timeout=2)
 
-    def test_expect_null(self):
-        self.ssh.exec('cd /home', expect='')
-        self.ssh.exec('cd /errpath', expect='')
+    def test_cmd_cd(self):
+        with self.ssh.cd('/tmp'):
+            self.assertEqual(self.ssh.exec('pwd'), '/tmp')
+    
+    def test_cmd_sudo(self):
+        self.assertEqual(self.ssh.sudo('whoami'), 'root')
 
-    def test_timeout(self):
-        with self.assertRaises(ShellError):
-            self.ssh.exec('sleep 5', timeout=3)
+    def test_sftp_01_putdir(self):
+        l = os.path.join(self.LPUTDIR, 'dir')
+        self.ssh.putdir(l, self.RPUTDIR)
+        p1 = self.ssh.join(self.RPUTDIR, 'dir', 'subdir')
+        self.assertTrue(self.ssh.exists(p1))
+        p2 = self.ssh.join(self.RPUTDIR, 'dir', 'subfile')
+        self.assertTrue(self.ssh.exists(p2))
 
-    def test_thread_safe(self):
-        def _setenv(name, value):
-            self.setenv(name, value)
-            rs = self.getenv(name)
-            self.assertEqual(rs, value)
-        t1 = threading.Thread(target=_setenv, args=('XBOT', 't1'))
-        t2 = threading.Thread(target=_setenv, args=('XBOT', 't2'))
-        t1.start()
-        t2.start()
-        t1.join()
-        t2.join()
+    def test_sftp_02_putfile(self):
+        l = os.path.join(self.LPUTDIR, 'file')
+        self.ssh.putfile(l, self.RPUTDIR)
+        p = self.ssh.join(self.RPUTDIR, 'file')
+        self.assertTrue(self.ssh.exists(p))
 
-    def test_preset_shenvs(self):
-        shenvs = {'XBOT_HOME': '/home/xbot'}
-        ssh = SSH(shenvs=shenvs)
-        ssh.connect(self.HOST, self.USER, self.PWD, self.PORT)
-        rs = ssh.exec('echo $XBOT_HOME')
-        self.assertEqual(rs, '/home/xbot')
-        ssh.close()
+    def test_sftp_03_getdir(self):
+        r = self.ssh.join(self.RGETDIR, 'dir')
+        self.ssh.getdir(r, self.LGETDIR)
+        p1 = os.path.join(self.LGETDIR, 'dir', 'subdir')
+        self.assertTrue(os.path.exists(p1))
+        p2 = os.path.join(self.LGETDIR, 'dir', 'subfile')
+        self.assertTrue(os.path.exists(p2))
+    
+    def test_sftp_04_getfile(self):
+        r = self.ssh.join(self.RGETDIR, 'file')
+        self.ssh.getfile(r, self.LGETDIR)
+        p = os.path.join(self.LGETDIR, 'file')
+        self.assertTrue(os.path.exists(p))
+
+    def test_sftp_05_openfile(self):
+        p = self.ssh.join(self.RPUTDIR, 'file')
+        with self.ssh.openfile(p, 'a') as fp:
+            fp.write('xbot\n')
+        with self.ssh.openfile(p, 'r') as fp:
+            self.assertIn('xbot', fp.read().decode('utf-8'))
+    
 
 
 if __name__ == '__main__':

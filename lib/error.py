@@ -4,8 +4,29 @@
 Exceptions.
 """
 
-class ShellError(Exception):
+class TestbedError(Exception):
     """
-    Shell command error.
+    Testbed file error.
+    """
+    pass
+
+
+class TestbedSchemaError(Exception):
+    """
+    Testbed schema file error.
+    """
+    pass
+
+
+class TestsetError(Exception):
+    """
+    Testset file error.
+    """
+    pass
+
+
+class TestcaseTimeout(Exception):
+    """
+    Testcase timeout.
     """
     pass

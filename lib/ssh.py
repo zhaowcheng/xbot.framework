@@ -4,311 +4,340 @@
 SSH module.
 """
 
-import inspect
-import threading
-import time
-import re
-import random
-import string
+import os
+import stat
 
-from typing import Tuple
-from datetime import datetime
-from paramiko import SSHClient, AutoAddPolicy
+from contextlib import contextmanager
+from fabric import Connection
+from invoke import Responder
+from paramiko import SFTPFile
 
 from lib import logger
-from lib.error import ShellError
+
+
+class Result(str):
+    """
+    Shell command result with extra attributes and methods.
+    """
+    def getfield(
+        self,
+        key: str,
+        col: int,
+        sep: str = None
+    ) -> str:
+        """
+        Get the specified field from result.
+
+        >>> r = Result('UID     PID   CMD
+        >>>             highgo   45   /opt/HighGoDB-5.6.4/bin/postgres
+        >>>             highgo   51   postgres: checkpointer process
+        >>>             highgo   52   postgres: writer process
+        >>>             highgo   53   postgres: wal writer process')
+        >>> pg_pid = r.getfield('/opt/HighgoDB', 2)
+        >>> print(pg_pid)
+        >>> 45
+
+        :param key: keyword to filter row.
+        :param col: column number.
+        :param sep: separator.
+        :return: filtered field.
+        """
+        for line in self.splitlines():
+            if key in line:
+                fields = line.split(sep)
+                if col <= len(fields):
+                    return fields[col-1]
+
+    def getcol(
+        self,
+        col: int,
+        sep: str = None,
+        start: int = 1
+    ) -> list:
+        """
+        Get all fields of the specified column.
+
+        >>> r = Result('UID     PID   CMD
+        >>>             highgo   45   /opt/HighGoDB-5.6.4/bin/postgres
+        >>>             highgo   51   postgres: checkpointer process
+        >>>             highgo   52   postgres: writer process
+        >>>             highgo   53   postgres: wal writer process')
+        >>> pids = r.getcol(2, start=2)
+        >>> print(pids)
+        >>> ['45', '51', '52', '53']
+
+        :param col: column number, start from 1.
+        :param sep: separator.
+        :param start: start line number.
+        :return: all fields of the specified column.
+        """
+        fields = []
+        for line in self.splitlines()[start-1:]:
+            segs = line.split(sep)
+            if col <= len(segs):
+                fields.append(segs[col-1])
+        return fields
+
 
 class SSH(object):
     """
     SSH Class.
     """
-
-    PS1 = '[sh@xbot]$ '
-
-    def __init__(self, shenvs: dict = {}):
-        """
-        :param shenvs: shell environment variables for exec().
-            PS1 defaults to SSH.PS1 and cannot be changed.
-            LANG defaults to en_US.UTF-8 and cannot be changed.
-            LANGUAGE defaults to en_US.UTF-8 and cannot be changed.
-        """
-        self._logger = logger.ExtraAdapter(logger.get_logger())
-        self._sshclient = SSHClient()
-        self._sshclient.set_missing_host_key_policy(AutoAddPolicy())
-        self._shells = {}
-        self._shenvs = shenvs
-        self._shenvs.update(PS1=SSH.PS1, 
-                            LANG='en_US.UTF-8', 
-                            LANGUAGE='en_US.UTF-8')
-        self._profile = None
-
-    def connect(
+    def __init__(
         self,
         host: str,
         user: str,
         password: str,
-        port: int = 22
+        port: int = 22,
+        envs: dict = {}
     ) -> None:
         """
-        SSH to `host:port` with `user` and `password`.
+        :param envs: shell environments.
         """
-        self._logger.extra = f'ssh://{user}@{host}:{port}'
-        self._logger.info('Connecting...')
-        self._sshclient.connect(host, port, user, password)
-        self._profile = self._mkprofile()
+        self.__conn = Connection(host=host, user=user, port=port, 
+                                 connect_kwargs={'password': password})
+        self.__conn.open()
+        self.__sftp = self.__conn.sftp()
+        self.__envs = envs
+        self.__cwd = ''
+        self.__logger = logger.ExtraAdapter(logger.get_logger())
+        self.__logger.extra = f'ssh://{user}@{host}:{port}'
 
     def close(self) -> None:
         """
         Close the connection.
         """
+        self.__conn.close()
+
+    def setenv(self, name: str, value: str) -> None:
+        """
+        Set shell environment.
+        """
+        self.__envs[name] = value
+
+    def delenv(self, name: str) -> None:
+        """
+        Delete shell environment.
+        """
+        self.__envs.pop(name, None)
+
+    @contextmanager
+    def cd(self, path) -> None:
+        """
+        Shell `cd` command.
+
+        >>> with cd('/my/workdir'):
+        ...     run('pwd')
+        ...
+        /my/workdir
+        """
+        r = self.__conn.run(f'cd {path}', hide=True, env=self.__envs)
+        if path == '-':
+            self.__cwd = r.stdout
+        else:
+            self.__cwd = path
         try:
-            self._sshclient.exec_command(f'/bin/rm {self._profile}')
-        except:
-            pass
-        for name in self.shell_names():
-            self._shells.pop(name).close()
-        self._sshclient.close()
-
-    @property
-    def closed(self) -> bool:
-        """
-        Whether the connection is closed.
-        """
-        transport = self._sshclient.get_transport()
-        if transport and transport.is_active():
-            return False
-        return True
-
-    def close_shell(self, name: str) -> None:
-        """
-        Close the sepecified shell by name.
-        """
-        self._shells.pop(name).close()
-
-    def shell_names(self) -> Tuple[str]:
-        """
-        Return all cached shell names.
-        """
-        return tuple(self._shells.keys())
-
+            yield
+        finally:
+            self.__cwd = ''
+        
     def exec(
         self,
-        cmd: str,
-        expect: str = '0',
-        timeout: int = 10
-    ) -> str:
+        command: str,
+        timeout: int = 10,
+        prompts: dict = {}
+    ) -> Result:
         """
         Execute a command on the SSH server.
 
-        :param cmd: the command to be executed.
-        :param expect: expected result of command execution.
-            '0': expect the command to execute successfully.
-            '' : do not check the result of command execution.
-            's': expect the str 's' to appear in the result.
-        :param timeout: command timeout (seconds).
-        :return: the result of command execution.
+        >>> exec('uname -s')
+        Linux
+        >>> exec('sudo whoami', prompts={'password:', 'mypwd'})
+        root
 
-        :raises: `.ShellError` -- if the result is not as expected.
-
-        :examples:
-            >>> exec('cd /home')  # successful
-            >>> exec('cd /errpath')  # ShellError
-            >>> exec('cd /errpath', expect='')  # no error
-            >>> exec('mkdir d1 d2')
-            >>> exec('rm -ri d1 d2', expect="remove directory 'd1'?")
-            >>> exec('y', expect="remove directory 'd2'?")  # d1 deleted
-            >>> exec('y')  # d2 deleted
+        :param prompts: for interactive command.
+        :return: command output.
         """
-        self._logger.info(f"Command: '{cmd}', Expect: '{expect}'")
-        data = f'{cmd}\necho $?' if expect == '0' else cmd
-        caller = inspect.stack()[1]
-        callermod = inspect.getmodulename(caller.filename)
-        threadname = threading.current_thread().name
-        shname = f'{callermod}-{threadname}'
-        if shname not in self._shells:
-            shell = self._sshclient.invoke_shell('builtin_ansi', 999, 999)
-            shell.set_name(shname)
-            self._shells[shname] = shell
-            data = f'source {self._profile}\n{data}'
-        shell = self._shells[shname]
-        shell.send(data + '\r')
-        result = _Result(self.PS1, cmd, expect)
-        stime = datetime.now()
-        while (datetime.now() - stime).seconds < timeout:
-            if shell.recv_ready():
-                result.appendrs(shell.recv(1024).decode(errors='ignore'))
-                if result.finished:
-                    if expect == '0' and result.rc != '0':
-                        d = {'Command': cmd, 'Expect': expect}
-                        msg = f"{d}\n{result.purers}"
-                        raise ShellError(msg) from None
-                    return result.purers
-            time.sleep(0.01)
-        else:
-            d = {'Command': cmd, 'Expect': expect}
-            msg = f"Timeout: {d}\n{result.purers}"
-            raise ShellError(msg) from None
-
-    def _mkprofile(self) -> str:
+        if self.__cwd:
+            command = f'cd {self.__cwd} && {command}'
+        extra = {'result': {}}
+        self.__logger.debug(f'Command: {command}', extra=extra)
+        watchers = [Responder(k, v + '\n') for k, v in prompts.items()]
+        result = self.__conn.run(command, timeout=timeout, 
+                                 watchers=watchers, pty=True, 
+                                 hide=True, env=self.__envs)
+        extra['result']['content'] = result.stdout.strip()
+        return Result(result.stdout.strip())
+    
+    def sudo(self, command: str, **kwargs) -> str:
         """
-        Create a profile for shell environments.
+        Same to shell sudo.
+
+        >>> sudo('whoami')
+        root
+
+        :param kwargs: arguments passed to `exec`.
+        :return: command output.
         """
-        rdmchrs = random.choices(string.ascii_letters, k=10)
-        profile = '/tmp/' + ''.join(rdmchrs)
-        sftp = self._sshclient.open_sftp()
-        with sftp.open(profile, 'w+') as fp:
-            for k, v in self._shenvs.items():
-                fp.write(f'export {k}="{v}"\n')
-        return profile
-
-
-class _Result(object):
-    """
-    Result of shell command.
-
-    example1(expect='', cached shell):
-        [sh@xbot]$ pwd                              <-- cmd
-        /home/xbot                                  <-- start & end & purers
-        [sh@xbot]$                                  <-- finished
-
-    example1(expect='', cached shell):
-        pwd                                         <-- cmd
-        /home/xbot                                  <-- start & end & purers
-        [sh@xbot]$                                  <-- finished
-
-    example2(expect='', non-cached shell):
-        [root@localhost ~]# source /tmp/DSXyqSkKeL  <-- shenvs
-        [sh@xbot]$ pwd                              <-- cmd
-        /home/xbot                                  <-- start & end & purers
-        [sh@xbot]$                                  <-- finished
-
-    example3(expect='0', non-cached shell):
-        [root@localhost ~]# source /tmp/DSXyqSkKeL  <-- shenvs
-        [sh@xbot]$ pwd                              <-- cmd
-        /home/xbot                                  <-- start & end & purers
-        [sh@xbot]$ echo $?                          <-- print rc
-        0                                           <-- rc
-        [sh@xbot]$                                  <-- finished
-
-    example4(expect='', cached shell):
-        [sh@xbot]$ echo -e 'line1\nline2\nline3'    <-- cmd
-        line1                                       <-- start <--+
-        line2                                                    +-- purers
-        line3                                       <-- end   <--+
-        [sh@xbot]$                                  <-- finished
-
-    example5(expect="'file1'?", chached shell):
-        [sh@xbot]$ rm -i file1 file2                <-- cmd
-        rm: remove regular empty file 'file1'?      <-- start & purers & finished
-
-    example6(expect='', cached shell, after example5):
-        [sh@xbot]$ y                                <-- cmd & end
-        [sh@xbot]$                                  <-- finished & start
-    """
-
-    def __init__(
-        self,
-        ps1: str,
-        cmd: str,
-        expect: str,
-    ):
+        command = 'sudo ' + command
+        kwargs['prompts'] = {
+            r'\[sudo\] password': self.__conn.connect_kwargs['password']
+        }
+        result = self.exec(command, **kwargs)
+        return Result('\n'.join(result.splitlines()[1:]))
+    
+    def getfile(self, rfile: str, ldir: str) -> None:
         """
-        :param ps1: shell PS1.
-        :param cmd: shell command.
-        :param expect: expected result.
-        """
-        self._ps1 = ps1
-        self._cmd = cmd
-        self._expect = expect
-        self._rs = ''  # return str of cmd.
-        self._rc = ''  # return code of cmd.
-        self._purers = ''  # return str that has removed redundant lines.
-        self._start = None  # start line number of purers in the rs.
-        self._end = None  # end line number of purers in the rs.
+        Get `rfile` from SFTP server into `ldir`.
 
-    @property
-    def rc(self) -> str:
-        """
-        Return code.
-        """
-        return self._rc
-
-    @property
-    def rs(self) -> str:
-        """
-        Return str.
-        """
-        return self._rs
-
-    @property
-    def purers(self) -> str:
-        """
-        Pure return str.
-        """
-        return self._purers
-
-    @property
-    def finished(self) -> bool:
-        """
-        Whether the command execution is finished.
-        """
-        if self._expect == '0':
-            return self._rc != ''
-        elif self._expect == '':
-            return self._end != None
-        else:
-            return self._expect in self._purers
-
-    def appendrs(self, s: str) -> None:
-        """
-        Append content to return str.
-        """
-        self._rs += s
-        self._start, self._end = self._locate_purers()
-        end = (self._end + 1) if self._end else self._end
-        self._purers = '\n'.join(
-            self._rs.splitlines()[self._start:end]).strip()
-        if self._expect == '0':
-            self._rc = self._getrc()
-
-    def _getrc(self) -> str:
-        """
-        Get return code from return str.
-        """
-        if self._end == None:
-            return ''
-        lines = self._rs.splitlines()[self._end+1:]
-        if len(lines) < 3:
-            return ''
-        ps1line = re.compile(f'.*?{re.escape(self._ps1)}.*')
-        if not ps1line.match(lines[-1]):
-            return ''
-        rc = lines[-2]
-        if not re.match(r'\d+', rc):
-            return ''
-        return rc
+        >>> getfile('/tmp/myfile', '/home')  # /home/myfile
+        >>> getfile('/tmp/myfile', 'D:\\')  # D:\\myfile
         
-    def _locate_purers(self) -> Tuple:
+        :param rfile: remote file.
+        :param ldir: local dir.
         """
-        Locate the start and end line number of purers.
+        ldir = os.path.join(ldir, '')
+        self.__logger.info(f'Getting file {ldir} <= {rfile}')
+        filename = self.basename(rfile)
+        lfile = os.path.join(ldir, filename)
+        self.__sftp.get(rfile, lfile)
+
+    def putfile(self, lfile: str, rdir: str) -> None:
         """
-        start, end = None, None
-        ps1line = re.compile(f'.*?{re.escape(self._ps1)}.*')
-        for i, line in enumerate(self._rs.splitlines()):
-            if (start is None) and (line == self._cmd):
-                start = i + 1
-                continue
-            if ps1line.match(line) and \
-                    line.endswith(self._cmd) and \
-                    self._cmd.strip() != '':
-                start = i + 1
-                continue
-            if ps1line.match(line):
-                if (' ' in self._cmd.strip()) and (start is None):
-                    continue
-                else:
-                    end = i - 1
-                    break
-        return start, end
+        Put `lfile` into the `rdir` of SFTP server.
 
+        >>> putfile('/home/myfile', '/tmp')  # /tmp/myfile
+        >>> putfile('D:\\myfile', '/tmp')  # /tmp/myfile
 
+        :param lfile: local file.
+        :param rdir: remote dir.
+        """
+        rdir = self.join(rdir, '')
+        self.__logger.info(f'Putting file {lfile} => {rdir}')
+        filename = os.path.basename(lfile)
+        rfile = self.join(rdir, filename)
+        self.__sftp.put(lfile, rfile)
+            
+    def getdir(self, rdir: str, ldir: str) -> None:
+        """
+        Get `rdir` from SFTP server into `ldir`.
+
+        >>> getdir('/tmp/mydir', '/home')  # /home/mydir
+        >>> getdir('/tmp/mydir', 'D:\\')  # D:\\mydir
+        
+        :param rdir: remote dir.
+        :param ldir: local dir.
+        """
+        rdir = self.normpath(rdir)
+        ldir = os.path.join(ldir, '')
+        self.__logger.info(f'Getting dir {ldir} <= {rdir}')
+        for top, dirs, files in self.walk(rdir):
+            basename = self.basename(top)
+            ldir = os.path.join(ldir, basename)
+            if not os.path.exists(ldir):
+                os.makedirs(ldir)
+            for f in files:
+                r = self.join(top, f)
+                l = os.path.join(ldir, f)
+                self.__sftp.get(r, l)
+            for d in dirs:
+                l = os.path.join(ldir, d)
+                if not os.path.exists(l):
+                    os.makedirs(l)
+
+    def putdir(self, ldir: str, rdir: str) -> None:
+        """
+        Put `ldir` into the `rdir` of SFTP server.
+
+        >>> putdir('/tmp/mydir', '/home')  # /home/mydir
+        >>> putdir('D:\\mydir', '/home')  # /home/mydir
+
+        :param ldir: local dir.
+        :param rdir: remote dir.
+        """
+        ldir = os.path.normpath(ldir)
+        rdir = self.join(rdir, '')
+        self.__logger.info(f'Putting dir {ldir} => {rdir}')
+        for top, dirs, files in os.walk(os.path.normpath(ldir)):
+            basename = os.path.basename(top)
+            rdir = self.join(rdir, basename)
+            if not self.exists(rdir):
+                self.makedirs(rdir)
+            for f in files:
+                l = os.path.join(top, f)
+                r = self.join(rdir, f)
+                self.__sftp.put(l, r)
+            for d in dirs:
+                r = self.join(rdir, d)
+                if not self.exists(r):
+                    self.makedirs(r)
+
+    def join(self, *paths: str) -> str:
+        """
+        Similar to os.path.join().
+        """
+        paths = [p.rstrip('/') for p in paths]
+        return '/'.join(paths)
+
+    def normpath(self, path: str) -> str:
+        """
+        Similar to os.path.normpath().
+        """
+        segs = [s.strip('/') for s in path.split('/')]
+        path = self.join(*segs)
+        return path.rstrip('/')
+
+    def basename(self, path: str) -> str:
+        """
+        Similar to os.path.basename().
+        """
+        return path.rsplit('/', 1)[-1]
+
+    def exists(self, path: str) -> str:
+        """
+        Similar to os.path.exists().
+        """
+        try:
+            self.__sftp.stat(path)
+            return True
+        except FileNotFoundError:
+            return False
+
+    def walk(self, path: str):
+        """
+        Similar to os.walk().
+        """
+        dirs, files =  [], []
+        for a in self.__sftp.listdir_attr(path):
+            if stat.S_ISDIR(a.st_mode):
+                dirs.append(a.filename)
+            else:
+                files.append(a.filename)
+        yield path, dirs, files
+
+        for d in dirs:
+            for w in self.walk(self.join(path, d)):
+                yield w
+
+    def makedirs(self, path: str) -> str:
+        """
+        Similar to os.makedirs().
+        """
+        self.__logger.info('Makedirs %s' % path)
+        curpath = '/'
+        for p in path.split('/'):
+            curpath = self.join(curpath, p)
+            if not self.exists(curpath):
+                self.__sftp.mkdir(curpath)
+
+    @contextmanager
+    def openfile(self, filepath: str, mode: str = 'r') -> SFTPFile:
+        """
+        Similar to builtin open().
+        """
+        self.__logger.debug('Open %s with mode=%s' % (filepath, mode))
+        f = self.__sftp.open(filepath, mode)
+        try:
+            yield f
+        finally:
+            f.close()

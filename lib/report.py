@@ -11,7 +11,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 from lib import util
-from lib import com
+from lib import common
 
 
 def gen_report(logdir: str) -> str:
@@ -24,16 +24,15 @@ def gen_report(logdir: str) -> str:
     counter = {
         'PASS': 0,
         'FAIL': 0,
-        'BLOCK': 0,
-        'SKIP': 0
+        'BLOCK': 0
     }
     report = os.path.join(logdir, 'report.html')
     for top, dirs, files in os.walk(logdir):
         for f in files:
-            if f.endswith('_log.html'):
+            if f.endswith('.html'):
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
-                casepath = caselog.replace('_log.html', '.py')
+                casepath = caselog.replace('.html', '.py')
                 with open(os.path.join(top, f)) as fp:
                     soup = BeautifulSoup(fp.read(), 'html.parser')
                     result = soup.find(id="result").text
@@ -53,12 +52,11 @@ def gen_report(logdir: str) -> str:
         strptime(cases[-1]['endtime']) - strptime(cases[0]['starttime'])
     )
     util.render_write(
-        com.REPORT_TEMPLATE, 
+        common.REPORT_TEMPLATE, 
         report,
         passcnt=counter['PASS'],
         failcnt=counter['FAIL'],
         blockcnt=counter['BLOCK'],
-        skipcnt=counter['SKIP'],
         allcnt=sum(counter.values()),
         total_duration=total_duration,
         cases=cases
