@@ -13,6 +13,7 @@ from invoke import Responder
 from paramiko import SFTPFile
 
 from lib import logger
+from lib import common
 
 
 class Result(str):
@@ -89,13 +90,16 @@ class SSH(object):
         user: str,
         password: str,
         port: int = 22,
+        connect_timeout: int = 5,
         envs: dict = {}
     ) -> None:
         """
         :param envs: shell environments.
         """
         self.__conn = Connection(host=host, user=user, port=port, 
-                                 connect_kwargs={'password': password})
+                                 connect_kwargs={'password': password},
+                                 connect_timeout=connect_timeout,
+                                 inline_ssh_env=True)
         self.__conn.open()
         self.__sftp = self.__conn.sftp()
         self.__envs = envs
@@ -145,7 +149,8 @@ class SSH(object):
         self,
         command: str,
         timeout: int = 10,
-        prompts: dict = {}
+        prompts: dict = {},
+        pty=True
     ) -> Result:
         """
         Execute a command on the SSH server.
@@ -164,10 +169,11 @@ class SSH(object):
         self.__logger.debug(f'Command: {command}', extra=extra)
         watchers = [Responder(k, v + '\n') for k, v in prompts.items()]
         result = self.__conn.run(command, timeout=timeout, 
-                                 watchers=watchers, pty=True, 
+                                 watchers=watchers, pty=pty, 
                                  hide=True, env=self.__envs)
-        extra['result']['content'] = result.stdout.strip()
-        return Result(result.stdout.strip())
+        stdout = common.REs.ANSI_ESCAPE.sub('', result.stdout.strip())
+        extra['result']['content'] = stdout
+        return Result(stdout)
     
     def sudo(self, command: str, **kwargs) -> str:
         """

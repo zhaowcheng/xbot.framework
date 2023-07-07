@@ -20,3 +20,11 @@ LOG_DIR = os.path.join(XBOT_DIR, 'log')
 LOG_TEMPLATE = os.path.join(LOG_DIR, 'log_template.html')
 
 REPORT_TEMPLATE = os.path.join(LOG_DIR, 'report_template.html')
+
+
+class REs(object):
+    """
+    常用正则
+    """
+    # ansi 控制码
+    ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')

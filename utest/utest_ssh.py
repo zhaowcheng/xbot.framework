@@ -14,10 +14,10 @@ from lib.error import ShellError
 
 class TestSSH(unittest.TestCase):
 
-    HOST = '192.168.70.12'
+    HOST = ''
     PORT = 22
-    USER = 'highgo'
-    PWD = 'iflow@123'
+    USER = ''
+    PWD = ''
 
     LHOME = os.environ.get('HOME') or os.environ['HOMEPATH']
     LPUTDIR = os.path.join(LHOME, 'lputdir')

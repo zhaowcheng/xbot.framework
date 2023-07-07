@@ -37,7 +37,7 @@ SCHEMA = """\
 
 class TestSet(object):
     """
-    Testsed class.
+    Testset class.
     """
     def __init__(self, filepath: str) -> None:
         """
