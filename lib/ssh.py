@@ -1,79 +1,93 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-SSH module.
+SSH 模块，可用于执行命令和传输文件。
 """
 
 import os
 import stat
 
+from typing import Union, Tuple
 from contextlib import contextmanager
 from fabric import Connection
-from invoke import Responder
+from invoke import Responder, UnexpectedExit
 from paramiko import SFTPFile
 
 from lib import logger
-from lib import common
+from lib.common import REs
 
 
-class Result(str):
+class SSHResult(str):
     """
-    Shell command result with extra attributes and methods.
+    带有附加信息和操作的命令回显。
     """
+    def __new__(cls, s: str, rc: int = 0) -> str:
+        """
+        :param s: 命令回显。
+        :param rc: 返回码。
+        """
+        o = str.__new__(cls, s)
+        o.rc = rc
+        return o
+
     def getfield(
         self,
-        key: str,
+        key_or_row: Union[str, int],
         col: int,
         sep: str = None
     ) -> str:
         """
-        Get the specified field from result.
+        从字符串中获取指定字段。
 
+        筛选出包含 key_or_row 的第一行(为 str 类型时)，或获取 key_or_row 
+        指定的行(为 int 类型时)，然后使用 sep 分割为多个字段，最后返回第 col 
+        个字段，如果筛选结果为空则返回 None。
+
+        >>> # 获取postgres主进程id
         >>> r = Result('UID     PID   CMD
         >>>             highgo   45   /opt/HighGoDB-5.6.4/bin/postgres
         >>>             highgo   51   postgres: checkpointer process
         >>>             highgo   52   postgres: writer process
         >>>             highgo   53   postgres: wal writer process')
-        >>> pg_pid = r.getfield('/opt/HighgoDB', 2)
+        >>> pg_pid = r.get_field('/opt/HighgoDB', 2)
         >>> print(pg_pid)
         >>> 45
 
-        :param key: keyword to filter row.
-        :param col: column number.
-        :param sep: separator.
-        :return: filtered field.
+        :param key: 筛选行的关键信息或行号(从 1 开始)。
+        :param col: 列号。
+        :param sep: 分隔符。
+        :return: 筛选结果，无结果返回 None。
         """
-        for line in self.splitlines():
-            if key in line:
-                fields = line.split(sep)
-                if col <= len(fields):
-                    return fields[col-1]
+        matchline = ''
+        lines = self.splitlines()
+        if isinstance(key_or_row, str):
+            for line in self.splitlines():
+                if key_or_row in line:
+                    matchline = line
+        elif isinstance(key_or_row, int):
+            matchline = lines[key_or_row-1]
+        if matchline:
+            fields = matchline.split(sep)
+            return fields[col-1]
 
     def getcol(
         self,
         col: int,
         sep: str = None,
-        start: int = 1
+        startline: int = 1
     ) -> list:
         """
-        Get all fields of the specified column.
+        从字符串中获取指定列。
 
-        >>> r = Result('UID     PID   CMD
-        >>>             highgo   45   /opt/HighGoDB-5.6.4/bin/postgres
-        >>>             highgo   51   postgres: checkpointer process
-        >>>             highgo   52   postgres: writer process
-        >>>             highgo   53   postgres: wal writer process')
-        >>> pids = r.getcol(2, start=2)
-        >>> print(pids)
-        >>> ['45', '51', '52', '53']
-
-        :param col: column number, start from 1.
-        :param sep: separator.
-        :param start: start line number.
-        :return: all fields of the specified column.
+        返回第 col 列，如果筛选结果为空则返回空列表。
+		
+        :param col: 列号，从 1 开始。
+        :param sep: 分隔符。
+        :param startline: 起始行号，从 1 开始。
+        :return: 指定列的所有元素。
         """
         fields = []
-        for line in self.splitlines()[start-1:]:
+        for line in self.splitlines()[startline-1:]:
             segs = line.split(sep)
             if col <= len(segs):
                 fields.append(segs[col-1])
@@ -82,7 +96,7 @@ class Result(str):
 
 class SSH(object):
     """
-    SSH Class.
+    SSH 类。
     """
     def __init__(
         self,
@@ -94,44 +108,37 @@ class SSH(object):
         envs: dict = {}
     ) -> None:
         """
-        :param envs: shell environments.
+        :param host: 主机名或 IP。
+        :param user: 用户名。
+        :param password: 密码。
+        :param port: 端口。
+        :param connect_timeout: 连接超时(秒)。
+        :param envs: 环境变量。
         """
-        self.__conn = Connection(host=host, user=user, port=port, 
-                                 connect_kwargs={'password': password},
-                                 connect_timeout=connect_timeout,
-                                 inline_ssh_env=True)
-        self.__conn.open()
-        self.__sftp = self.__conn.sftp()
-        self.__envs = envs
-        self.__cwd = ''
         self.__logger = logger.ExtraAdapter(logger.get_logger())
         self.__logger.extra = f'ssh://{user}@{host}:{port}'
-
+        self.__logger.info('Connecting...')
+        self.__conn = Connection(host=host, user=user, port=port, 
+                                 connect_timeout=connect_timeout,
+                                 connect_kwargs={'password': str(password)},
+                                 inline_ssh_env=True)
+        self.__conn.open()
+        self.__cwd = ''
+        self.__envs = envs
+    
     def close(self) -> None:
         """
-        Close the connection.
+        关闭连接。
         """
         self.__conn.close()
-
-    def setenv(self, name: str, value: str) -> None:
-        """
-        Set shell environment.
-        """
-        self.__envs[name] = value
-
-    def delenv(self, name: str) -> None:
-        """
-        Delete shell environment.
-        """
-        self.__envs.pop(name, None)
 
     @contextmanager
     def cd(self, path) -> None:
         """
-        Shell `cd` command.
+        切换工作路径。
 
         >>> with cd('/my/workdir'):
-        ...     run('pwd')
+        ...     exec('pwd')
         ...
         /my/workdir
         """
@@ -148,91 +155,94 @@ class SSH(object):
     def exec(
         self,
         command: str,
-        timeout: int = 10,
+        timeout: int = 30,
         prompts: dict = {},
-        pty=True
-    ) -> Result:
+        pty=True,
+        fail=True
+    ) -> SSHResult:
         """
-        Execute a command on the SSH server.
+        执行命令。
 
         >>> exec('uname -s')
         Linux
         >>> exec('sudo whoami', prompts={'password:', 'mypwd'})
         root
 
-        :param prompts: for interactive command.
-        :return: command output.
+        :param command: 命令。
+        :param timeout: 命令超时(秒)。
+        :param prompts: 用于交互式命令的提示及响应。
+        :param pty: 是否使用 pty。
+        :param fail: 命令执行失败时是否抛出异常。
+        :return: 命令输出。
         """
         if self.__cwd:
             command = f'cd {self.__cwd} && {command}'
-        extra = {'result': {}}
-        self.__logger.debug(f'Command: {command}', extra=extra)
+        self.__logger.info(f'Command: {command}')
         watchers = [Responder(k, v + '\n') for k, v in prompts.items()]
-        result = self.__conn.run(command, timeout=timeout, 
-                                 watchers=watchers, pty=pty, 
-                                 hide=True, env=self.__envs)
-        stdout = common.REs.ANSI_ESCAPE.sub('', result.stdout.strip())
-        extra['result']['content'] = stdout
-        return Result(stdout)
+        try:
+            result = self.__conn.run(command, timeout=timeout, 
+                                     watchers=watchers, pty=pty, 
+                                     hide=True, env=self.__envs)
+        except UnexpectedExit as e:
+            if fail:
+                raise e from None
+            else:
+                return SSHResult(e.streams_for_display()[0], 
+                                 e.result.exited, command)
+        stdout = REs.ANSI_ESCAPE.sub('', result.stdout.strip())
+        return SSHResult(stdout)
     
     def sudo(self, command: str, **kwargs) -> str:
         """
-        Same to shell sudo.
-
-        >>> sudo('whoami')
-        root
-
-        :param kwargs: arguments passed to `exec`.
-        :return: command output.
+        sudo 方式执行命令，参数及返回值与 exec 一致。
         """
         command = 'sudo ' + command
         kwargs['prompts'] = {
             r'\[sudo\] password': self.__conn.connect_kwargs['password']
         }
-        result = self.exec(command, **kwargs)
-        return Result('\n'.join(result.splitlines()[1:]))
+        return self.exec(command, **kwargs)
     
     def getfile(self, rfile: str, ldir: str) -> None:
         """
-        Get `rfile` from SFTP server into `ldir`.
+        下载文件。
 
         >>> getfile('/tmp/myfile', '/home')  # /home/myfile
         >>> getfile('/tmp/myfile', 'D:\\')  # D:\\myfile
         
-        :param rfile: remote file.
-        :param ldir: local dir.
+        :param rfile: 远端文件路径。
+        :param ldir: 本地目录。
         """
         ldir = os.path.join(ldir, '')
         self.__logger.info(f'Getting file {ldir} <= {rfile}')
         filename = self.basename(rfile)
         lfile = os.path.join(ldir, filename)
-        self.__sftp.get(rfile, lfile)
+        self.__conn.sftp().get(rfile, lfile)
 
     def putfile(self, lfile: str, rdir: str) -> None:
         """
-        Put `lfile` into the `rdir` of SFTP server.
+        上传文件。
 
         >>> putfile('/home/myfile', '/tmp')  # /tmp/myfile
         >>> putfile('D:\\myfile', '/tmp')  # /tmp/myfile
 
-        :param lfile: local file.
-        :param rdir: remote dir.
+        :param lfile: 本地文件路径。
+        :param rdir: 远端目录。
         """
         rdir = self.join(rdir, '')
         self.__logger.info(f'Putting file {lfile} => {rdir}')
         filename = os.path.basename(lfile)
         rfile = self.join(rdir, filename)
-        self.__sftp.put(lfile, rfile)
+        self.__conn.sftp().put(lfile, rfile)
             
     def getdir(self, rdir: str, ldir: str) -> None:
         """
-        Get `rdir` from SFTP server into `ldir`.
-
+        下载目录。
+        
         >>> getdir('/tmp/mydir', '/home')  # /home/mydir
         >>> getdir('/tmp/mydir', 'D:\\')  # D:\\mydir
-        
-        :param rdir: remote dir.
-        :param ldir: local dir.
+
+        :param rdir: 远端目录。
+        :param ldir: 本地目录。
         """
         rdir = self.normpath(rdir)
         ldir = os.path.join(ldir, '')
@@ -245,7 +255,7 @@ class SSH(object):
             for f in files:
                 r = self.join(top, f)
                 l = os.path.join(ldir, f)
-                self.__sftp.get(r, l)
+                self.__conn.sftp().get(r, l)
             for d in dirs:
                 l = os.path.join(ldir, d)
                 if not os.path.exists(l):
@@ -253,13 +263,13 @@ class SSH(object):
 
     def putdir(self, ldir: str, rdir: str) -> None:
         """
-        Put `ldir` into the `rdir` of SFTP server.
+        上传目录。
 
         >>> putdir('/tmp/mydir', '/home')  # /home/mydir
         >>> putdir('D:\\mydir', '/home')  # /home/mydir
 
-        :param ldir: local dir.
-        :param rdir: remote dir.
+        :param ldir: 本地目录。
+        :param rdir: 远端目录。
         """
         ldir = os.path.normpath(ldir)
         rdir = self.join(rdir, '')
@@ -272,7 +282,7 @@ class SSH(object):
             for f in files:
                 l = os.path.join(top, f)
                 r = self.join(rdir, f)
-                self.__sftp.put(l, r)
+                self.__conn.sftp().put(l, r)
             for d in dirs:
                 r = self.join(rdir, d)
                 if not self.exists(r):
@@ -280,14 +290,14 @@ class SSH(object):
 
     def join(self, *paths: str) -> str:
         """
-        Similar to os.path.join().
+        拼接远端路径，类似于 os.path.join()。
         """
         paths = [p.rstrip('/') for p in paths]
         return '/'.join(paths)
 
     def normpath(self, path: str) -> str:
         """
-        Similar to os.path.normpath().
+        正常化远端路径，类似于 os.path.normpath()。
         """
         segs = [s.strip('/') for s in path.split('/')]
         path = self.join(*segs)
@@ -295,26 +305,26 @@ class SSH(object):
 
     def basename(self, path: str) -> str:
         """
-        Similar to os.path.basename().
+        获取远端路径的末尾字段，类似于 os.path.basename()。
         """
         return path.rsplit('/', 1)[-1]
 
     def exists(self, path: str) -> str:
         """
-        Similar to os.path.exists().
+        判断远端路径是否存在，类似于 os.path.exists()。
         """
         try:
-            self.__sftp.stat(path)
+            self.__conn.sftp().stat(path)
             return True
         except FileNotFoundError:
             return False
 
     def walk(self, path: str):
         """
-        Similar to os.walk().
+        递归远端目录，类似于 os.walk()。
         """
         dirs, files =  [], []
-        for a in self.__sftp.listdir_attr(path):
+        for a in self.__conn.sftp().listdir_attr(path):
             if stat.S_ISDIR(a.st_mode):
                 dirs.append(a.filename)
             else:
@@ -327,22 +337,22 @@ class SSH(object):
 
     def makedirs(self, path: str) -> str:
         """
-        Similar to os.makedirs().
+        在远端创建目录，类似于 os.makedirs()。
         """
         self.__logger.info('Makedirs %s' % path)
         curpath = '/'
         for p in path.split('/'):
             curpath = self.join(curpath, p)
             if not self.exists(curpath):
-                self.__sftp.mkdir(curpath)
+                self.__conn.sftp().mkdir(curpath)
 
     @contextmanager
     def openfile(self, filepath: str, mode: str = 'r') -> SFTPFile:
         """
-        Similar to builtin open().
+        打开远端文件，用法与内建函数 open 相同。
         """
-        self.__logger.debug('Open %s with mode=%s' % (filepath, mode))
-        f = self.__sftp.open(filepath, mode)
+        self.__logger.info('Open %s with mode=%s' % (filepath, mode))
+        f = self.__conn.sftp().open(filepath, mode)
         try:
             yield f
         finally:

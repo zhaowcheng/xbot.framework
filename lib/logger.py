@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Logging module.
+日志模块。
 """
 
 import logging
@@ -34,7 +34,7 @@ if not ROOT_LOGGER.hasHandlers():
 
 def get_logger(name: str = ''):
     """
-    For other modules.
+    获取 Logger，供其他模块调用。
     """
     if name:
         return ROOT_LOGGER.getChild(name)
@@ -46,7 +46,7 @@ def get_logger(name: str = ''):
 
 class ExtraAdapter(logging.LoggerAdapter):
     """
-    A logger with an extra field.
+    可添加额外信息的 LoggerAdapter。
     """
     def process(self, msg, kwargs):
         msg = f'[{self.extra}] {msg}' if self.extra else msg
@@ -55,7 +55,7 @@ class ExtraAdapter(logging.LoggerAdapter):
 
 class CaseLogFilter(logging.Filter):
     """
-    TestCase log filter.
+    过滤指定用例的日志。
     """
     def filter(self, record):
         return self.name == record.threadName
@@ -63,7 +63,7 @@ class CaseLogFilter(logging.Filter):
 
 class CaseLogHandler(logging.Handler):
     """
-    TestCase log handler.
+    用例日志处理器。
     """
     def __init__(self, level=logging.NOTSET):
         super().__init__(level)

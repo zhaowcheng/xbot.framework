@@ -1,1 +1,1 @@
-This directory is used to store test rescoures, such as additional test tools.
+该目录用于存放测试所需的额外资源。

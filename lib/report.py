@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Generate execution report.
+用例执行报告相关模块。
 """
 
 import os
@@ -15,10 +15,11 @@ from lib import common
 
 
 def gen_report(logdir: str) -> str:
-    """Generate report.
+    """
+    生成报告。
 
-    :param logdir: log directory path.
-    :return: report file path.
+    :param logdir: 日志目录。
+    :return: 报告文件路径。
     """
     cases = []
     counter = {

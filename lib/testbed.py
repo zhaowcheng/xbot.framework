@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Test environment management.
+测试床相关模块。
 """
 
 import os
@@ -9,16 +9,29 @@ import typing
 import lxml.etree
 
 from lib import common
-from lib.error import TestbedError, TestbedSchemaError
+
+
+class TestbedError(Exception):
+    """
+    测试床文件错误。
+    """
+    pass
+
+
+class TestbedSchemaError(Exception):
+    """
+    测试床 schema 文件错误。
+    """
+    pass
 
 
 class TestBed(object):
     """
-    Testbed class.
+    测试床。
     """
     def __init__(self, filepath: str) -> None:
         """
-        :param filepath: testbed filepath.
+        :param filepath: 测试床文件路径。
         """
         self.__etree = self.__parse(filepath)
         with open(filepath) as f:
@@ -26,7 +39,7 @@ class TestBed(object):
 
     def __parse(self, filepath: str) -> typing.Any:
         """
-        parse and validate the testbed file.
+        解析并验证测试床文件。
         """
         testbed_etree = lxml.etree.parse(filepath)
         testbed_etree_root = lxml.etree.parse(filepath).getroot()
@@ -56,15 +69,15 @@ class TestBed(object):
     @property
     def content(self) -> str:
         """
-        Testbed file content.
+        测试床文件内容。
         """
         return self.__content
     
     def xpath(self, expr: str) -> list:
         """
-        Get elements by xpath.
-        reference: https://lxml.de/xpathxslt.html#xpath
+        通过 xpath 获取测试床文件中的内容。
+        xpath 语法参考: https://lxml.de/xpathxslt.html#xpath
 
-        :param expr: xpath expression
+        :param expr: xpath 表达式。
         """
         return self.__etree.xpath(expr)

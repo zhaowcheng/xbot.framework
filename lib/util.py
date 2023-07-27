@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Utility functions.
+实用函数。
 """
 
 import jinja2
@@ -10,7 +10,7 @@ import functools
 
 class ColorText(object):
     """
-    Terminal text color.
+    终端彩色文本。
     """
 
     COLORS = {
@@ -22,7 +22,7 @@ class ColorText(object):
     @staticmethod
     def wrap(s: str, color: str) -> str:
         """
-        Color the `s`.
+        给字符串 `s` 添加颜色 `color`。
         """
         code = ColorText.COLORS.get(color, None)
         if not code:
@@ -38,7 +38,7 @@ def xprint(
     **kwargs
 ) -> None:
     """
-    Print function for xbot.
+    xbot 专用 print 函数。
     """
     if color:
         values = [ColorText.wrap(v, color) for v in values]
@@ -51,10 +51,11 @@ printerr = functools.partial(xprint, 'error:', color='red', do_exit=True)
 
 
 def render_write(template: str, outfile: str, **kwargs) -> None:
-    """Render the `template` and write to `outfile`.
+    """
+    渲染并写入文件。
     
-    :param template: html template.
-    :param outfile: output file.
+    :param template: 模板文件。
+    :param outfile: 输出文件。
     """
     rendered_content = ''
     with open(template) as fp:

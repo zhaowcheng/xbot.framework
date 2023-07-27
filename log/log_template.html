@@ -79,12 +79,12 @@
         <div>
             <table style="border-collapse: separate; height: 240px;">
                 <tr>
-                    <th colspan="3">Summary</th>
-                    <th colspan="3">TestCase</th>
-                    <th colspan="3">TestBed</th>
+                    <th colspan="3">执行该要</th>
+                    <th colspan="3">用例描述</th>
+                    <th colspan="3">环境信息</th>
                 </tr>
                 <tr>
-                    <th>CaseID</th>
+                    <th>用例编号</th>
                     <td id="caseid" colspan="2">{{caseid}}</td>
                     <td colspan="3" rowspan="5">
                         <pre id="testcase" style="overflow-y: scroll;">{{testcase}}</pre>
@@ -94,19 +94,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Result</th>
+                    <th>执行结果</th>
                     <td id="result" colspan="2">{{result}}</td>
                 </tr>
                 <tr>
-                    <th>StartTime</th>
+                    <th>开始时间</th>
                     <td id="starttime" colspan="2">{{starttime}}</td>
                 </tr>
                 <tr>
-                    <th>EndTime</th>
+                    <th>结束时间</th>
                     <td id="endtime" colspan="2">{{endtime}}</td>
                 </tr>
                 <tr>
-                    <th>Duration</th>
+                    <th>执行时长</th>
                     <td id="duration" colspan="2">{{duration}}</td>
                 </tr>
             </table>
@@ -120,10 +120,10 @@
             <div id="{{stage}}">
                 <table>
                     <tr>
-                        <th class="asctime">Time</th>
-                        <th class="levelname">Level</th>
-                        <th class="modname">Module</th>
-                        <th class="message">Message</th>
+                        <th class="asctime">时间</th>
+                        <th class="levelname">级别</th>
+                        <th class="modname">模块</th>
+                        <th class="message">消息</th>
                     </tr>
                     {% for record in records %}
                     <tr class="{{record.levelname}}">

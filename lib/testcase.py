@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Testcase base.
+测试用例相关模块。
 """
 
 import os
@@ -10,6 +10,7 @@ import traceback
 import re
 import textwrap
 import time
+import operator
 
 from abc import ABC, abstractmethod
 from importlib import import_module
@@ -18,21 +19,29 @@ from typing import Any, Container
 
 from lib import logger, util, common
 from lib.testbed import TestBed
-from lib.error import TestcaseTimeout
+
+
+class TestcaseTimeout(Exception):
+    """
+    用例执行超时。
+    """
+    pass
 
 
 class TestCase(ABC):
     """
-    Testcase base.
+    测试用例基类。
     """
 
-    TIMEOUT = 5  # minutes
+    # 用例执行最长时间，单位：分钟。
+    TIMEOUT = 5
+    # 用例标签。
     TAGS = []
 
     def __init__(self, testbed: TestBed, logfile: str):
         """
-        :param testbed: TestBed instance
-        :param logfile: logfile path
+        :param testbed: 测试床实例。
+        :param logfile: 日志文件路径。
         """
         self.testbed = testbed
         self.__logfile = logfile
@@ -48,7 +57,7 @@ class TestCase(ABC):
     @property
     def caseid(self) -> str:
         """
-        Filename without suffix.
+        用例编号（不带后缀的文件名）。
         """
         return os.path.basename(
             import_module(self.__module__).__file__.replace('.py', '')
@@ -57,28 +66,28 @@ class TestCase(ABC):
     @property
     def starttime(self) -> datetime:
         """
-        Execution start time.
+        开始时间。
         """
         return self.__starttime
 
     @property
     def endtime(self) -> datetime:
         """
-        Execution end time.
+        结束时间。
         """
         return self.__endtime
 
     @property
     def duration(self) -> timedelta:
         """
-        Execution duration.
+        执行时长。
         """
         return self.__duration
 
     @property
     def timestamp(self) -> str:
         """
-        caseid + starttime
+        时间戳（caseid + starttime）。
         """
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
@@ -86,38 +95,84 @@ class TestCase(ABC):
     @property
     def result(self) -> str:
         """
-        Execution result.
+        执行结果。
         """
         return self.__result
     
     def debug(self, msg: str, *args, **kwargs) -> None:
         """
-        DEBUG message.
+        DEBUG 日志。
         """
         self.__logger.debug(msg, *args, **kwargs)
 
     def info(self, msg: str, *args, **kwargs) -> None:
         """
-        INFO message.
+        INFO 日志.
         """
         self.__logger.info(msg, *args, **kwargs)
 
     def warn(self, msg: str, *args, **kwargs) -> None:
         """
-        WARN message.
+        WARN 日志.
         """
         self.__logger.warn(msg, *args, **kwargs)
 
     def error(self, msg: str, *args, **kwargs) -> None:
         """
-        ERROR message.
+        ERROR 日志.
         """
         self.__logger.error(msg, *args, **kwargs)
 
+    def assertx(a: Any, op: str, b: Any) -> None:
+        """
+        断言
+
+        >>> assertx(1, '==', 1)
+        >>> assertx(1, '!=', 2)
+        >>> assertx(1, '>', 0)
+        >>> assertx(1, '>=', 1)
+        >>> assertx(1, '<', 2)
+        >>> assertx(1, '<=', 1)
+        >>> assertx(1, 'in', [1, 2, 3])
+        >>> assertx(1, 'not in', [2, 3, 4])
+        >>> assertx(1, 'is', 1)
+        >>> assertx(1, 'is not', 2)
+        >>> assertx('abc', 'match', r'^[a-z]+$')
+        >>> assertx('abc', 'not match', r'^[0-9]+$')
+        >>> assertx('abc', 'search', r'[a-z]')
+        >>> assertx('abc', 'not search', r'[0-9]')
+
+        :param a: 操作对象 a
+        :param op: 操作符
+        :param b: 操作对象 b
+        :raises AssertionError: 断言失败
+        """
+        funcs = {
+            '==': operator.eq,
+            '!=': operator.ne,
+            '>': operator.gt,
+            '>=': operator.ge,
+            '<': operator.lt,
+            '<=': operator.le,
+            'in': lambda a, b: operator.contains(b, a),
+            'not in': lambda a, b: not operator.contains(b, a),
+            'is': operator.is_,
+            'is not': operator.is_not,
+            'match': lambda a, b: re.match(b, a),
+            'not match': lambda a, b: not re.match(b, a),
+            'search': lambda a, b: re.search(b, a),
+            'not search': lambda a, b: not re.search(b, a)
+        }
+        if op not in funcs:
+            raise ValueError(f'Invalid operator: {op}')
+        if not funcs[op](a, b):
+            raise AssertionError(
+                f'Expects {a} {op} {b}, but got the opposite.'
+            )
 
     def sleep(self, seconds: float) -> None:
         """
-        带有提示信息的 sleep
+        带有提示信息的 sleep。
         """
         self.info(f'Sleep {seconds} second(s)...')
         time.sleep(seconds)
@@ -125,24 +180,24 @@ class TestCase(ABC):
     @abstractmethod
     def setup(self) -> None:
         """
-        Preset steps.
+        预置步骤。
         """
 
     @abstractmethod
     def process(self) -> None:
         """
-        Test steps.
+        测试过程。
         """
 
     @abstractmethod
     def teardown(self) -> None:
         """
-        Recovery steps.
+        清理步骤。
         """
 
     def run(self) -> None:
         """
-        Execute this testcase.
+        执行测试用例。
         """
         self.__starttime = datetime.now().replace(microsecond=0)
         self.__run_stage('setup')
@@ -157,7 +212,7 @@ class TestCase(ABC):
 
     def __run_stage(self, stage: str) -> None:
         """
-        Execute the specified stage(setup, process, teardown).
+        执行测试用例的某个阶段。
         """
         func = {'setup': self.setup,
                 'process': self.process,
@@ -168,14 +223,17 @@ class TestCase(ABC):
         except TestcaseTimeout:
             self.error(f'TestcaseTimeout: Execution did not '
                        'complete within {self.TIMEOUT} minute(s).')
-            self.__result = 'BLOCK'
-        except Exception:
+            self.__result = 'TIMEOUT'
+        except Exception as e:
             self.error(traceback.format_exc())
-            self.__result = 'FAIL'
+            if isinstance(e, AssertionError):
+                self.__result = 'ERROR'
+            else:
+                self.__result = 'FAIL'
 
     def __dump_log(self):
         """
-        Dump the logs to file.
+        转存日志。
         """
         util.render_write(
             common.LOG_TEMPLATE,

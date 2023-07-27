@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Testcase execution queue management.
+测试套相关模块。
 """
 
 import os
@@ -10,7 +10,6 @@ import lxml.etree
 
 from io import StringIO
 from lib import common
-from lib.error import TestsetError
 
 
 SCHEMA = """\
@@ -35,19 +34,26 @@ SCHEMA = """\
 """
 
 
+class TestsetError(Exception):
+    """
+    测试套文件错误。
+    """
+    pass
+
+
 class TestSet(object):
     """
-    Testset class.
+    测试套。
     """
     def __init__(self, filepath: str) -> None:
         """
-        :param filepath: testset filepath.
+        :param filepath: 测试套文件路径。
         """
         self.__etree = self.__parse(filepath)
 
     def __parse(self, filepath: str) -> typing.Any:
         """
-        parse and validate the testset file.
+        解析并验证测试套文件。
         """
         testset_etree = lxml.etree.parse(filepath)
         testset_etree_root = lxml.etree.parse(filepath).getroot()
