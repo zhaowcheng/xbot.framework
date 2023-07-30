@@ -1,8 +1,14 @@
 xbot 是一个基础自动化测试框架，使用者可根据需要对 lib 库和 testbed 进行扩展以满足实际需求。
 
-## 快速上手
+安装步骤：
 
-命令行帮助：
+```
+$ git clone https://github.com/zhaowcheng/xbot.git
+$ cd xbot && pip install -r requirements.txt
+$ python3 xbot.py --help
+```
+
+命令帮助：
 
 ```console
 $ python3 xbot.py --help
