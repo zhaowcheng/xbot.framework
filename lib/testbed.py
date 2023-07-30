@@ -5,10 +5,12 @@
 """
 
 import os
-import typing
 import lxml.etree
 
+from functools import cache
+from typing import Any
 from lib import common
+from lib.ssh import SSH
 
 
 class TestbedError(Exception):
@@ -33,11 +35,12 @@ class TestBed(object):
         """
         :param filepath: 测试床文件路径。
         """
-        self.__etree = self.__parse(filepath)
+        self._etree = self._parse(filepath)
+        self._name = os.path.basename(filepath).replace('.xml', '')
         with open(filepath) as f:
-            self.__content = f.read()
+            self._content = f.read()
 
-    def __parse(self, filepath: str) -> typing.Any:
+    def _parse(self, filepath: str) -> Any:
         """
         解析并验证测试床文件。
         """
@@ -65,13 +68,20 @@ class TestBed(object):
             except lxml.etree.DocumentInvalid as e:
                 raise TestbedError(f'{str(e)}({filepath})') from None
         return testbed_etree
+
+    @property
+    def name(self) -> str:
+        """
+        测试床名称。
+        """
+        return self._name
     
     @property
     def content(self) -> str:
         """
         测试床文件内容。
         """
-        return self.__content
+        return self._content
     
     def xpath(self, expr: str) -> list:
         """
@@ -80,4 +90,11 @@ class TestBed(object):
 
         :param expr: xpath 表达式。
         """
-        return self.__etree.xpath(expr)
+        return self._etree.xpath(expr)
+
+    @cache
+    def ssh(self, host: str, user: str, password: str, sshport: int = 22) -> SSH:
+        """
+        获取 SSH 连接。
+        """
+        return SSH(host, user, password, sshport)

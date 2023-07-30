@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 
 
 XBOT_DIR = os.path.abspath('%s/../..' % __file__)

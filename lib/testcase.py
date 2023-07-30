@@ -5,6 +5,7 @@
 """
 
 import os
+import sys
 import logging
 import traceback
 import re
@@ -13,7 +14,6 @@ import time
 import operator
 
 from abc import ABC, abstractmethod
-from importlib import import_module
 from datetime import datetime, timedelta
 from typing import Any, Container
 
@@ -60,7 +60,7 @@ class TestCase(ABC):
         用例编号（不带后缀的文件名）。
         """
         return os.path.basename(
-            import_module(self.__module__).__file__.replace('.py', '')
+            sys.modules[self.__module__].__file__.replace('.py', '')
         )
     
     @property
@@ -227,13 +227,13 @@ class TestCase(ABC):
         except Exception as e:
             self.error(traceback.format_exc())
             if isinstance(e, AssertionError):
-                self.__result = 'ERROR'
-            else:
                 self.__result = 'FAIL'
+            else:
+                self.__result = 'ERROR'
 
     def __dump_log(self):
         """
-        转存日志。
+        保存日志。
         """
         util.render_write(
             common.LOG_TEMPLATE,
@@ -243,7 +243,7 @@ class TestCase(ABC):
             starttime=self.starttime.strftime('%Y-%m-%d %H:%M:%S'),
             endtime=self.endtime.strftime('%Y-%m-%d %H:%M:%S'),
             duration=str(self.duration),
-            testcase=textwrap.dedent(' ' * 4 + self.__doc__.strip()),
+            testcase=textwrap.dedent(self.__doc__.strip()),
             testbed=self.testbed.content.replace('<','&lt').replace('>','&gt'),
             stage_records=self.__loghdlr.stage_records
         )

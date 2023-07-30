@@ -15,7 +15,10 @@ log/*
 # testbed files
 testbed/*
 !testbed/testbed_template.xml
+!testbed/testbed_example.xml
+!testbed/testbed_example.xsd
 
 # testset files
 testset/*
 !testset/testset_template.xml
+!testset/testset_example.xml

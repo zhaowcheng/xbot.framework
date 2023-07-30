@@ -21,12 +21,14 @@ class SSHResult(str):
     """
     带有附加信息和操作的命令回显。
     """
-    def __new__(cls, s: str, rc: int = 0) -> str:
+    def __new__(cls, s: str, cmd: str, rc: int = 0) -> str:
         """
         :param s: 命令回显。
+        :param cmd: 命令。
         :param rc: 返回码。
         """
         o = str.__new__(cls, s)
+        o.cmd = cmd
         o.rc = rc
         return o
 
@@ -115,22 +117,28 @@ class SSH(object):
         :param connect_timeout: 连接超时(秒)。
         :param envs: 环境变量。
         """
-        self.__logger = logger.ExtraAdapter(logger.get_logger())
-        self.__logger.extra = f'ssh://{user}@{host}:{port}'
-        self.__logger.info('Connecting...')
-        self.__conn = Connection(host=host, user=user, port=port, 
-                                 connect_timeout=connect_timeout,
-                                 connect_kwargs={'password': str(password)},
-                                 inline_ssh_env=True)
-        self.__conn.open()
-        self.__cwd = ''
-        self.__envs = envs
+        self._logger = logger.ExtraAdapter(logger.get_logger())
+        self._logger.extra = f'{user}@{host}:{port}'
+        self._logger.info('Connecting...')
+        self._conn = Connection(host=host, user=user, port=port, 
+                                connect_timeout=connect_timeout,
+                                connect_kwargs={'password': str(password)},
+                                inline_ssh_env=True)
+        self._conn.open()
+        self._cwd = ''
+        self._envs = envs
     
     def close(self) -> None:
         """
         关闭连接。
         """
-        self.__conn.close()
+        self._conn.close()
+
+    def setenvs(self, envs: dict) -> None:
+        """
+        设置环境变量。
+        """
+        self._envs.update(envs)
 
     @contextmanager
     def cd(self, path) -> None:
@@ -142,15 +150,15 @@ class SSH(object):
         ...
         /my/workdir
         """
-        r = self.__conn.run(f'cd {path}', hide=True, env=self.__envs)
+        r = self._conn.run(f'cd {path}', hide=True, env=self._envs)
         if path == '-':
-            self.__cwd = r.stdout
+            self._cwd = r.stdout
         else:
-            self.__cwd = path
+            self._cwd = path
         try:
             yield
         finally:
-            self.__cwd = ''
+            self._cwd = ''
         
     def exec(
         self,
@@ -175,22 +183,27 @@ class SSH(object):
         :param fail: 命令执行失败时是否抛出异常。
         :return: 命令输出。
         """
-        if self.__cwd:
-            command = f'cd {self.__cwd} && {command}'
-        self.__logger.info(f'Command: {command}')
+        if self._cwd:
+            command = f'cd {self._cwd} && {command}'
+        extra = {'result': {}}
+        self._logger.info(f'Command: {command}', extra=extra)
         watchers = [Responder(k, v + '\n') for k, v in prompts.items()]
         try:
-            result = self.__conn.run(command, timeout=timeout, 
-                                     watchers=watchers, pty=pty, 
-                                     hide=True, env=self.__envs)
+            result = self._conn.run(command, timeout=timeout, 
+                                    watchers=watchers, pty=pty, 
+                                    hide=True, env=self._envs)
         except UnexpectedExit as e:
             if fail:
                 raise e from None
             else:
-                return SSHResult(e.streams_for_display()[0], 
-                                 e.result.exited, command)
+                stdout = REs.ANSI_ESCAPE.sub('', e.streams_for_display()[0])
+                sshres = SSHResult(stdout, e.result.exited, command)
+                extra['result']['content'] = sshres
+                return sshres
         stdout = REs.ANSI_ESCAPE.sub('', result.stdout.strip())
-        return SSHResult(stdout)
+        sshres = SSHResult(stdout, result.exited, command)
+        extra['result']['content'] = sshres
+        return sshres
     
     def sudo(self, command: str, **kwargs) -> str:
         """
@@ -198,7 +211,7 @@ class SSH(object):
         """
         command = 'sudo ' + command
         kwargs['prompts'] = {
-            r'\[sudo\] password': self.__conn.connect_kwargs['password']
+            r'\[sudo\] password': self._conn.connect_kwargs['password']
         }
         return self.exec(command, **kwargs)
     
@@ -213,10 +226,10 @@ class SSH(object):
         :param ldir: 本地目录。
         """
         ldir = os.path.join(ldir, '')
-        self.__logger.info(f'Getting file {ldir} <= {rfile}')
+        self._logger.info(f'Getting file {ldir} <= {rfile}')
         filename = self.basename(rfile)
         lfile = os.path.join(ldir, filename)
-        self.__conn.sftp().get(rfile, lfile)
+        self._conn.sftp().get(rfile, lfile)
 
     def putfile(self, lfile: str, rdir: str) -> None:
         """
@@ -229,10 +242,10 @@ class SSH(object):
         :param rdir: 远端目录。
         """
         rdir = self.join(rdir, '')
-        self.__logger.info(f'Putting file {lfile} => {rdir}')
+        self._logger.info(f'Putting file {lfile} => {rdir}')
         filename = os.path.basename(lfile)
         rfile = self.join(rdir, filename)
-        self.__conn.sftp().put(lfile, rfile)
+        self._conn.sftp().put(lfile, rfile)
             
     def getdir(self, rdir: str, ldir: str) -> None:
         """
@@ -246,7 +259,7 @@ class SSH(object):
         """
         rdir = self.normpath(rdir)
         ldir = os.path.join(ldir, '')
-        self.__logger.info(f'Getting dir {ldir} <= {rdir}')
+        self._logger.info(f'Getting dir {ldir} <= {rdir}')
         for top, dirs, files in self.walk(rdir):
             basename = self.basename(top)
             ldir = os.path.join(ldir, basename)
@@ -255,7 +268,7 @@ class SSH(object):
             for f in files:
                 r = self.join(top, f)
                 l = os.path.join(ldir, f)
-                self.__conn.sftp().get(r, l)
+                self._conn.sftp().get(r, l)
             for d in dirs:
                 l = os.path.join(ldir, d)
                 if not os.path.exists(l):
@@ -273,7 +286,7 @@ class SSH(object):
         """
         ldir = os.path.normpath(ldir)
         rdir = self.join(rdir, '')
-        self.__logger.info(f'Putting dir {ldir} => {rdir}')
+        self._logger.info(f'Putting dir {ldir} => {rdir}')
         for top, dirs, files in os.walk(os.path.normpath(ldir)):
             basename = os.path.basename(top)
             rdir = self.join(rdir, basename)
@@ -282,7 +295,7 @@ class SSH(object):
             for f in files:
                 l = os.path.join(top, f)
                 r = self.join(rdir, f)
-                self.__conn.sftp().put(l, r)
+                self._conn.sftp().put(l, r)
             for d in dirs:
                 r = self.join(rdir, d)
                 if not self.exists(r):
@@ -314,7 +327,7 @@ class SSH(object):
         判断远端路径是否存在，类似于 os.path.exists()。
         """
         try:
-            self.__conn.sftp().stat(path)
+            self._conn.sftp().stat(path)
             return True
         except FileNotFoundError:
             return False
@@ -324,7 +337,7 @@ class SSH(object):
         递归远端目录，类似于 os.walk()。
         """
         dirs, files =  [], []
-        for a in self.__conn.sftp().listdir_attr(path):
+        for a in self._conn.sftp().listdir_attr(path):
             if stat.S_ISDIR(a.st_mode):
                 dirs.append(a.filename)
             else:
@@ -339,20 +352,20 @@ class SSH(object):
         """
         在远端创建目录，类似于 os.makedirs()。
         """
-        self.__logger.info('Makedirs %s' % path)
+        self._logger.info('Makedirs %s' % path)
         curpath = '/'
         for p in path.split('/'):
             curpath = self.join(curpath, p)
             if not self.exists(curpath):
-                self.__conn.sftp().mkdir(curpath)
+                self._conn.sftp().mkdir(curpath)
 
     @contextmanager
     def openfile(self, filepath: str, mode: str = 'r') -> SFTPFile:
         """
         打开远端文件，用法与内建函数 open 相同。
         """
-        self.__logger.info('Open %s with mode=%s' % (filepath, mode))
-        f = self.__conn.sftp().open(filepath, mode)
+        self._logger.info('Open %s with mode=%s' % (filepath, mode))
+        f = self._conn.sftp().open(filepath, mode)
         try:
             yield f
         finally:

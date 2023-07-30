@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com/online-xml-to-xsd-converter) -->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="testbed">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="postgresql">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="host" type="xs:string" />
+              <xs:element name="sshport" type="xs:unsignedByte" />
+              <xs:element name="osusers">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="osuser">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="name" type="xs:string" />
+                          <xs:element name="password" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="pghome" type="xs:string" />
+              <xs:element name="pgdata" type="xs:string" />
+              <xs:element name="pgport" type="xs:unsignedShort" />
+              <xs:element name="dbname" type="xs:string" />
+              <xs:element name="dbusers">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="dbuser">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="name" type="xs:string" />
+                          <xs:element name="password" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="schema" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -45,6 +45,10 @@
             background-color: orange;
         }
 
+        .filter_button.skip {
+            background-color: gray;
+        }
+
         #filter_button_line {
             float: left;
             width: 100%;
@@ -89,6 +93,10 @@
             background-color: rgba(252, 161, 48, .3) !important;
         }
 
+        .SKIP {
+            background-color: rgba(87, 86, 85, 0.3) !important;
+        }
+
         a {
             text-decoration: none;
         }
@@ -97,7 +105,7 @@
 
 <body>
     <script language="javascript" type="text/javascript">
-        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; */
+        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: SKIP*/
         function filterCase(level) {
             trs = document.getElementsByTagName("tr");
             for (var i = 1; i < trs.length; i++) {
@@ -129,6 +137,12 @@
                     } else {
                         tr.style.display = 'none';
                     }
+                } else if (level == 5) {
+                    if (result == 'SKIP') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
                 }
             }
         }
@@ -141,6 +155,7 @@
         <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[{{failcnt}}]</a>
         <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[{{errorcnt}}]</a>
         <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[{{timeoutcnt}}]</a>
+        <a class="skip filter_button" href='javascript:filterCase(5)'>SKIP[{{skipcnt}}]</a>
     </div>
 
     <table id='result_table'>

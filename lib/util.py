@@ -4,8 +4,12 @@
 实用函数。
 """
 
+import os
 import jinja2
 import functools
+import ctypes
+
+from threading import Thread
 
 
 class ColorText(object):
@@ -61,5 +65,24 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
     with open(template) as fp:
         tpl = jinja2.Template(fp.read())
         rendered_content = tpl.render(**kwargs)
+    if not os.path.exists(os.path.dirname(outfile)):
+        os.makedirs(os.path.dirname(outfile))
     with open(outfile, 'w') as fp:
         fp.write(rendered_content)
+
+
+def stop_thread(thread: Thread, exc: Exception = SystemExit):
+    """通过让线程主动抛出异常的方式以结束线程
+    
+    :param thread: 线程实例
+    :param exc: 异常类型
+    :raises SystemError: 停止线程失败
+    """
+    r = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+            ctypes.c_long(thread.ident), ctypes.py_object(exc))
+    if r == 0:
+        raise ValueError("Invalid thread id '%s'" % thread.ident)
+    if r != 1:
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(
+            ctypes.c_long(thread.ident), None)
+        raise SystemError("Stop thread '%s' failed" % thread.name)
