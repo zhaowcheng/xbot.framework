@@ -1,5 +1,6 @@
 fabric==2.6; python_version >= '3.10'
 jinja2; python_version >= '3.10'
-lxml; python_version >= '3.10'
 beautifulsoup4; python_version >= '3.10'
 click; python_version >= '3.10'
+jsonschema; python_version >= '3.10'
+ruamel.yaml; python_version >= '3.10'

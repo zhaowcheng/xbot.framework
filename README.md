@@ -90,7 +90,6 @@ Examples:
 ```
 
 运行示例：
-
 ```console
 $ python3 xbot.py runcases -b testbed/testbed_example.xml -s testset/testset_example.xml
 [2023-07-30 22:16:55,096] [INFO] [MainThread] [runner] === Start: testcase/example/postgres/initdb/tc_example_postgres_initdb_01.py ===

@@ -5,24 +5,21 @@
 """
 
 import os
-import lxml.etree
+
 
 from functools import cache
-from typing import Any
+from collections import UserDict
+from typing import Any, Optional
+from ruamel import yaml
+from jsonschema import validate
 from lib import common
 from lib.ssh import SSH
+from lib.util import deepget
 
 
 class TestbedError(Exception):
     """
     测试床文件错误。
-    """
-    pass
-
-
-class TestbedSchemaError(Exception):
-    """
-    测试床 schema 文件错误。
     """
     pass
 
@@ -35,62 +32,60 @@ class TestBed(object):
         """
         :param filepath: 测试床文件路径。
         """
-        self._etree = self._parse(filepath)
-        self._name = os.path.basename(filepath).replace('.xml', '')
-        with open(filepath) as f:
-            self._content = f.read()
+        self.__data = self.__parse(filepath)
+        self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
 
-    def _parse(self, filepath: str) -> Any:
+    def __parse(self, filepath: str) -> Any:
         """
         解析并验证测试床文件。
         """
-        testbed_etree = lxml.etree.parse(filepath)
-        testbed_etree_root = lxml.etree.parse(filepath).getroot()
-        if testbed_etree_root.tag != 'testbed':
-            raise TestbedError(
-                'The tag of the root element must be `testbed`, ' \
-                f'but now is `{testbed_etree_root.tag}`.'
-            )
-        schema_filename = testbed_etree_root.attrib.get('schema')
-        if schema_filename:
-            schema_filepath = os.path.join(common.TESTBED_DIR, schema_filename)
-            if not os.path.exists(schema_filepath):
-                raise TestbedError(
-                    f'The schema file `{schema_filename}` ' \
-                    f'does not exist in `{common.TESTBED_DIR}`.'
-                )
+        with open(filepath) as f:
+            data = yaml.safe_load(f)
+            if 'testbed' not in data:
+                raise TestbedError('Missing `testbed` key.')
+            if 'schema' not in data:
+                raise TestbedError('Missing `schema` key.')
             try:
-                schema_etree = lxml.etree.parse(schema_filepath)
-            except lxml.etree.XMLSchemaError as e:
-                raise TestbedSchemaError(f'{str(e)}({schema_filepath})') from None
-            try:
-                lxml.etree.XMLSchema(schema_etree).assertValid(testbed_etree)
-            except lxml.etree.DocumentInvalid as e:
-                raise TestbedError(f'{str(e)}({filepath})') from None
-        return testbed_etree
+                validate(data['testbed'], data['schema'])
+            except Exception as e:
+                raise TestbedError(str(e)) from None
+            return data['testbed']
 
     @property
     def name(self) -> str:
         """
         测试床名称。
         """
-        return self._name
+        return self.__name
     
-    @property
+    @cached_property
     def content(self) -> str:
         """
         测试床文件内容。
         """
-        return self._content
-    
-    def xpath(self, expr: str) -> list:
-        """
-        通过 xpath 获取测试床文件中的内容。
-        xpath 语法参考: https://lxml.de/xpathxslt.html#xpath
+        return yaml.safe_dump(self.__data, default_flow_style=True)
 
-        :param expr: xpath 表达式。
+    def get(self, deepkey: str, default: Optional[Any] = None) -> Any:
         """
-        return self._etree.xpath(expr)
+        ----------yamlfile--------
+        a:
+          b1: c
+          b2:
+            - 1
+            - 2
+            - 3
+        ---------------------------
+        >>> get('a.b1')
+        'c'
+        >>> get('a.b2[0]')
+        1
+        >>> get('a.b3', default='x')
+        'x'
+        """
+        try:
+            return deepget(self.__data, key)
+        except KeyError:
+            return default
 
     @cache
     def ssh(self, host: str, user: str, password: str, sshport: int = 22) -> SSH:
