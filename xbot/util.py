@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-实用函数。
+Utility functions.
 """
 
 import os
@@ -14,7 +14,7 @@ from threading import Thread
 
 class ColorText(object):
     """
-    终端彩色文本。
+    Terminal text color.
     """
 
     COLORS = {
@@ -24,9 +24,9 @@ class ColorText(object):
     }
 
     @staticmethod
-    def wrap(s: str, color: str) -> str:
+    def wrap(s, color):
         """
-        给字符串 `s` 添加颜色 `color`。
+        Color the str `s`.
         """
         code = ColorText.COLORS.get(color, None)
         if not code:
@@ -34,15 +34,9 @@ class ColorText(object):
         return f'\033[{code}{s}\033[39m'
 
 
-def xprint(
-    *values, 
-    color: str = '', 
-    do_exit: bool = False, 
-    exit_code: int = -1, 
-    **kwargs
-) -> None:
+def xprint(*values, color, do_exit=False, exit_code=-1, **kwargs):
     """
-    xbot 专用 print 函数。
+    Print function for xbot.
     """
     if color:
         values = [ColorText.wrap(v, color) for v in values]
@@ -54,12 +48,12 @@ def xprint(
 printerr = functools.partial(xprint, 'error:', color='red', do_exit=True)
 
 
-def render_write(template: str, outfile: str, **kwargs) -> None:
+def render_write(template, outfile, **kwargs):
     """
-    渲染并写入文件。
+    Render the `template` and write to `outfile`.
     
-    :param template: 模板文件。
-    :param outfile: 输出文件。
+    :param template: html template.
+    :param outfile: output file.
     """
     rendered_content = ''
     with open(template) as fp:
@@ -71,12 +65,13 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
         fp.write(rendered_content)
 
 
-def stop_thread(thread: Thread, exc: Exception = SystemExit):
-    """通过让线程主动抛出异常的方式以结束线程
+def stop_thread(thread, exc=SystemExit):
+    """
+    Stop thread by raising an exception.
     
-    :param thread: 线程实例
-    :param exc: 异常类型
-    :raises SystemError: 停止线程失败
+    :param thread: Thread instance.
+    :param exc: Exception to raise.
+    :raises SystemError: If stop thread failed.
     """
     r = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             ctypes.c_long(thread.ident), ctypes.py_object(exc))
@@ -88,9 +83,9 @@ def stop_thread(thread: Thread, exc: Exception = SystemExit):
         raise SystemError("Stop thread '%s' failed" % thread.name)
 
 
-def parse_deepkey(deepkey: str, sep: str = '.') -> list:
+def parse_deepkey(deepkey, sep='.'):
     """
-    深度路径分割
+    Parse deepkey to list.
 
     >>> parse_deepkey('a.b1')
     ['a', 'b1']
@@ -99,9 +94,9 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     >>> parse_deepkey('a.b2[0].c2')
     ['a', 'b2', 0, 'c2']
 
-    :param deepkey: 深度路径
-    :param sep: 分隔符
-    :return: 列表格式的深度路径
+    :param deepkey: deepkey string.
+    :param sep: separator.
+    :return: list of keys.
     """
     keys = []
     for k in re.split(r'%s|\[' % re.escape(sep), deepkey):
@@ -112,9 +107,9 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     return keys
 
 
-def deepget(obj: object, deepkey: str, sep: str = '.') -> any:
+def deepget(obj, deepkey, sep='.'):
     """
-    深度获取对象中的值
+    Deep get value from object.
 
     >>> d = {
     ...     'a': {
@@ -127,19 +122,19 @@ def deepget(obj: object, deepkey: str, sep: str = '.') -> any:
     >>> deepget(d, 'a.b2[0]')
     1
 
-    :param obj: 对象
-    :param deepkey: 深度路径
-    :param sep: 分隔符
-    :return: 获取到的值
+    :param obj: object.
+    :param deepkey: deepkey string.
+    :param sep: separator for deepkey.
+    :return: value.
     """
     keys = parse_deepkey(deepkey, sep)
     return reduce(operator.getitem, keys, obj)
 
 
-def deepset(obj: object, deepkey: str, value: any, sep: str = '.') -> None:
+def deepset(obj, deepkey, value, sep='.'):
     """
-    深度设置对象中的值。
-    如果路径不存在则创建（路径中带索引的情况除外，如 a.b[0]）
+    Deep set value to object.
+    Create path if not exists(except for path with index, e.g. a.b[0])
 
     >>> d = {
     ...     'a': {
@@ -157,10 +152,10 @@ def deepset(obj: object, deepkey: str, value: any, sep: str = '.') -> None:
     >>> d
     {'a': {'b1': 'd', 'b2': ['-1', 2, 3]}, 'i': {'j': 'x'}}
 
-    :param obj: 对象
-    :param deepkey: 深度路径
-    :param value: 待设置的值
-    :param sep: 分隔符
+    :param obj: Object.
+    :param deepkey: deepkey string.
+    :param value: value to set.
+    :param sep: separator for deepkey.
     """
     keys = parse_deepkey(deepkey, sep)
     for k in keys[:-1]:
@@ -172,11 +167,11 @@ def deepset(obj: object, deepkey: str, value: any, sep: str = '.') -> None:
     operator.setitem(obj, keys[-1], value)
 
 
-def ip_reachable(ip: str) -> bool:
+def ip_reachable(ip):
     """
-    检查 IP 地址是否可达
+    Check if IP address is reachable.
 
-    :param ip: IP 地址
+    :param ip: IP address.
     """
     try:
         conn = socket.create_connection((ip, 22), 0.1)
@@ -189,10 +184,10 @@ def ip_reachable(ip: str) -> bool:
 
 def port_opened(ip: str, port: int) -> bool:
     """
-    检查端口是否开放
+    Check if port is opened.
 
-    :param ip: IP 地址
-    :param port: 端口号
+    :param ip: IP address.
+    :param port: Port number.
     """
     try:
         conn = socket.create_connection((ip, port), 0.1)
@@ -200,3 +195,4 @@ def port_opened(ip: str, port: int) -> bool:
         return True
     except:
         return False
+    

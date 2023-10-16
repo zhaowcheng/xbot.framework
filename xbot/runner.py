@@ -1,52 +1,53 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-用例执行器。
+TestCase runner.
 """
 
 import os
 import shutil
 import traceback
 
-from typing import Union
 from threading import Thread
 from importlib import import_module
 from datetime import datetime
-from lib.logger import get_logger
-from lib.testbed import TestBed
-from lib.testset import TestSet
-from lib.testcase import TestCase, TestcaseTimeout
-from lib.common import LOG_DIR, LOG_TEMPLATE
-from lib.util import render_write, stop_thread
+
+from xbot.logger import getlogger
+from xbot.errors import TestCaseTimeout
+from xbot.common import LOG_TEMPLATE
+from xbot.util import render_write, stop_thread
+
+
+logger = getlogger()
 
 
 class Runner(object):
     """
-    用例执行器。
+    TestCase runner.
     """
-    def __init__(self) -> None:
-        self._logger = get_logger()
+    def __init__(self):
+        pass
 
-    def run(self, testbed: TestBed, testset: TestSet) -> str:
+    def run(self, testbed, testset):
         """
-        执行测试套中的测试用例。
+        Run testcases.
 
-        :param testbed: 测试床。
-        :param testset: 测试集。
-        :return: 本次执行的日志目录。
+        :param testbed: TestBed instance.
+        :param testset: TestSet instance.
+        :return: logdir of this execution.
         """
         logdir = self._make_logdir(testbed)
         for casepath in testset.paths:
-            self._logger.info(f' Start: {casepath} '.center(80, '='))
+            logger.info(' Start: %s '.center(80, '='), casepath)
             caselog = self._make_logfile(logdir, casepath)
             try:
                 casecls = self._import_case(casepath)
                 if testset.tags and set(testset.tags).isdisjoint(casecls.TAGS):
                     self._handle_abnormal_case(
                         'skipped', caselog, testbed, 
-                        f'Skipped because dont contain any tag of {testset.tags}.'
+                        'Skipped because dont contain any tag of %s.' % testset.tags
                     )
-                    self._logger.info(f' End: {casepath} '.center(80, '=') + '\n')
+                    logger.info(' End: %s '.center(80, '=') + '\n', casepath)
                     continue
             except (ImportError, AttributeError):
                 self._handle_abnormal_case(
@@ -54,43 +55,43 @@ class Runner(object):
                 )
                 continue
             self._run_case(casecls, testbed, caselog)
-            self._logger.info(f' End: {casepath} '.center(80, '=') + '\n')
+            logger.info(' End: %s '.center(80, '=') + '\n', casepath)
         return logdir
 
-    def _make_logdir(self, testbed: TestBed) -> str:
+    def _make_logdir(self, testbed):
         """
-        创建日志目录。
+        Create log directory.
 
-        :param testbed: 测试床。
-        :return: 日志目录。
+        :param testbed: TestBed instance.
+        :return: logdir path.
         """
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logdir = os.path.join(LOG_DIR, testbed.name, timestamp)
+        logdir = os.path.join(os.getcwd(), 'logs', testbed.name, timestamp)
         os.makedirs(logdir)
         return logdir
 
-    def _make_logfile(self, logdir: str, casepath: str) -> str:
+    def _make_logfile(self, logdir, casepath):
         """
-        创建日志文件。
+        Create log file.
 
-        :param logdir: 日志目录。
-        :param casepath: 用例路径。
-        :return: 日志文件。
+        :param logdir: logdir path.
+        :param casepath: TestCase path.
+        :return: logfile path.
         """
         logfile = os.path.normpath(
-            os.path.join(logdir, casepath.replace('testcase/', ''))
+            os.path.join(logdir, casepath.replace('testcases/', ''))
         ).replace('.py', '.html')
         if not os.path.exists(os.path.dirname(logfile)):
             os.makedirs(os.path.dirname(logfile))
         shutil.copyfile(LOG_TEMPLATE, logfile)
         return logfile
 
-    def _import_case(self, casepath: str) -> TestCase:
+    def _import_case(self, casepath):
         """
-        导入测试用例。
+        Import testcase module.
 
-        :param casepath: 用例路径。
-        :return: 测试用例实例。
+        :param casepath: TestCase path.
+        :return: TestCase class.
         """
         caseid = casepath.split('/')[-1].rstrip('.py')
         modname = casepath.rstrip('.py').replace('/', '.')
@@ -98,24 +99,18 @@ class Runner(object):
         casecls = getattr(casemod, caseid)
         return casecls
 
-    def _handle_abnormal_case(
-        self, 
-        reason: Union['importerr', 'skipped'],
-        caselog: str, 
-        testbed: TestBed,
-        message: str
-    ) -> None:
+    def _handle_abnormal_case(self, reason, caselog, testbed, message):
         """
-        处理非正常用例。
+        Handle abnormal case.
 
-        :param caselog: 用例日志文件。
-        :param testbed: 测试床实例。
-        :param reason: 错误原因。
+        :param caselog: TestCase logfile.
+        :param testbed: TestBed instance.
+        :param reason: 'importerr' or 'skipped'.
         """
         if reason == 'importerr':
-            self._logger.error(message)
+            logger.error(message)
         elif reason == 'skipped':
-            self._logger.warn(message)
+            logger.warn(message)
         caseid = os.path.basename(caselog).replace('.html', '')
         starttime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         record = {
@@ -138,23 +133,18 @@ class Runner(object):
             stage_records={'setup': [record], 'process': [], 'teardown': []}
         )
 
-    def _run_case(
-        self, 
-        casecls: TestCase, 
-        testbed: TestBed, 
-        caselog: str
-    ) -> None:
+    def _run_case(self, casecls, testbed, caselog):
         """
-        执行测试用例。
+        Execute testcase.
 
-        :param casecls: 测试用例类。
-        :param testbed: 测试床实例。
-        :param caselog: 用例日志文件。
+        :param casecls: TestCase class.
+        :param testbed: TestBed instance.
+        :param caselog: TestCase logfile.
         """
         caseinst = casecls(testbed, caselog)
         t = Thread(target=caseinst.run, name=caseinst.caseid)
         t.start()
         t.join(caseinst.TIMEOUT * 60)
         if t.is_alive():
-            stop_thread(t, TestcaseTimeout)
-            t.join(60)  # 等待 teardown 结束
+            stop_thread(t, TestCaseTimeout)
+            t.join(60)  # wait for teardown to finished.

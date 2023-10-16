@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-测试用例相关模块。
+TestCase base.
 """
 
 import os
@@ -13,37 +13,25 @@ import textwrap
 import time
 import operator
 
-from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import Any, Container
 
-from lib import logger, util, common
-from lib.testbed import TestBed
+from xbot import logger, util, common
 
 
-class TestcaseTimeout(Exception):
+class TestCase(object):
     """
-    用例执行超时。
-    """
-    pass
-
-
-class TestCase(ABC):
-    """
-    测试用例基类。
+    TestCase base.
     """
 
-    # 用例执行最长时间，单位：分钟。
-    TIMEOUT = 5
-    # 用例标签。
+    TIMEOUT = 5  # minute(s)
     TAGS = []
 
-    def __init__(self, testbed: TestBed, logfile: str):
+    def __init__(self, testbed, logfile):
         """
-        :param testbed: 测试床实例。
-        :param logfile: 日志文件路径。
+        :param testbed: TestBed instance.
+        :param logfile: logfile path.
         """
-        self.testbed = testbed
+        self.__testbed = testbed
         self.__logfile = logfile
         self.__starttime = None
         self.__endtime = None
@@ -55,77 +43,84 @@ class TestCase(ABC):
         logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
-    def caseid(self) -> str:
+    def testbed(self):
         """
-        用例编号（不带后缀的文件名）。
+        TestBed instance.
+        """
+        return self.__testbed
+
+    @property
+    def caseid(self):
+        """
+        TestCase filename without extension.
         """
         return os.path.basename(
             sys.modules[self.__module__].__file__.replace('.py', '')
         )
     
     @property
-    def starttime(self) -> datetime:
+    def starttime(self):
         """
-        开始时间。
+        Execution start time.
         """
         return self.__starttime
 
     @property
-    def endtime(self) -> datetime:
+    def endtime(self):
         """
-        结束时间。
+        Execution end time.
         """
         return self.__endtime
 
     @property
-    def duration(self) -> timedelta:
+    def duration(self):
         """
-        执行时长。
+        Execution duration.
         """
         return self.__duration
 
     @property
-    def timestamp(self) -> str:
+    def timestamp(self):
         """
-        时间戳（caseid + starttime）。
+        <caseid>_<starttime>
         """
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
 
     @property
-    def result(self) -> str:
+    def result(self):
         """
-        执行结果。
+        Execution result.
         """
         return self.__result
     
-    def debug(self, msg: str, *args, **kwargs) -> None:
+    def debug(self, msg, *args, **kwargs):
         """
-        DEBUG 日志。
+        DEBUG log.
         """
         self.__logger.debug(msg, *args, **kwargs)
 
-    def info(self, msg: str, *args, **kwargs) -> None:
+    def info(self, msg, *args, **kwargs):
         """
-        INFO 日志.
+        INFO log.
         """
         self.__logger.info(msg, *args, **kwargs)
 
-    def warn(self, msg: str, *args, **kwargs) -> None:
+    def warn(self, msg, *args, **kwargs):
         """
-        WARN 日志.
+        WARN log.
         """
         self.__logger.warn(msg, *args, **kwargs)
 
-    def error(self, msg: str, *args, **kwargs) -> None:
+    def error(self, msg, *args, **kwargs):
         """
-        ERROR 日志.
+        ERROR log.
         """
         self.__logger.error(msg, *args, **kwargs)
 
-    def assertx(a: Any, op: str, b: Any) -> None:
+    def assertx(a, op, b):
         """
-        断言
+        Assertion.
 
         >>> assertx(1, '==', 1)
         >>> assertx(1, '!=', 2)
@@ -142,10 +137,10 @@ class TestCase(ABC):
         >>> assertx('abc', 'search', r'[a-z]')
         >>> assertx('abc', 'not search', r'[0-9]')
 
-        :param a: 操作对象 a
-        :param op: 操作符
-        :param b: 操作对象 b
-        :raises AssertionError: 断言失败
+        :param a: Operation object a.
+        :param op: Operator.
+        :param b: Operation object b.
+        :raises AssertionError: Assertion failed.
         """
         funcs = {
             '==': operator.eq,
@@ -170,34 +165,34 @@ class TestCase(ABC):
                 f'Expects {a} {op} {b}, but got the opposite.'
             )
 
-    def sleep(self, seconds: float) -> None:
+    def sleep(self, seconds):
         """
-        带有提示信息的 sleep。
+        Sleep with logging.
         """
         self.info(f'Sleep {seconds} second(s)...')
         time.sleep(seconds)
 
-    @abstractmethod
-    def setup(self) -> None:
+    def setup(self):
         """
-        预置步骤。
+        Preset steps.
         """
+        raise NotImplementedError
 
-    @abstractmethod
-    def process(self) -> None:
+    def process(self):
         """
-        测试过程。
+        Test steps.
         """
+        raise NotImplementedError
 
-    @abstractmethod
-    def teardown(self) -> None:
+    def teardown(self):
         """
-        清理步骤。
+        Post steps.
         """
+        raise NotImplementedError
 
-    def run(self) -> None:
+    def run(self):
         """
-        执行测试用例。
+        Execute testcase.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
         self.__run_stage('setup')
@@ -210,9 +205,9 @@ class TestCase(ABC):
         self.__dump_log()
         logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
 
-    def __run_stage(self, stage: str) -> None:
+    def __run_stage(self, stage: str):
         """
-        执行测试用例的某个阶段。
+        Execute one stage(setup, process, teardown).
         """
         func = {'setup': self.setup,
                 'process': self.process,
@@ -233,7 +228,7 @@ class TestCase(ABC):
 
     def __dump_log(self):
         """
-        保存日志。
+        Dump testcase log.
         """
         util.render_write(
             common.LOG_TEMPLATE,
