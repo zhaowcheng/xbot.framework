@@ -10,10 +10,3 @@ __pycache__/
 # logs
 logs/
 
-# testbeds
-testbeds/
-!testbeds/testbed_example.yml
-
-# testsets
-testsets/
-!testsets/testset_template.yml

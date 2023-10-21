@@ -1,0 +1,11 @@
+tags:
+  include:
+    - tag1
+    - tag2
+  exclude:
+    - tag3
+    - tag4
+
+paths:
+  - testcases/module1/submodule1/tc_mod1_submod1_01.py
+  - testcases/module1/submodule2/  # recursively

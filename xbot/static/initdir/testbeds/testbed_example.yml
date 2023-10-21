@@ -1,0 +1,21 @@
+postgres:
+  host: 192.168.8.8
+  sshport: 22
+  osusers:
+    admin:
+      name: root
+      password: root@123
+    normal:
+      name: xbot
+      password: xbot@123
+  instdir: /usr/local/pgsql
+  datadir: /usr/local/pgsql/data
+  dbname: postgres
+  dbport: 5432
+  dbusers:
+    admin:
+      name: postgres
+      password: postgres@123
+    normal:
+      name: xbot
+      password: xbot@123
