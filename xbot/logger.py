@@ -15,7 +15,7 @@ class ExtraAdapter(logging.LoggerAdapter):
     """
     def process(self, msg, kwargs):
         if self.extra:
-            msg = '[%s]%s' % (self.extra, msg)
+            msg = '[%s] %s' % (self.extra, msg)
         return msg, kwargs
 
 
@@ -58,7 +58,7 @@ def getlogger(name=None):
     if not name:
         caller = inspect.stack()[1]
         name = inspect.getmodulename(caller.filename)
-    return ExtraAdapter(ROOT_LOGGER.getChild(callermod))
+    return ExtraAdapter(ROOT_LOGGER.getChild(name))
 
 
 ROOT_LOGGER = logging.getLogger('xbot')
@@ -71,8 +71,9 @@ if not ROOT_LOGGER.hasHandlers():
     stderr = logging.StreamHandler(sys.stderr)
     stderr.setLevel('ERROR')
     formater = logging.Formatter(
-        '[%(asctime)s][%(levelname)s][%(module)s]'
-        '[%(threadName)s]%(message)s'
+        '[%(asctime)s] [%(levelname)s] [%(module)s] '
+        '[%(threadName)s] %(message)s',
+        datefmt='%H:%M:%S'
     )
     stdout.setFormatter(formater)
     stderr.setFormatter(formater)

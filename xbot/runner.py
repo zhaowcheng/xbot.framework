@@ -15,7 +15,7 @@ from datetime import datetime
 from xbot.logger import getlogger
 from xbot.errors import TestCaseTimeout
 from xbot.common import LOG_TEMPLATE
-from xbot.util import render_write, stop_thread
+from xbot.util import render_write, stop_thread, xprint
 
 
 logger = getlogger()
@@ -38,16 +38,24 @@ class Runner(object):
         """
         logdir = self._make_logdir(testbed)
         for casepath in testset.paths:
-            logger.info(' Start: %s '.center(80, '='), casepath)
+            caseid = casepath.split('/')[-1].replace('.py', '')
+            self._print_divider('start', caseid)
             caselog = self._make_logfile(logdir, casepath)
             try:
                 casecls = self._import_case(casepath)
-                if testset.tags and set(testset.tags).isdisjoint(casecls.TAGS):
+                if testset.exclude_tags and not set(testset.exclude_tags).isdisjoint(casecls.TAGS):
                     self._handle_abnormal_case(
                         'skipped', caselog, testbed, 
-                        'Skipped because dont contain any tag of %s.' % testset.tags
+                        'Skipped because contain some tag(s) of exclude_tags:%s.' % str(testset.exclude_tags)
                     )
-                    logger.info(' End: %s '.center(80, '=') + '\n', casepath)
+                    self._print_divider('end', caseid)
+                    continue
+                if testset.include_tags and set(testset.include_tags).isdisjoint(casecls.TAGS):
+                    self._handle_abnormal_case(
+                        'skipped', caselog, testbed, 
+                        'Skipped because dont contain any tag of include_tags:%s.' % str(testset.include_tags)
+                    )
+                    self._print_divider('end', caseid)
                     continue
             except (ImportError, AttributeError):
                 self._handle_abnormal_case(
@@ -55,8 +63,22 @@ class Runner(object):
                 )
                 continue
             self._run_case(casecls, testbed, caselog)
-            logger.info(' End: %s '.center(80, '=') + '\n', casepath)
+            self._print_divider('end', caseid)
         return logdir
+
+    def _print_divider(self, typ, caseid):
+        """
+        Print testcase divider.
+
+        :param typ: 'start' or 'end'.
+        :param caseid: TestCase id.
+        """
+        if typ == 'start':
+            xprint(' Start: %s '.center(80, '=') % caseid)
+        elif typ == 'end':
+            xprint(' End: %s '.center(80, '=') % caseid + '\n')
+        else:
+            raise ValueError('Invalid type: %s' % typ)
 
     def _make_logdir(self, testbed):
         """
@@ -93,8 +115,8 @@ class Runner(object):
         :param casepath: TestCase path.
         :return: TestCase class.
         """
-        caseid = casepath.split('/')[-1].rstrip('.py')
-        modname = casepath.rstrip('.py').replace('/', '.')
+        caseid = casepath.split('/')[-1].replace('.py', '')
+        modname = casepath.replace('/', '.').replace('.py', '')
         casemod = import_module(modname)
         casecls = getattr(casemod, caseid)
         return casecls
@@ -128,7 +150,7 @@ class Runner(object):
             starttime=starttime,
             endtime=starttime,
             duration='0:00:00',
-            testcase=caseid,
+            testcase='',
             testbed=testbed.content.replace('<','&lt').replace('>','&gt'),
             stage_records={'setup': [record], 'process': [], 'teardown': []}
         )

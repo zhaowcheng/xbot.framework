@@ -47,7 +47,7 @@ def gen_report(logdir):
             if f.endswith('.html'):
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
-                casepath = 'testcase/' + caselog.replace('.html', '.py')
+                casepath = 'testcases/' + caselog.replace('.html', '.py')
                 with open(os.path.join(top, f)) as fp:
                     content = fp.read()
                     result = find_value(content, 'result')

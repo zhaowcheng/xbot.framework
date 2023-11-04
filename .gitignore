@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 
 # IDE config files
-.vscode/
-.idea/
+.vscode/*
+.idea/*
 
+# setuptools
+build/
+xbot.egg-info/

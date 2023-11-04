@@ -16,6 +16,7 @@ import operator
 from datetime import datetime, timedelta
 
 from xbot import logger, util, common
+from xbot.errors import TestCaseTimeout
 
 
 class TestCase(object):
@@ -37,7 +38,7 @@ class TestCase(object):
         self.__endtime = None
         self.__duration = None
         self.__result = None
-        self.__logger = logger.get_logger(self.caseid)
+        self.__logger = logger.getlogger(self.caseid)
         self.__loghdlr = logger.CaseLogHandler(logging.DEBUG)
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
         logger.ROOT_LOGGER.addHandler(self.__loghdlr)
@@ -55,7 +56,8 @@ class TestCase(object):
         TestCase filename without extension.
         """
         return os.path.basename(
-            sys.modules[self.__module__].__file__.replace('.py', '')
+            sys.modules[self.__module__].__file__.replace('.'
+                                                          'py', '')
         )
     
     @property
@@ -118,7 +120,7 @@ class TestCase(object):
         """
         self.__logger.error(msg, *args, **kwargs)
 
-    def assertx(a, op, b):
+    def assertx(self, a, op, b):
         """
         Assertion.
 
@@ -190,6 +192,13 @@ class TestCase(object):
         """
         raise NotImplementedError
 
+    def stepdesc(self, stepid):
+        """
+        logging step description.
+
+        :param stepid: stepid from __doc__.
+        """
+
     def run(self):
         """
         Execute testcase.
@@ -215,8 +224,8 @@ class TestCase(object):
         try:
             self.__loghdlr.stage = stage
             func()
-        except TestcaseTimeout:
-            self.error(f'TestcaseTimeout: Execution did not '
+        except TestCaseTimeout:
+            self.error(f'TestCaseTimeout: Execution did not '
                        'complete within {self.TIMEOUT} minute(s).')
             self.__result = 'TIMEOUT'
         except Exception as e:

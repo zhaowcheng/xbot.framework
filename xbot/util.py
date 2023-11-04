@@ -5,10 +5,13 @@ Utility functions.
 """
 
 import os
-import jinja2
-import functools
+import re
 import ctypes
+import operator
 
+import jinja2
+
+from functools import reduce, partial
 from threading import Thread
 
 
@@ -34,7 +37,7 @@ class ColorText(object):
         return f'\033[{code}{s}\033[39m'
 
 
-def xprint(*values, color, do_exit=False, exit_code=-1, **kwargs):
+def xprint(*values, color=None, do_exit=False, exit_code=-1, **kwargs):
     """
     Print function for xbot.
     """
@@ -45,7 +48,7 @@ def xprint(*values, color, do_exit=False, exit_code=-1, **kwargs):
         exit(exit_code)
 
 
-printerr = functools.partial(xprint, 'error:', color='red', do_exit=True)
+printerr = partial(xprint, 'error:', color='red', do_exit=True)
 
 
 def render_write(template, outfile, **kwargs):

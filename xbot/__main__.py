@@ -48,6 +48,15 @@ def init(directory):
         printerr('%s already exists.' % directory)
     shutil.copytree(INIT_DIR, directory)
     xprint('Initialized %s.' % directory)
+
+
+def is_projdir(directory):
+    """
+    Check if directory is a project directory.
+
+    :param directory: directory to check.
+    """
+    return os.path.exists(os.path.join(directory, 'testcases'))
     
 
 def run(tbcls, testbed, testset):
@@ -58,9 +67,12 @@ def run(tbcls, testbed, testset):
     :param testbed: testbed file.
     :param testset: testset file.
     """
+    if not is_projdir(os.getcwd()):
+        printerr("No `testcases` directory in current directory, "
+                 "maybe current is not a project directory.")
     tb = tbcls(testbed)
     ts = TestSet(testset)
-    logdir = Runner(tb, ts)
+    logdir = Runner().run(tb, ts)
     xprint('\nGenerating report...  ', end='')
     report_filepath, is_allpassed = gen_report(logdir)
     xprint(report_filepath, '\n', color='green', 
@@ -82,5 +94,7 @@ def main(tbcls=TestBed, internal=False):
         run(tbcls, args.testbed, args.testset)
 
 
+internal_main = lambda: main(internal=True)
+
 if __name__ == '__main__':
-    main(internal=True)
+    internal_main()

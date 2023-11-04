@@ -1,0 +1,12 @@
+# This is just an example, you can add whatever you want, 
+# but it must be in yaml format, these values can be accessed
+# in the test case through the self.testbed.get() method.
+example:
+  key1: value1
+  key2: 
+    key2-1: value2-1
+    key2-2: value2-2
+  key3:
+    - value3-1
+    - value3-2
+    - value3-3

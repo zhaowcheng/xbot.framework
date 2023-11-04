@@ -1,0 +1,11 @@
+tags:
+  include:
+    - tag1
+    - tag2
+  exclude:
+    - tag3
+    - tag4
+
+paths:
+  - testcases/examples/subdir1/tc_eg_01.py
+  - testcases/examples/subdir2/  # recursively

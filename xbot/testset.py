@@ -9,8 +9,7 @@ import textwrap
 
 from ruamel import yaml
 
-from xbot import common
-from xbot.errors import TestsetError
+from xbot.errors import TestSetError
 
 
 class TestSet(object):
@@ -59,17 +58,16 @@ class TestSet(object):
         if not self._paths:
             paths = []
             for p in self._data['paths']:
-                abspath = os.path.normpath(os.path.join(common.XBOT_DIR, p))
-                if not os.path.exists(abspath):
-                    raise TestsetError(f'Path `{p}` does not exist.')
+                if not os.path.exists(p):
+                    raise TestSetError(f'Path `{p}` does not exist.')
                 if p.endswith('.py'):
                     paths.append(p)
                 else:
-                    for top, dirs, files in os.walk(abspath):
+                    for top, dirs, files in os.walk(p):
                         for f in files:
                             if f.endswith('.py') and f != '__init__.py':
                                 relpath = os.path.relpath(os.path.join(top, f), 
-                                                        common.XBOT_DIR)
+                                                          os.getcwd())
                                 paths.append(relpath.replace(os.sep, '/'))
             self._paths = paths
         return tuple(self._paths)

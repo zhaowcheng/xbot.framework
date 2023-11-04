@@ -68,6 +68,6 @@ class TestBed(object):
         :return: value.
         """
         try:
-            return deepget(self.__data, key)
+            return deepget(self.__data, deepkey)
         except KeyError:
             return default

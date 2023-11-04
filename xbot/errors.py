@@ -5,14 +5,14 @@ Exceptions.
 """
 
 
-class TestcaseTimeout(Exception):
+class TestCaseTimeout(Exception):
     """
     Testcase execution timeout.
     """
     pass
 
 
-class TestsetError(Exception):
+class TestSetError(Exception):
     """
     Testset error.
     """
