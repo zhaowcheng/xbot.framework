@@ -6,17 +6,71 @@ Logging module.
 
 import logging
 import inspect
+import os
 import sys
+import io
+import traceback
 
 
-class ExtraAdapter(logging.LoggerAdapter):
+class XbotLogger(logging.Logger):
     """
-    Logger can logging with extra msg.
+    Custom Logger.
+
+    findCaller() and _log() are copied from logging.Logger of Python3.8
     """
-    def process(self, msg, kwargs):
-        if self.extra:
-            msg = '[%s] %s' % (self.extra, msg)
-        return msg, kwargs
+    def findCaller(self, stacklevel=1):
+        """
+        Find the stack frame of the caller so that we can note the source
+        file name, line number and function name.
+        """
+        f = logging.currentframe()
+        #On some versions of IronPython, currentframe() returns None if
+        #IronPython isn't run with -X:Frames.
+        if f is not None:
+            f = f.f_back
+        orig_f = f
+        while f and stacklevel > 1:
+            f = f.f_back
+            stacklevel -= 1
+        if not f:
+            f = orig_f
+        rv = "(unknown file)", 0, "(unknown function)", None
+        while hasattr(f, "f_code"):
+            co = f.f_code
+            filename = os.path.normcase(co.co_filename)
+            if filename == logging._srcfile:
+                f = f.f_back
+                continue
+            rv = (co.co_filename, f.f_lineno, co.co_name)
+            break
+        return rv
+
+    def _log(self, level, msg, args, exc_info=None, extra=None, stacklevel=1):
+        """
+        Low-level logging routine which creates a LogRecord and then calls
+        all the handlers of this logger to handle the record.
+        """
+        if logging._srcfile:
+            #IronPython doesn't track Python frames, so findCaller raises an
+            #exception on some versions of IronPython. We trap it here so that
+            #IronPython can use logging.
+            try:
+                fn, lno, func = self.findCaller(stacklevel)
+            except ValueError: # pragma: no cover
+                fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        else: # pragma: no cover
+            fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        if exc_info:
+            if isinstance(exc_info, BaseException):
+                exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
+            elif not isinstance(exc_info, tuple):
+                exc_info = sys.exc_info()
+        record = self.makeRecord(self.name, level, fn, lno, msg, args,
+                                 exc_info, func, extra)
+        self.handle(record)
+
+
+logging.setLoggerClass(XbotLogger)
 
 
 class StdoutFilter(logging.Filter):
@@ -51,16 +105,6 @@ class CaseLogHandler(logging.Handler):
         self.stage_records[self.stage].append(record.__dict__)
 
 
-def getlogger(name=None):
-    """
-    Create logger with name.
-    """
-    if not name:
-        caller = inspect.stack()[1]
-        name = inspect.getmodulename(caller.filename)
-    return ExtraAdapter(ROOT_LOGGER.getChild(name))
-
-
 ROOT_LOGGER = logging.getLogger('xbot')
 
 
@@ -71,12 +115,19 @@ if not ROOT_LOGGER.hasHandlers():
     stderr = logging.StreamHandler(sys.stderr)
     stderr.setLevel('ERROR')
     formater = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] [%(module)s] '
-        '[%(threadName)s] %(message)s',
-        datefmt='%H:%M:%S'
+        '[%(asctime)s] [%(levelname)s] [%(module)s:%(lineno)s] %(message)s'
     )
     stdout.setFormatter(formater)
     stderr.setFormatter(formater)
     ROOT_LOGGER.addHandler(stdout)
     ROOT_LOGGER.addHandler(stderr)
 
+
+def getlogger(name=None):
+    """
+    Create logger with name.
+    """
+    if not name:
+        caller = inspect.stack()[1]
+        name = inspect.getmodulename(caller.filename)
+    return ROOT_LOGGER.getChild(name)

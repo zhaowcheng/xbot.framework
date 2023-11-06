@@ -74,9 +74,9 @@ class Runner(object):
         :param caseid: TestCase id.
         """
         if typ == 'start':
-            xprint(' Start: %s '.center(80, '=') % caseid)
+            xprint(' Start: %s '.center(100, '=') % caseid)
         elif typ == 'end':
-            xprint(' End: %s '.center(80, '=') % caseid + '\n')
+            xprint(' End: %s '.center(100, '=') % caseid + '\n')
         else:
             raise ValueError('Invalid type: %s' % typ)
 

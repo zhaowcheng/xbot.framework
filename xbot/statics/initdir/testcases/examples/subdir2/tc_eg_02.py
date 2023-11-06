@@ -53,6 +53,7 @@ class tc_eg_02(TestCase):
         self.info('Start test step 2')
         file1 = os.path.join(dir1, 'file1')
         open(file1, 'w').close()
+        self.sleep(1)
         self.assertx(os.path.exists(file1), '==', True)
 
         # Test step 3

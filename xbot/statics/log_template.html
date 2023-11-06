@@ -60,7 +60,7 @@
             width: 80px;
         }
 
-        .modname {
+        .location {
             width: 100px;
         }
 
@@ -122,14 +122,14 @@
                     <tr>
                         <th class="asctime">time</th>
                         <th class="levelname">level</th>
-                        <th class="modname">module</th>
+                        <th class="location">location</th>
                         <th class="message">message</th>
                     </tr>
                     {% for record in records %}
                     <tr class="{{record.levelname}}">
                         <td>{{record.asctime}}</td>
                         <td>{{record.levelname}}</td>
-                        <td>{{record.module}}</td>
+                        <td>{{record.module}}:{{record.lineno}}</td>
                         <td>
                             <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
                             {% if 'result' in record and 'content' in record.result %}

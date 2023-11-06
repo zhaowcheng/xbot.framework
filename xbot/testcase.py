@@ -95,30 +95,37 @@ class TestCase(object):
         Execution result.
         """
         return self.__result
+
+    def __log(self, level, msg, *args, **kwargs):
+        """
+        Log message.
+        """
+        kwargs['stacklevel'] = kwargs.get('stacklevel', 3)
+        self.__logger.log(level, msg, *args, **kwargs)
     
     def debug(self, msg, *args, **kwargs):
         """
         DEBUG log.
         """
-        self.__logger.debug(msg, *args, **kwargs)
+        self.__log(logging.DEBUG, msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         """
         INFO log.
         """
-        self.__logger.info(msg, *args, **kwargs)
+        self.__log(logging.INFO, msg, *args, **kwargs)
 
     def warn(self, msg, *args, **kwargs):
         """
         WARN log.
         """
-        self.__logger.warn(msg, *args, **kwargs)
+        self.__log(logging.WARN, msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
         ERROR log.
         """
-        self.__logger.error(msg, *args, **kwargs)
+        self.__log(logging.ERROR, msg, *args, **kwargs)
 
     def assertx(self, a, op, b):
         """
@@ -161,17 +168,17 @@ class TestCase(object):
             'not search': lambda a, b: not re.search(b, a)
         }
         if op not in funcs:
-            raise ValueError(f'Invalid operator: {op}')
+            raise ValueError('Invalid operator: %s', op)
         if not funcs[op](a, b):
-            raise AssertionError(
-                f'Expects {a} {op} {b}, but got the opposite.'
-            )
+            raise AssertionError('%s %s %s' % (a, op, b))
+        else:
+            self.info('AssertionSuccess: %s %s %s', a, op, b, stacklevel=4)
 
     def sleep(self, seconds):
         """
         Sleep with logging.
         """
-        self.info(f'Sleep {seconds} second(s)...')
+        self.info(f'Sleep {seconds} second(s)...', stacklevel=4)
         time.sleep(seconds)
 
     def setup(self):
