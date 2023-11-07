@@ -5,11 +5,8 @@ Logging module.
 """
 
 import logging
-import inspect
 import os
 import sys
-import io
-import traceback
 
 
 class XbotLogger(logging.Logger):
@@ -18,7 +15,7 @@ class XbotLogger(logging.Logger):
 
     findCaller() and _log() are copied from logging.Logger of Python3.8
     """
-    def findCaller(self, stacklevel=1):
+    def findCaller(self, stacklevel= 1):
         """
         Find the stack frame of the caller so that we can note the source
         file name, line number and function name.
@@ -93,7 +90,7 @@ class CaseLogHandler(logging.Handler):
     Handler for testcase.
     """
     def __init__(self, level=logging.NOTSET):
-        super().__init__(level)
+        super(CaseLogHandler, self).__init__(level)
         self.stage_records = {
             'setup': [],
             'process': [],
@@ -108,7 +105,7 @@ class CaseLogHandler(logging.Handler):
 ROOT_LOGGER = logging.getLogger('xbot')
 
 
-if not ROOT_LOGGER.hasHandlers():
+if not ROOT_LOGGER.handlers:
     ROOT_LOGGER.setLevel('DEBUG')
     stdout = logging.StreamHandler(sys.stdout)
     stdout.addFilter(StdoutFilter())
@@ -123,11 +120,8 @@ if not ROOT_LOGGER.hasHandlers():
     ROOT_LOGGER.addHandler(stderr)
 
 
-def getlogger(name=None):
+def getlogger(name):
     """
     Create logger with name.
     """
-    if not name:
-        caller = inspect.stack()[1]
-        name = inspect.getmodulename(caller.filename)
     return ROOT_LOGGER.getChild(name)

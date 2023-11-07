@@ -1,2 +1,2 @@
-jinja2
-ruamel.yaml
+jinja2; python_version >= '3.6'
+ruamel.yaml; python_version >= '3.6'

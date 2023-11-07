@@ -10,3 +10,9 @@ __pycache__/
 # setuptools
 build/
 xbot.egg-info/
+
+# venv
+venv/
+
+# testproj
+testproj/

@@ -8,11 +8,12 @@ import os
 import re
 import ctypes
 import operator
+import socket
 
 import jinja2
 
+from typing import Any
 from functools import reduce, partial
-from threading import Thread
 
 
 class ColorText(object):
@@ -33,14 +34,22 @@ class ColorText(object):
         """
         code = ColorText.COLORS.get(color, None)
         if not code:
-            raise ValueError(f'Not supported color: {color}')
-        return f'\033[{code}{s}\033[39m'
+            raise ValueError('Not supported color: %s' % color)
+        return '\033[%s%s\033[39m' % (code, s)
 
 
-def xprint(*values, color=None, do_exit=False, exit_code=-1, **kwargs):
+def xprint(*values, **kwargs) -> None:
     """
     Print function for xbot.
+
+    :param values: values to print.
+    :param color: color of values.
+    :param do_exit: exit after print.
+    :param exit_code: exit code, default -1.
     """
+    color = kwargs.pop('color', None)
+    do_exit = kwargs.pop('do_exit', False)
+    exit_code = kwargs.pop('exit_code', -1)
     if color:
         values = [ColorText.wrap(v, color) for v in values]
     print(*values, **kwargs)
@@ -51,7 +60,7 @@ def xprint(*values, color=None, do_exit=False, exit_code=-1, **kwargs):
 printerr = partial(xprint, 'error:', color='red', do_exit=True)
 
 
-def render_write(template, outfile, **kwargs):
+def render_write(template: str, outfile: str, **kwargs) -> None:
     """
     Render the `template` and write to `outfile`.
     
@@ -68,7 +77,7 @@ def render_write(template, outfile, **kwargs):
         fp.write(rendered_content)
 
 
-def stop_thread(thread, exc=SystemExit):
+def stop_thread(thread, exc=SystemExit) -> None:
     """
     Stop thread by raising an exception.
     
@@ -86,7 +95,7 @@ def stop_thread(thread, exc=SystemExit):
         raise SystemError("Stop thread '%s' failed" % thread.name)
 
 
-def parse_deepkey(deepkey, sep='.'):
+def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     """
     Parse deepkey to list.
 
@@ -110,7 +119,7 @@ def parse_deepkey(deepkey, sep='.'):
     return keys
 
 
-def deepget(obj, deepkey, sep='.'):
+def deepget(obj, deepkey: str, sep: str = '.') -> Any:
     """
     Deep get value from object.
 
@@ -134,7 +143,7 @@ def deepget(obj, deepkey, sep='.'):
     return reduce(operator.getitem, keys, obj)
 
 
-def deepset(obj, deepkey, value, sep='.'):
+def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
     """
     Deep set value to object.
     Create path if not exists(except for path with index, e.g. a.b[0])
@@ -170,11 +179,12 @@ def deepset(obj, deepkey, value, sep='.'):
     operator.setitem(obj, keys[-1], value)
 
 
-def ip_reachable(ip):
+def ip_reachable(ip: str) -> bool:
     """
     Check if IP address is reachable.
 
     :param ip: IP address.
+    :return: True if reachable, else False.
     """
     try:
         conn = socket.create_connection((ip, 22), 0.1)
@@ -191,6 +201,7 @@ def port_opened(ip: str, port: int) -> bool:
 
     :param ip: IP address.
     :param port: Port number.
+    :return: True if opened, else False.
     """
     try:
         conn = socket.create_connection((ip, port), 0.1)

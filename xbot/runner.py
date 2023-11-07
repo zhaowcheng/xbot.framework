@@ -5,6 +5,7 @@ TestCase runner.
 """
 
 import os
+import sys
 import shutil
 import traceback
 
@@ -15,10 +16,13 @@ from datetime import datetime
 from xbot.logger import getlogger
 from xbot.errors import TestCaseTimeout
 from xbot.common import LOG_TEMPLATE
+from xbot.testbed import TestBed
+from xbot.testset import TestSet
 from xbot.util import render_write, stop_thread, xprint
 
+sys.path.insert(0, '.')
 
-logger = getlogger()
+logger = getlogger('runner')
 
 
 class Runner(object):
@@ -28,7 +32,7 @@ class Runner(object):
     def __init__(self):
         pass
 
-    def run(self, testbed, testset):
+    def run(self, testbed: TestBed, testset: TestSet) -> str:
         """
         Run testcases.
 
@@ -66,7 +70,7 @@ class Runner(object):
             self._print_divider('end', caseid)
         return logdir
 
-    def _print_divider(self, typ, caseid):
+    def _print_divider(self, typ: str, caseid: str) -> None:
         """
         Print testcase divider.
 
@@ -80,7 +84,7 @@ class Runner(object):
         else:
             raise ValueError('Invalid type: %s' % typ)
 
-    def _make_logdir(self, testbed):
+    def _make_logdir(self, testbed: TestBed) -> str:
         """
         Create log directory.
 
@@ -92,7 +96,7 @@ class Runner(object):
         os.makedirs(logdir)
         return logdir
 
-    def _make_logfile(self, logdir, casepath):
+    def _make_logfile(self, logdir: str, casepath: str) -> str:
         """
         Create log file.
 
@@ -108,7 +112,7 @@ class Runner(object):
         shutil.copyfile(LOG_TEMPLATE, logfile)
         return logfile
 
-    def _import_case(self, casepath):
+    def _import_case(self, casepath: str) -> type:
         """
         Import testcase module.
 
@@ -121,10 +125,12 @@ class Runner(object):
         casecls = getattr(casemod, caseid)
         return casecls
 
-    def _handle_abnormal_case(self, reason, caselog, testbed, message):
+    def _handle_abnormal_case(self, reason: str, caselog: str, 
+                              testbed: TestBed, message: str) -> None:
         """
         Handle abnormal case.
 
+        :param reason: 'importerr' or 'skipped'.
         :param caselog: TestCase logfile.
         :param testbed: TestBed instance.
         :param reason: 'importerr' or 'skipped'.
@@ -155,7 +161,7 @@ class Runner(object):
             stage_records={'setup': [record], 'process': [], 'teardown': []}
         )
 
-    def _run_case(self, casecls, testbed, caselog):
+    def _run_case(self, casecls: type, testbed: TestBed, caselog: str) -> None:
         """
         Execute testcase.
 

@@ -5,7 +5,6 @@ TestSet management.
 """
 
 import os
-import textwrap
 
 from ruamel import yaml
 
@@ -16,7 +15,7 @@ class TestSet(object):
     """
     TestSet management.
     """
-    def __init__(self, filepath):
+    def __init__(self, filepath: str):
         """
         :param filepath: Testset filepath。
         """
@@ -25,15 +24,15 @@ class TestSet(object):
         self._exclude_tags = None
         self._paths = None
 
-    def _parse(self, filepath):
+    def _parse(self, filepath: str) -> dict:
         """
         Parse testset file.
         """
         with open(filepath) as f:
-            return yaml.safe_load(f)
+            return yaml.YAML(typ='safe').load(f)
 
     @property
-    def include_tags(self):
+    def include_tags(self) -> tuple:
         """
         Include tags in testset.
         """
@@ -42,7 +41,7 @@ class TestSet(object):
         return tuple(self._include_tags)
 
     @property
-    def exclude_tags(self):
+    def exclude_tags(self) -> tuple:
         """
         Exclude tags in testset.
         """
@@ -51,7 +50,7 @@ class TestSet(object):
         return tuple(self._exclude_tags)
 
     @property
-    def paths(self):
+    def paths(self) -> tuple:
         """
         Testcase paths.
         """
@@ -59,7 +58,7 @@ class TestSet(object):
             paths = []
             for p in self._data['paths']:
                 if not os.path.exists(p):
-                    raise TestSetError(f'Path `{p}` does not exist.')
+                    raise TestSetError('Path `%s` does not exist.' % p)
                 if p.endswith('.py'):
                     paths.append(p)
                 else:

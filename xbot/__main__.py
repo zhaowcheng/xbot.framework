@@ -18,7 +18,7 @@ from xbot.util import printerr, xprint
 from xbot.common import INIT_DIR
 
 
-def create_parser(internal=False):
+def create_parser(internal: bool = False) -> argparse.ArgumentParser:
     """
     Create command line interface parser.
 
@@ -38,7 +38,7 @@ def create_parser(internal=False):
     return parser
 
 
-def init(directory):
+def init(directory: str) -> None:
     """
     Initialize directory.
 
@@ -50,7 +50,7 @@ def init(directory):
     xprint('Initialized %s.' % directory)
 
 
-def is_projdir(directory):
+def is_projdir(directory: str) -> bool:
     """
     Check if directory is a project directory.
 
@@ -59,7 +59,7 @@ def is_projdir(directory):
     return os.path.exists(os.path.join(directory, 'testcases'))
     
 
-def run(tbcls, testbed, testset):
+def run(tbcls: type, testbed: str, testset: str) -> None:
     """
     Run testcases.
 
@@ -79,7 +79,7 @@ def run(tbcls, testbed, testset):
            do_exit=True, exit_code=(not is_allpassed))
 
 
-def main(tbcls=TestBed, internal=False):
+def main(tbcls: type = TestBed, internal: bool = False) -> None:
     """
     Main function.
 

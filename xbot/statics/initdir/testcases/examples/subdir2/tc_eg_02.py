@@ -37,7 +37,7 @@ class tc_eg_02(TestCase):
         Preset steps.
         """
         self.workdir = tempfile.mkdtemp()
-        self.info(f'Created workdir: {self.workdir}')
+        self.info('Created workdir: %s', self.workdir)
 
     def process(self):
         """
@@ -53,7 +53,6 @@ class tc_eg_02(TestCase):
         self.info('Start test step 2')
         file1 = os.path.join(dir1, 'file1')
         open(file1, 'w').close()
-        self.sleep(1)
         self.assertx(os.path.exists(file1), '==', True)
 
         # Test step 3
@@ -69,4 +68,4 @@ class tc_eg_02(TestCase):
         """
         self.info('Start teardown')
         shutil.rmtree(self.workdir)
-        self.info(f'Removed workdir: {self.workdir}')
+        self.info('Removed workdir: %s', self.workdir)

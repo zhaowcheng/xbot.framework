@@ -6,7 +6,6 @@ Report module.
 
 import os
 import re
-import bisect
 
 from datetime import datetime
 
@@ -14,7 +13,7 @@ from xbot import util
 from xbot import common
 
 
-def find_value(content, key):
+def find_value(content: str, key: str) -> str:
     """
     Find value in html logfile by key.
 
@@ -25,7 +24,7 @@ def find_value(content, key):
     return re.search(r'id="%s".*>(.*)<.*' % key, content).group(1)
 
 
-def gen_report(logdir):
+def gen_report(logdir: str) -> (str, bool):
     """
     Generate report.
 
@@ -62,7 +61,8 @@ def gen_report(logdir):
                         'endtime': find_value(content, 'endtime'),
                         'duration': find_value(content, 'duration')
                     }
-                    bisect.insort(cases, caseinfo, key=lambda x: x['starttime'])
+                    cases.append(caseinfo)
+    cases.sort(key=lambda x: x['starttime'])
     strptime = lambda t: datetime.strptime(t, '%Y-%m-%d %H:%M:%S')
     total_duration = str(
         strptime(cases[-1]['endtime']) - strptime(cases[0]['starttime'])

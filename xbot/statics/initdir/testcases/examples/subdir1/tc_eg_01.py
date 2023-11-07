@@ -46,6 +46,7 @@ class tc_eg_01(TestCase):
         self.info('开始执行测试步骤 2')
         value2 = self.testbed.get('example.key2.key2-1')
         self.assertx(value2, '==', 'value2-1')
+        self.sleep(1)
 
         # 测试步骤 3
         self.info('开始执行测试步骤 3')

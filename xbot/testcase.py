@@ -13,9 +13,11 @@ import textwrap
 import time
 import operator
 
+from typing import Any
 from datetime import datetime, timedelta
 
 from xbot import logger, util, common
+from xbot.testbed import TestBed
 from xbot.errors import TestCaseTimeout
 
 
@@ -27,7 +29,7 @@ class TestCase(object):
     TIMEOUT = 5  # minute(s)
     TAGS = []
 
-    def __init__(self, testbed, logfile):
+    def __init__(self, testbed: TestBed, logfile: str):
         """
         :param testbed: TestBed instance.
         :param logfile: logfile path.
@@ -44,14 +46,14 @@ class TestCase(object):
         logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
-    def testbed(self):
+    def testbed(self) -> TestBed:
         """
         TestBed instance.
         """
         return self.__testbed
 
     @property
-    def caseid(self):
+    def caseid(self) -> str:
         """
         TestCase filename without extension.
         """
@@ -61,28 +63,28 @@ class TestCase(object):
         )
     
     @property
-    def starttime(self):
+    def starttime(self) -> datetime:
         """
         Execution start time.
         """
         return self.__starttime
 
     @property
-    def endtime(self):
+    def endtime(self) -> datetime:
         """
         Execution end time.
         """
         return self.__endtime
 
     @property
-    def duration(self):
+    def duration(self) -> timedelta:
         """
         Execution duration.
         """
         return self.__duration
 
     @property
-    def timestamp(self):
+    def timestamp(self) -> str:
         """
         <caseid>_<starttime>
         """
@@ -90,44 +92,41 @@ class TestCase(object):
             self.caseid, self.starttime.strftime('%H%M%S'))
 
     @property
-    def result(self):
+    def result(self) -> str:
         """
         Execution result.
         """
         return self.__result
-
-    def __log(self, level, msg, *args, **kwargs):
-        """
-        Log message.
-        """
-        kwargs['stacklevel'] = kwargs.get('stacklevel', 3)
-        self.__logger.log(level, msg, *args, **kwargs)
     
     def debug(self, msg, *args, **kwargs):
         """
         DEBUG log.
         """
-        self.__log(logging.DEBUG, msg, *args, **kwargs)
+        kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
+        self.__logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         """
         INFO log.
         """
-        self.__log(logging.INFO, msg, *args, **kwargs)
+        kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
+        self.__logger.info(msg, *args, **kwargs)
 
     def warn(self, msg, *args, **kwargs):
         """
         WARN log.
         """
-        self.__log(logging.WARN, msg, *args, **kwargs)
+        kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
+        self.__logger.warn(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
         ERROR log.
         """
-        self.__log(logging.ERROR, msg, *args, **kwargs)
+        kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
+        self.__logger.error(msg, *args, **kwargs)
 
-    def assertx(self, a, op, b):
+    def assertx(self, a: Any, op: str, b: Any) -> None:
         """
         Assertion.
 
@@ -172,13 +171,13 @@ class TestCase(object):
         if not funcs[op](a, b):
             raise AssertionError('%s %s %s' % (a, op, b))
         else:
-            self.info('AssertionSuccess: %s %s %s', a, op, b, stacklevel=4)
+            self.info('AssertionOK: %s %s %s', a, op, b, stacklevel=3)
 
-    def sleep(self, seconds):
+    def sleep(self, seconds: float) -> None:
         """
         Sleep with logging.
         """
-        self.info(f'Sleep {seconds} second(s)...', stacklevel=4)
+        self.info('Sleep %s second(s)...' % seconds, stacklevel=3)
         time.sleep(seconds)
 
     def setup(self):
@@ -199,14 +198,7 @@ class TestCase(object):
         """
         raise NotImplementedError
 
-    def stepdesc(self, stepid):
-        """
-        logging step description.
-
-        :param stepid: stepid from __doc__.
-        """
-
-    def run(self):
+    def run(self) -> None:
         """
         Execute testcase.
         """
@@ -221,7 +213,7 @@ class TestCase(object):
         self.__dump_log()
         logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
 
-    def __run_stage(self, stage: str):
+    def __run_stage(self, stage: str) -> None:
         """
         Execute one stage(setup, process, teardown).
         """
@@ -232,8 +224,8 @@ class TestCase(object):
             self.__loghdlr.stage = stage
             func()
         except TestCaseTimeout:
-            self.error(f'TestCaseTimeout: Execution did not '
-                       'complete within {self.TIMEOUT} minute(s).')
+            self.error('TestCaseTimeout: Execution did not '
+                       'complete within %s minute(s).' % self.TIMEOUT)
             self.__result = 'TIMEOUT'
         except Exception as e:
             self.error(traceback.format_exc())
@@ -242,7 +234,7 @@ class TestCase(object):
             else:
                 self.__result = 'ERROR'
 
-    def __dump_log(self):
+    def __dump_log(self) -> None:
         """
         Dump testcase log.
         """
@@ -254,7 +246,7 @@ class TestCase(object):
             starttime=self.starttime.strftime('%Y-%m-%d %H:%M:%S'),
             endtime=self.endtime.strftime('%Y-%m-%d %H:%M:%S'),
             duration=str(self.duration),
-            testcase=textwrap.dedent(self.__doc__.strip()),
+            testcase=textwrap.dedent(' ' * 4 + self.__doc__.strip()),
             testbed=self.testbed.content.replace('<','&lt').replace('>','&gt'),
             stage_records=self.__loghdlr.stage_records
         )

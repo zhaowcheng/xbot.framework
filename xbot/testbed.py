@@ -6,6 +6,8 @@ TestBed management.
 
 import os
 
+from typing import Any
+
 from ruamel import yaml
 from xbot.util import deepget
 
@@ -14,37 +16,37 @@ class TestBed(object):
     """
     TestBed management.
     """
-    def __init__(self, filepath):
+    def __init__(self, filepath: str):
         """
-        :param filepath: Testbed filepath。
+        :param filepath: Testbed filepath.
         """
         self.__data = self.__parse(filepath)
         self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
         with open(filepath) as f:
             self.__content = f.read()
 
-    def __parse(self, filepath):
+    def __parse(self, filepath: str) -> dict:
         """
         Parse testbed file.
         """
         with open(filepath) as f:
-            return yaml.safe_load(f)
+            return yaml.YAML(typ='safe').load(f)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Testbed name.
         """
         return self.__name
     
     @property
-    def content(self):
+    def content(self) -> str:
         """
         Testbed file content.
         """
         return self.__content
 
-    def get(self, deepkey, default=None):
+    def get(self, deepkey: str, default: Any = None) -> Any:
         """
         Get value from testbed file.
 
