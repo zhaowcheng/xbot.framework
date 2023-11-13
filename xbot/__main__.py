@@ -73,7 +73,7 @@ def run(tbcls: type, testbed: str, testset: str) -> None:
     tb = tbcls(testbed)
     ts = TestSet(testset)
     logdir = Runner().run(tb, ts)
-    xprint('\nGenerating report...  ', end='')
+    xprint('Generating report...  ', end='')
     report_filepath, is_allpassed = gen_report(logdir)
     xprint(report_filepath, '\n', color='green', 
            do_exit=True, exit_code=(not is_allpassed))

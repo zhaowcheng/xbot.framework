@@ -50,7 +50,9 @@ def gen_report(logdir: str) -> (str, bool):
                 with open(os.path.join(top, f)) as fp:
                     content = fp.read()
                     result = find_value(content, 'result')
-                    if result != 'PASS':
+                    if result not in counter:
+                        raise ValueError(f'Unknown result: {result}: {os.path.join(top, f)}')
+                    if result not in ['PASS', 'SKIP']:
                         allpassed = False
                     counter[result] += 1
                     caseinfo = {

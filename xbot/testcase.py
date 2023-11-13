@@ -180,19 +180,19 @@ class TestCase(object):
         self.info('Sleep %s second(s)...' % seconds, stacklevel=3)
         time.sleep(seconds)
 
-    def setup(self):
+    def setup(self) -> None:
         """
         Preset steps.
         """
         raise NotImplementedError
 
-    def process(self):
+    def process(self) -> None:
         """
         Test steps.
         """
         raise NotImplementedError
 
-    def teardown(self):
+    def teardown(self) -> None:
         """
         Post steps.
         """

@@ -195,6 +195,7 @@ def ip_reachable(ip: str) -> bool:
     except:
         return False
 
+
 def port_opened(ip: str, port: int) -> bool:
     """
     Check if port is opened.
@@ -210,3 +211,33 @@ def port_opened(ip: str, port: int) -> bool:
     except:
         return False
     
+
+def wrapstr(s: str, title: str = '') -> str:
+    """
+    Wrap str with character borders.
+
+    >>> print(wrapstr('hello world'))
+    +-------------+
+    | hello world |
+    +-------------+
+    >>> print(wrapstr('hello world\\nhello world2'))
+    +--------------+
+    | hello world  |
+    | hello world2 |
+    +--------------+
+    >>> print(wrapstr('hello world', title='test'))
+    +-----test----+
+    | hello world |
+    +-------------+
+
+    :param s: 字符串。
+    :param title: 标题。
+    """
+    lines = s.splitlines()
+    width = max(len(line) for line in lines + [title])
+    return '\n'.join([
+        '+' + title.center(width + 2, '-') + '+',
+        *('| %s |' % line.ljust(width) for line in lines),
+        '+' + '-' * (width + 2) + '+'
+    ])
+

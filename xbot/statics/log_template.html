@@ -131,10 +131,10 @@
                         <td>{{record.levelname}}</td>
                         <td>{{record.module}}:{{record.lineno}}</td>
                         <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'result' in record and 'content' in record.result %}, <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@result</a>{% endif %}</pre>
-                            {% if 'result' in record and 'content' in record.result %}
+                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %} <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@more</a>{% endif %}</pre>
+                            {% if 'hook' in record and 'more' in record.hook %}
                             <pre id='{{record.asctime}}'
-                                style="display: none;font-family: monospace;">{{record.result.content.replace('<','&lt').replace('>','&gt')}}</pre>
+                                style="display: none;font-family: monospace;">{{record.hook.more.replace('<','&lt').replace('>','&gt')}}</pre>
                             {% endif %}
                         </td>
                     </tr>
