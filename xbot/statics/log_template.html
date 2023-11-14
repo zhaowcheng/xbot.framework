@@ -131,7 +131,7 @@
                         <td>{{record.levelname}}</td>
                         <td>{{record.module}}:{{record.lineno}}</td>
                         <td>
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %} <a href="javascript:switchElementDisplayState('{{record.asctime}}')">@more</a>{% endif %}</pre>
+                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %}  <a id="a{{record.asctime}}" href="javascript:switchElementDisplayState('{{record.asctime}}');switchMoreOrLess('a{{record.asctime}}')">@more</a>{% endif %}</pre>
                             {% if 'hook' in record and 'more' in record.hook %}
                             <pre id='{{record.asctime}}'
                                 style="display: none;font-family: monospace;">{{record.hook.more.replace('<','&lt').replace('>','&gt')}}</pre>
@@ -154,6 +154,16 @@
         }
         else {
             element.style.display = 'none'
+        }
+    }
+
+    function switchMoreOrLess(eid) {
+        var element = document.getElementById(eid)
+        if (element.textContent == '@more') {
+            element.textContent = '@less'
+        }
+        else {
+            element.textContent = '@more'
         }
     }
 </script>
