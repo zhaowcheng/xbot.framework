@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 
 from xbot import logger, util, common
 from xbot.testbed import TestBed
+from xbot.testset import TestSet
 from xbot.errors import TestCaseTimeout
 
 
@@ -29,12 +30,13 @@ class TestCase(object):
     TIMEOUT = 5  # minute(s)
     TAGS = []
 
-    def __init__(self, testbed: TestBed, logfile: str):
+    def __init__(self, testbed: TestBed, testset: TestSet, logfile: str):
         """
         :param testbed: TestBed instance.
         :param logfile: logfile path.
         """
         self.__testbed = testbed
+        self.__testset = testset
         self.__logfile = logfile
         self.__starttime = None
         self.__endtime = None
@@ -58,8 +60,7 @@ class TestCase(object):
         TestCase filename without extension.
         """
         return os.path.basename(
-            sys.modules[self.__module__].__file__.replace('.'
-                                                          'py', '')
+            sys.modules[self.__module__].__file__.replace('.py', '')
         )
     
     @property
@@ -203,10 +204,19 @@ class TestCase(object):
         Execute testcase.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
-        self.__run_stage('setup')
-        if not self.__result:
-            self.__run_stage('process')
-        self.__run_stage('teardown')
+        etags = self.__testset.exclude_tags
+        itags = self.__testset.include_tags
+        if etags and not set(etags).isdisjoint(self.TAGS):
+            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.exclude={etags}')
+            self.__result = 'SKIP'
+        elif itags and set(itags).isdisjoint(self.TAGS):
+            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.include={itags}')
+            self.__result = 'SKIP'
+        else:
+            self.__run_stage('setup')
+            if not self.__result:
+                self.__run_stage('process')
+            self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
         self.__duration = self.endtime - self.starttime
         self.__result = self.__result or 'PASS'
@@ -250,3 +260,45 @@ class TestCase(object):
             testbed=self.testbed.content.replace('<','&lt').replace('>','&gt'),
             stage_records=self.__loghdlr.stage_records
         )
+
+
+class ErrorTestCase(TestCase):
+    """
+    Construct an error testcase for runner.
+    """
+    def __init__(
+        self, 
+        testbed: TestBed, 
+        testset: TestSet, 
+        logfile: str,
+        caseid: str,
+        exc: Exception
+    ) -> None:
+        """
+        :param exc: Exception instance to raise.
+        """
+        super().__init__(testbed, testset, logfile)
+        self.__caseid = caseid
+        self.__exc = exc
+
+    @property
+    def caseid(self) -> str:
+        return self.__caseid
+    
+    def setup(self) -> None:
+        """
+        Preset steps.
+        """
+        raise self.__exc from None
+
+    def process(self) -> None:
+        """
+        Test steps.
+        """
+        pass
+
+    def teardown(self) -> None:
+        """
+        Post steps.
+        """
+        pass

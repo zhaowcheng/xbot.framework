@@ -8,6 +8,11 @@ import logging
 import os
 import sys
 
+from datetime import datetime, timedelta
+
+from xbot.common import LOG_TEMPLATE
+from xbot.testbed import TestBed
+
 
 class XbotLogger(logging.Logger):
     """
@@ -120,7 +125,7 @@ if not ROOT_LOGGER.handlers:
     ROOT_LOGGER.addHandler(stderr)
 
 
-def getlogger(name):
+def getlogger(name) -> XbotLogger:
     """
     Create logger with name.
     """

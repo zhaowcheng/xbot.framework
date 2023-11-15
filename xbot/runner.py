@@ -18,7 +18,8 @@ from xbot.errors import TestCaseTimeout
 from xbot.common import LOG_TEMPLATE
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
-from xbot.util import render_write, stop_thread, xprint
+from xbot.testcase import TestCase, ErrorTestCase
+from xbot.util import stop_thread, xprint
 
 sys.path.insert(0, '.')
 
@@ -29,44 +30,33 @@ class Runner(object):
     """
     TestCase runner.
     """
-    def __init__(self):
-        pass
+    def __init__(self, testbed: TestBed, testset: TestSet):
+        """
+        :param testbed: TestBed instance.
+        :param testset: TestSet instance.
+        """
+        self.testbed = testbed
+        self.testset = testset
 
-    def run(self, testbed: TestBed, testset: TestSet) -> str:
+    def run(self) -> str:
         """
         Run testcases.
 
-        :param testbed: TestBed instance.
-        :param testset: TestSet instance.
         :return: logdir of this execution.
         """
-        logdir = self._make_logdir(testbed)
-        for casepath in testset.paths:
+        logdir = self._make_logdir()
+        for casepath in self.testset.paths:
             caseid = casepath.split('/')[-1].replace('.py', '')
             self._print_divider('start', caseid)
             caselog = self._make_logfile(logdir, casepath)
             try:
                 casecls = self._import_case(casepath)
-                if testset.exclude_tags and not set(testset.exclude_tags).isdisjoint(casecls.TAGS):
-                    self._handle_abnormal_case(
-                        'skipped', caselog, testbed, 
-                        'Skipped because contain some tag(s) of exclude_tags:%s.' % str(testset.exclude_tags)
-                    )
-                    self._print_divider('end', caseid)
-                    continue
-                if testset.include_tags and set(testset.include_tags).isdisjoint(casecls.TAGS):
-                    self._handle_abnormal_case(
-                        'skipped', caselog, testbed, 
-                        'Skipped because dont contain any tag of include_tags:%s.' % str(testset.include_tags)
-                    )
-                    self._print_divider('end', caseid)
-                    continue
-            except (ImportError, AttributeError):
-                self._handle_abnormal_case(
-                    'importerr', caselog, testbed, traceback.format_exc()
-                )
+                caseinst = casecls(self.testbed, self.testset, caselog)
+            except (ImportError, AttributeError) as e:
+                caseinst = ErrorTestCase(self.testbed, self.testset, 
+                                         caselog, caseid, e)
                 continue
-            self._run_case(casecls, testbed, caselog)
+            self._run_case(caseinst)
             self._print_divider('end', caseid)
         return logdir
 
@@ -83,16 +73,16 @@ class Runner(object):
             xprint(' End: %s '.center(100, '=') % caseid + '\n')
         else:
             raise ValueError('Invalid type: %s' % typ)
-
-    def _make_logdir(self, testbed: TestBed) -> str:
+        
+    def _make_logdir(self) -> str:
         """
         Create log directory.
 
-        :param testbed: TestBed instance.
+        :param self.testbed: self.testbed instance.
         :return: logdir path.
         """
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logdir = os.path.join(os.getcwd(), 'logs', testbed.name, timestamp)
+        logdir = os.path.join(os.getcwd(), 'logs', self.testbed.name, timestamp)
         os.makedirs(logdir)
         return logdir
 
@@ -125,51 +115,10 @@ class Runner(object):
         casecls = getattr(casemod, caseid)
         return casecls
 
-    def _handle_abnormal_case(self, reason: str, caselog: str, 
-                              testbed: TestBed, message: str) -> None:
-        """
-        Handle abnormal case.
-
-        :param reason: 'importerr' or 'skipped'.
-        :param caselog: TestCase logfile.
-        :param testbed: TestBed instance.
-        :param reason: 'importerr' or 'skipped'.
-        """
-        if reason == 'importerr':
-            logger.error(message)
-        elif reason == 'skipped':
-            logger.warn(message)
-        caseid = os.path.basename(caselog).replace('.html', '')
-        starttime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        record = {
-            'levelname': {'importerr': 'ERROR', 'skipped': 'WARN'}[reason],
-            'asctime': starttime,
-            'module': 'runner',
-            'threadName': caseid,
-            'message': message
-        }
-        render_write(
-            LOG_TEMPLATE,
-            caselog,
-            caseid=caseid,
-            result={'importerr': 'ERROR', 'skipped': 'SKIP'}[reason],
-            starttime=starttime,
-            endtime=starttime,
-            duration='0:00:00',
-            testcase='',
-            testbed=testbed.content.replace('<','&lt').replace('>','&gt'),
-            stage_records={'setup': [record], 'process': [], 'teardown': []}
-        )
-
-    def _run_case(self, casecls: type, testbed: TestBed, caselog: str) -> None:
+    def _run_case(self, caseinst: TestCase) -> None:
         """
         Execute testcase.
-
-        :param casecls: TestCase class.
-        :param testbed: TestBed instance.
-        :param caselog: TestCase logfile.
         """
-        caseinst = casecls(testbed, caselog)
         t = Thread(target=caseinst.run, name=caseinst.caseid)
         t.start()
         t.join(caseinst.TIMEOUT * 60)

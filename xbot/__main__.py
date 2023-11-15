@@ -8,6 +8,7 @@ import os
 import sys
 import shutil
 import argparse
+import textwrap
 
 from xbot.version import __version__
 from xbot.testbed import TestBed
@@ -24,17 +25,23 @@ def create_parser(internal: bool = False) -> argparse.ArgumentParser:
 
     :param internal: True if internal command line interface.
     """
-    cmds = ['run']
     if internal:
-        cmds += ['init']
-    parser = argparse.ArgumentParser(prog='xbot')
+        cmds = ['init', 'run']
+        prog = 'xbot'
+    else:
+        cmds = ['run']
+        prog = None
+    parser = argparse.ArgumentParser(prog=prog)
     parser.add_argument('command', choices=cmds)
     if 'init' in cmds:
-        parser.add_argument('-d', '--directory', required=('init' in sys.argv), help='directory to init')
+        parser.add_argument('-d', '--directory', required=('init' in sys.argv), 
+                            help='directory to init (required by `init` command)')
     if 'run' in cmds:
-        parser.add_argument('-b', '--testbed', required=('run' in sys.argv), help='testbed file')
-        parser.add_argument('-s', '--testset', required=('run' in sys.argv), help='testset file')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+        parser.add_argument('-b', '--testbed', required=('run' in sys.argv), 
+                            help='testbed filepath (required by `run` command)')
+        parser.add_argument('-s', '--testset', required=('run' in sys.argv), 
+                            help='testset filepath (required by `run` command)')
+    parser.add_argument('-v', '--version', action='version', version=f'xbot {__version__}')
     return parser
 
 
@@ -72,7 +79,8 @@ def run(tbcls: type, testbed: str, testset: str) -> None:
                  "maybe current is not a project directory.")
     tb = tbcls(testbed)
     ts = TestSet(testset)
-    logdir = Runner().run(tb, ts)
+    runner = Runner(tb, ts)
+    logdir = runner.run()
     xprint('Generating report...  ', end='')
     report_filepath, is_allpassed = gen_report(logdir)
     xprint(report_filepath, '\n', color='green', 
