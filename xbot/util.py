@@ -9,10 +9,11 @@ import re
 import ctypes
 import operator
 import socket
+import tempfile
 
 import jinja2
 
-from typing import Any
+from typing import Any, Iterator, Tuple, List
 from functools import reduce, partial
 
 
@@ -241,3 +242,44 @@ def wrapstr(s: str, title: str = '') -> str:
         '+' + '-' * (width + 2) + '+'
     ])
 
+
+def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
+    """
+    Similar to os.walk, but accessed in name order.
+
+    >>> tmpdir = tempfile.mkdtemp()
+    >>> dir1 = os.path.join(tmpdir, 'dir1')
+    >>> dir2 = os.path.join(tmpdir, 'dir2')
+    >>> file1 = os.path.join(tmpdir, 'file1')
+    >>> file2 = os.path.join(tmpdir, 'file2')
+    >>> file1_1 = os.path.join(dir1, 'file1_1')
+    >>> file1_2 = os.path.join(dir1, 'file1_2')
+    >>> file2_1 = os.path.join(dir2, 'file2_1')
+    >>> file2_2 = os.path.join(dir2, 'file2_2')
+    >>> os.makedirs(os.path.join(tmpdir, 'dir1'))
+    >>> os.makedirs(os.path.join(tmpdir, 'dir2'))
+    >>> for file in [file1, file2, file1_1, file1_2, file2_1, file2_2]:
+    ...     with open(file, 'w') as fp:
+    ...         _ = fp.write('hello world')
+    >>> for top, dirs, files in ordered_walk(tmpdir):
+    ...     print(f'dirs: {dirs}, files: {files}')
+    dirs: ['dir1', 'dir2'], files: ['file1', 'file2']
+    dirs: [], files: ['file1_1', 'file1_2']
+    dirs: [], files: ['file2_1', 'file2_2']
+
+    :param path: path to walk.
+    :yield: (top, dirs, files)
+    """
+    top, dirs, files = path, [], []
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.is_dir():
+                dirs.append(entry.name)
+            elif entry.is_file():
+                files.append(entry.name)
+    dirs.sort()
+    files.sort()
+    yield top, dirs, files
+    for d in dirs:
+        for t in ordered_walk(os.path.join(path, d)):
+            yield t

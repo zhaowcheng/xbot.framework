@@ -27,7 +27,7 @@ class TestCase(object):
     TestCase base.
     """
 
-    TIMEOUT = 5  # minute(s)
+    TIMEOUT = 60  # second(s)
     TAGS = []
 
     def __init__(self, testbed: TestBed, testset: TestSet, logfile: str):
@@ -235,7 +235,7 @@ class TestCase(object):
             func()
         except TestCaseTimeout:
             self.error('TestCaseTimeout: Execution did not '
-                       'complete within %s minute(s).' % self.TIMEOUT)
+                       'complete within %s second(s).' % self.TIMEOUT)
             self.__result = 'TIMEOUT'
         except Exception as e:
             self.error(traceback.format_exc())
@@ -277,9 +277,9 @@ class ErrorTestCase(TestCase):
         """
         :param exc: Exception instance to raise.
         """
-        super().__init__(testbed, testset, logfile)
         self.__caseid = caseid
         self.__exc = exc
+        super().__init__(testbed, testset, logfile)
 
     @property
     def caseid(self) -> str:

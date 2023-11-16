@@ -160,14 +160,18 @@
 
     <table id='result_table'>
         <tr id='header_row'>
-            <th width="60%">testcase</th>
-            <th>duration[{{total_duration}}]</th>
-            <th>result</th>
+            <th width="55%">testcase</th>
+            <th width="14%">starttime</th>
+            <th width="14%">endtime</th>
+            <th width="11%">duration[{{total_duration}}]</th>
+            <th width="6%">result</th>
         </tr>
 
         {% for case in cases %}
         <tr class="{{case.result}}">
             <td >{{case.path}}</td>
+            <td align='center'>{{case.starttime}}</td>
+            <td align='center'>{{case.endtime}}</td>
             <td align='center'>{{case.duration}}</td>
             <td align='center'>
                 <a href="{{case.log}}" target="_blank">{{case.result}}</a>

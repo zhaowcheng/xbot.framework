@@ -41,7 +41,7 @@ def gen_report(logdir: str) -> (str, bool):
     }
     report = os.path.join(logdir, 'report.html')
     allpassed = True
-    for top, dirs, files in os.walk(logdir):
+    for top, dirs, files in util.ordered_walk(logdir):
         for f in files:
             if f.endswith('.html'):
                 reltop = os.path.relpath(top, logdir)
@@ -64,7 +64,7 @@ def gen_report(logdir: str) -> (str, bool):
                         'duration': find_value(content, 'duration')
                     }
                     cases.append(caseinfo)
-    cases.sort(key=lambda x: x['starttime'])
+    cases.sort(key=lambda x: (x['starttime'], x['path']))
     strptime = lambda t: datetime.strptime(t, '%Y-%m-%d %H:%M:%S')
     total_duration = str(
         strptime(cases[-1]['endtime']) - strptime(cases[0]['starttime'])

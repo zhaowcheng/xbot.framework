@@ -7,7 +7,6 @@ TestCase runner.
 import os
 import sys
 import shutil
-import traceback
 
 from threading import Thread
 from importlib import import_module
@@ -55,7 +54,6 @@ class Runner(object):
             except (ImportError, AttributeError) as e:
                 caseinst = ErrorTestCase(self.testbed, self.testset, 
                                          caselog, caseid, e)
-                continue
             self._run_case(caseinst)
             self._print_divider('end', caseid)
         return logdir
@@ -121,7 +119,7 @@ class Runner(object):
         """
         t = Thread(target=caseinst.run, name=caseinst.caseid)
         t.start()
-        t.join(caseinst.TIMEOUT * 60)
+        t.join(caseinst.TIMEOUT)
         if t.is_alive():
             stop_thread(t, TestCaseTimeout)
             t.join(60)  # wait for teardown to finished.

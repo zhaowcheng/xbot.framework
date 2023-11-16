@@ -22,8 +22,8 @@ class tc_eg_01(TestCase):
         3. 值应为 `value3-2`；
     """
 
-    # 用例最大执行时长（分钟）。
-    TIMEOUT = 5
+    # 用例最大执行时长（秒）。
+    TIMEOUT = 60
     # 用例标签。
     TAGS = ['tag1']
 
@@ -46,7 +46,6 @@ class tc_eg_01(TestCase):
         self.info('开始执行测试步骤 2')
         value2 = self.testbed.get('example.key2.key2-1')
         self.assertx(value2, '==', 'value2-1')
-        self.sleep(1)
 
         # 测试步骤 3
         self.info('开始执行测试步骤 3')
@@ -58,3 +57,4 @@ class tc_eg_01(TestCase):
         Post steps.
         """
         self.info('开始执行清理步骤')
+        self.sleep(1)

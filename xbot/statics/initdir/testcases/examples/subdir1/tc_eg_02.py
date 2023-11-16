@@ -27,8 +27,8 @@ class tc_eg_02(TestCase):
         3. `file1` should contain `hello world`;
     """
 
-    # Max execution time(minutes).
-    TIMEOUT = 5
+    # Max execution time(seconds).
+    TIMEOUT = 60
     # Testcase tags.
     TAGS = ['tag2']
 
@@ -69,3 +69,4 @@ class tc_eg_02(TestCase):
         self.info('Start teardown')
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)
+        self.sleep(1)
