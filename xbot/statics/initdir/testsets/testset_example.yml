@@ -1,11 +1,8 @@
 tags:
   include:
     - tag1
-    - tag2
-    - tag3
-    - tag4
   exclude:
-    - tag5
+    - tag2
 
 paths:
   - testcases/examples/subdir1/tc_eg_01.py

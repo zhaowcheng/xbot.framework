@@ -30,7 +30,7 @@ class tc_eg_02(TestCase):
     # Max execution time(seconds).
     TIMEOUT = 60
     # Testcase tags.
-    TAGS = ['tag2']
+    TAGS = ['tag1']
 
     def setup(self):
         """

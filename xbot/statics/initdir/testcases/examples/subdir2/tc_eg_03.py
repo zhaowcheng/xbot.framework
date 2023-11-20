@@ -20,7 +20,7 @@ class tc_eg_03(TestCase):
     # 用例最大执行时长（秒）。
     TIMEOUT = 60
     # 用例标签。
-    TAGS = ['tag3']
+    TAGS = ['tag1']
 
     def setup(self):
         """
