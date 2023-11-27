@@ -27,7 +27,11 @@ class TestCase(object):
     TestCase base.
     """
 
-    TIMEOUT = 60  # second(s)
+    # Max execution time(seconds).
+    TIMEOUT = 60
+    # Can it be executed in parallel.
+    PARALLEL = False
+    # Testcase tags.
     TAGS = []
 
     def __init__(self, testbed: TestBed, testset: TestSet, logfile: str):

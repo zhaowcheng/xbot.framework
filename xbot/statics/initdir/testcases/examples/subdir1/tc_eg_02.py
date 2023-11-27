@@ -29,6 +29,8 @@ class tc_eg_02(TestCase):
 
     # Max execution time(seconds).
     TIMEOUT = 60
+    # Can it be executed in parallel.
+    PARALLEL = False
     # Testcase tags.
     TAGS = ['tag1']
 

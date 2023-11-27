@@ -8,7 +8,6 @@ import os
 import sys
 import shutil
 import argparse
-import textwrap
 
 from xbot.version import __version__
 from xbot.testbed import TestBed

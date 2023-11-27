@@ -1,8 +1,12 @@
 tags:
-  include:
+  include:  # zero ~ many
     - tag1
-  exclude:
+  exclude:  # zero ~ many
     - tag2
+
+# max testcases excuted at the same, only testcases with the 
+# `PARALLEL` property set to `True` will be executed in parallel.
+max_parallel: 1
 
 paths:
   - testcases/examples/subdir1/tc_eg_01.py
