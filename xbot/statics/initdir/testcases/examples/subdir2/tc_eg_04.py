@@ -1,47 +1,38 @@
+from xbot.util import assertx
+
 from lib.testcase import TestCase
 
 
 class tc_eg_04(TestCase):
     """
     错误的测试用例。
-
-    @用例名称: 错误的测试用例。
-
-    @预置步骤:
-        1. 创建列表 self.mylist = [1, 2]
-
-    @测试步骤:
-        1. 访问 self.mylist[2]
-        
-    @预期结果:
-        无
     """
-
-    # 用例最大执行时长（秒）。
     TIMEOUT = 60
-    # 是否可以被并行执行。
-    PARALLEL = False
-    # 用例标签。
+    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):
         """
-        Preset steps.
+        创建列表 self.mylist = [1, 2]
         """
-        self.info('开始执行预置步骤')
         self.mylist = [1, 2]
 
-    def process(self):
+    def step1(self):
         """
-        Test steps.
+        访问 self.mylist[2]
         """
         # 测试步骤 1
-        self.info('开始执行测试步骤 1')
         self.mylist[2]
+
+    def step2(self):
+        """
+        访问 self.mylist[1]
+        """
+        # 测试步骤 1
+        self.mylist[1]
 
     def teardown(self):
         """
-        Post steps.
+        睡 1 秒模拟清理步骤
         """
-        self.info('开始执行清理步骤')
         self.sleep(1)

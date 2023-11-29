@@ -9,12 +9,13 @@ import sys
 import logging
 import traceback
 import re
-import textwrap
 import time
 import operator
+import inspect
 
-from typing import Any
+from typing import Any, List
 from datetime import datetime, timedelta
+from importlib import import_module
 
 from xbot import logger, util, common
 from xbot.testbed import TestBed
@@ -26,11 +27,10 @@ class TestCase(object):
     """
     TestCase base.
     """
-
     # Max execution time(seconds).
     TIMEOUT = 60
-    # Can it be executed in parallel.
-    PARALLEL = False
+    # Stop the test run on the first fail.
+    FAILFAST = True
     # Testcase tags.
     TAGS = []
 
@@ -66,6 +66,13 @@ class TestCase(object):
         return os.path.basename(
             sys.modules[self.__module__].__file__.replace('.py', '')
         )
+    
+    @property
+    def steps(self) -> List[str]:
+        """
+        Test steps.
+        """
+        return sorted([n for n in dir(self.__class__) if re.match(r'step\d+', n)])
     
     @property
     def starttime(self) -> datetime:
@@ -131,53 +138,6 @@ class TestCase(object):
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.error(msg, *args, **kwargs)
 
-    def assertx(self, a: Any, op: str, b: Any) -> None:
-        """
-        Assertion.
-
-        >>> assertx(1, '==', 1)
-        >>> assertx(1, '!=', 2)
-        >>> assertx(1, '>', 0)
-        >>> assertx(1, '>=', 1)
-        >>> assertx(1, '<', 2)
-        >>> assertx(1, '<=', 1)
-        >>> assertx(1, 'in', [1, 2, 3])
-        >>> assertx(1, 'not in', [2, 3, 4])
-        >>> assertx(1, 'is', 1)
-        >>> assertx(1, 'is not', 2)
-        >>> assertx('abc', 'match', r'^[a-z]+$')
-        >>> assertx('abc', 'not match', r'^[0-9]+$')
-        >>> assertx('abc', 'search', r'[a-z]')
-        >>> assertx('abc', 'not search', r'[0-9]')
-
-        :param a: Operation object a.
-        :param op: Operator.
-        :param b: Operation object b.
-        :raises AssertionError: Assertion failed.
-        """
-        funcs = {
-            '==': operator.eq,
-            '!=': operator.ne,
-            '>': operator.gt,
-            '>=': operator.ge,
-            '<': operator.lt,
-            '<=': operator.le,
-            'in': lambda a, b: operator.contains(b, a),
-            'not in': lambda a, b: not operator.contains(b, a),
-            'is': operator.is_,
-            'is not': operator.is_not,
-            'match': lambda a, b: re.match(b, a),
-            'not match': lambda a, b: not re.match(b, a),
-            'search': lambda a, b: re.search(b, a),
-            'not search': lambda a, b: not re.search(b, a)
-        }
-        if op not in funcs:
-            raise ValueError('Invalid operator: %s', op)
-        if not funcs[op](a, b):
-            raise AssertionError('%s %s %s' % (a, op, b))
-        else:
-            self.info('AssertionOK: %s %s %s', a, op, b, stacklevel=3)
-
     def sleep(self, seconds: float) -> None:
         """
         Sleep with logging.
@@ -191,15 +151,17 @@ class TestCase(object):
         """
         raise NotImplementedError
 
-    def process(self) -> None:
+    def step1(self) -> None:
         """
-        Test steps.
+        Test step 1, you can add step2, step3, etc., these 
+        steps will be executed in the order of their names, 
+        a testcase requires at lease one step.
         """
         raise NotImplementedError
 
     def teardown(self) -> None:
         """
-        Post steps.
+        Cleanup steps.
         """
         raise NotImplementedError
 
@@ -211,15 +173,20 @@ class TestCase(object):
         etags = self.__testset.exclude_tags
         itags = self.__testset.include_tags
         if etags and not set(etags).isdisjoint(self.TAGS):
+            self.__loghdlr.set_stage('setup')
+            self.__result = 'SKIP'
             self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.exclude={etags}')
-            self.__result = 'SKIP'
         elif itags and set(itags).isdisjoint(self.TAGS):
-            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.include={itags}')
+            self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
+            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.include={itags}')
         else:
             self.__run_stage('setup')
             if not self.__result:
-                self.__run_stage('process')
+                for step in self.steps:
+                    if not self.__result or (self.__result == 'FAIL' and 
+                                             self.FAILFAST == False):
+                        self.__run_stage(step)
             self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
         self.__duration = self.endtime - self.starttime
@@ -229,13 +196,13 @@ class TestCase(object):
 
     def __run_stage(self, stage: str) -> None:
         """
-        Execute one stage(setup, process, teardown).
+        Execute one stage(setup, step1, teardown, etc).
         """
-        func = {'setup': self.setup,
-                'process': self.process,
-                'teardown': self.teardown}[stage]
+        func = getattr(self, stage)
         try:
-            self.__loghdlr.stage = stage
+            self.__loghdlr.set_stage(stage)
+            if not callable(func):
+                raise TypeError(f'`{stage}` is not callable')
             func()
         except TestCaseTimeout:
             self.error('TestCaseTimeout: Execution did not '
@@ -260,9 +227,9 @@ class TestCase(object):
             starttime=self.starttime.strftime('%Y-%m-%d %H:%M:%S'),
             endtime=self.endtime.strftime('%Y-%m-%d %H:%M:%S'),
             duration=str(self.duration),
-            testcase=textwrap.dedent(' ' * 4 + self.__doc__.strip()),
+            sourcecode=inspect.getsource(import_module(self.__module__)),
             testbed=self.testbed.content.replace('<','&lt').replace('>','&gt'),
-            stage_records=self.__loghdlr.stage_records
+            stage_records=self.__loghdlr.records
         )
 
 
@@ -295,9 +262,9 @@ class ErrorTestCase(TestCase):
         """
         raise self.__exc from None
 
-    def process(self) -> None:
+    def step1(self) -> None:
         """
-        Test steps.
+        Test step 1.
         """
         pass
 

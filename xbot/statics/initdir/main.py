@@ -1,4 +1,4 @@
-from xbot.__main__ import main
+from xbot.main import main
 from lib.testbed import TestBed
 
 

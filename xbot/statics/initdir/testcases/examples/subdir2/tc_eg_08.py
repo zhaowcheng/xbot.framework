@@ -3,16 +3,12 @@ from xbot.util import assertx
 from lib.testcase import TestCase
 
 
-# 类名将被作为用例编号，且应与文件名保持一致。
-class tc_eg_01(TestCase):
+class tc_eg_08(TestCase):
     """
-    从示例测试床中获取信息并检查。
+    FAILFAST 属性为 False 的用例。
     """
-    # 用例最大执行时长（秒）。
     TIMEOUT = 60
-    # 当第一个 FAIL(断言失败) 出现时是否立即停止用例执行
-    FAILFAST = True
-    # 用例标签。
+    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):
@@ -30,10 +26,10 @@ class tc_eg_01(TestCase):
 
     def step2(self):
         """
-        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-1`。
+        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-2`。
         """
         value2 = self.testbed.get('example.key2.key2-1')
-        assertx(value2, '==', 'value2-1')
+        assertx(value2, '==', 'value2-2')
 
     def step3(self):
         """

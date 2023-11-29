@@ -9,12 +9,16 @@ import re
 import ctypes
 import operator
 import socket
-import tempfile
 
 import jinja2
 
 from typing import Any, Iterator, Tuple, List
 from functools import reduce, partial
+
+from xbot.logger import getlogger
+
+
+logger = getlogger('util')
 
 
 class ColorText(object):
@@ -247,6 +251,7 @@ def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     """
     Similar to os.walk, but accessed in name order.
 
+    >>> import tempfile
     >>> tmpdir = tempfile.mkdtemp()
     >>> dir1 = os.path.join(tmpdir, 'dir1')
     >>> dir2 = os.path.join(tmpdir, 'dir2')
@@ -283,3 +288,61 @@ def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     for d in dirs:
         for t in ordered_walk(os.path.join(path, d)):
             yield t
+
+
+def assertx(
+        a: Any, 
+        op: str, 
+        b: Any, 
+        errmsg: str = None, 
+        verbose: bool = True
+    ) -> None:
+    """
+    Assertion.
+
+    >>> assertx(1, '==', 1)
+    >>> assertx(1, '!=', 2)
+    >>> assertx(1, '>', 0)
+    >>> assertx(1, '>=', 1)
+    >>> assertx(1, '<', 2)
+    >>> assertx(1, '<=', 1)
+    >>> assertx(1, 'in', [1, 2, 3])
+    >>> assertx(1, 'not in', [2, 3, 4])
+    >>> assertx(1, 'is', 1)
+    >>> assertx(1, 'is not', 2)
+    >>> assertx('abc', 'match', r'^[a-z]+$')
+    >>> assertx('abc', 'not match', r'^[0-9]+$')
+    >>> assertx('abc', 'search', r'[a-z]')
+    >>> assertx('abc', 'not search', r'[0-9]')
+
+    :param a: Operation object a.
+    :param op: Operator.
+    :param b: Operation object b.
+    :param errmsg: Error message.
+    :param verbose: logging when successful.
+    :raises AssertionError: Assertion failed.
+    """
+    funcs = {
+        '==': operator.eq,
+        '!=': operator.ne,
+        '>': operator.gt,
+        '>=': operator.ge,
+        '<': operator.lt,
+        '<=': operator.le,
+        'in': lambda a, b: operator.contains(b, a),
+        'not in': lambda a, b: not operator.contains(b, a),
+        'is': operator.is_,
+        'is not': operator.is_not,
+        'match': lambda a, b: re.match(b, a),
+        'not match': lambda a, b: not re.match(b, a),
+        'search': lambda a, b: re.search(b, a),
+        'not search': lambda a, b: not re.search(b, a)
+    }
+    if op not in funcs:
+        raise ValueError('Invalid operator: %s', op)
+    if not funcs[op](a, b):
+        if not errmsg:
+            errmsg = '%s %s %s' % (a, op, b)
+        raise AssertionError(errmsg)
+    if verbose:
+        logger.info('AssertionOK: %s %s %s', a, op, b, stacklevel=2)

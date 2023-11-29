@@ -44,9 +44,10 @@ class Runner(object):
         :return: logdir of this execution.
         """
         logdir = self._make_logdir()
-        for casepath in self.testset.paths:
+        casecnt = len(self.testset.paths)
+        for i, casepath in enumerate(self.testset.paths):
             caseid = casepath.split('/')[-1].replace('.py', '')
-            self._print_divider('start', caseid)
+            xprint(f'Start: {caseid} ({i+1}/{casecnt})'.center(100, '='))
             caselog = self._make_logfile(logdir, casepath)
             try:
                 casecls = self._import_case(casepath)
@@ -55,22 +56,8 @@ class Runner(object):
                 caseinst = ErrorTestCase(self.testbed, self.testset, 
                                          caselog, caseid, e)
             self._run_case(caseinst)
-            self._print_divider('end', caseid)
+            xprint(f'End: {caseid} ({i+1}/{casecnt})'.center(100, '='), '\n')
         return logdir
-
-    def _print_divider(self, typ: str, caseid: str) -> None:
-        """
-        Print testcase divider.
-
-        :param typ: 'start' or 'end'.
-        :param caseid: TestCase id.
-        """
-        if typ == 'start':
-            xprint(' Start: %s '.center(100, '=') % caseid)
-        elif typ == 'end':
-            xprint(' End: %s '.center(100, '=') % caseid + '\n')
-        else:
-            raise ValueError('Invalid type: %s' % typ)
         
     def _make_logdir(self) -> str:
         """

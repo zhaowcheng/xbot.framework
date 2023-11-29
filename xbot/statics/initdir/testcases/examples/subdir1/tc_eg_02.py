@@ -2,6 +2,8 @@ import os
 import tempfile
 import shutil
 
+from xbot.util import assertx
+
 from lib.testcase import TestCase
 
 
@@ -10,65 +12,53 @@ from lib.testcase import TestCase
 class tc_eg_02(TestCase):
     """
     Test creation of directory and file.
-
-    @TestcaseName: Test creation of directory and file.
-
-    @PresetSteps:
-        1. Create a temporary workdir;
-
-    @TestSteps:
-        1. Create directory `dir1` in workdir;
-        2. Create empty file `file1` in `dir1`;
-        3. Write `hello world` to `file1`;
-        
-    @ExpectedResults:
-        1. `dir1` should be created;
-        2. `file1` should be created;
-        3. `file1` should contain `hello world`;
     """
-
     # Max execution time(seconds).
     TIMEOUT = 60
-    # Can it be executed in parallel.
-    PARALLEL = False
+    # Stop the test run on the first fail.
+    FAILFAST = True
     # Testcase tags.
     TAGS = ['tag1']
 
     def setup(self):
         """
-        Preset steps.
+        Create a temporary workdir.
         """
         self.workdir = tempfile.mkdtemp()
         self.info('Created workdir: %s', self.workdir)
 
-    def process(self):
+    def step1(self):
         """
-        Test steps.
+        Create directory `dir1` in workdir and check 
+        that it should be created successfully.
         """
-        # Test step 1
-        self.info('Start test step 1')
-        dir1 = os.path.join(self.workdir, 'dir1')
-        os.mkdir(dir1)
-        self.assertx(os.path.exists(dir1), '==', True)
+        self.dir1 = os.path.join(self.workdir, 'dir1')
+        os.mkdir(self.dir1)
+        assertx(os.path.exists(self.dir1), '==', True)
 
-        # Test step 2
-        self.info('Start test step 2')
-        file1 = os.path.join(dir1, 'file1')
-        open(file1, 'w').close()
-        self.assertx(os.path.exists(file1), '==', True)
+    def step2(self):
+        """
+        Create empty file `file1` in `dir1` and check 
+        that it should be created successfully.
+        """
+        self.file1 = os.path.join(self.dir1, 'file1')
+        open(self.file1, 'w').close()
+        assertx(os.path.exists(self.file1), '==', True)
 
-        # Test step 3
-        self.info('Start test step 3')
-        with open(file1, 'w') as f:
+    def step3(self):
+        """
+        Write `hello world` to `file1` and check
+        that it should be wrote successfully.
+        """
+        with open(self.file1, 'w') as f:
             f.write('hello world')
-        with open(file1, 'r') as f:
-            self.assertx(f.read(), '==', 'hello world')
+        with open(self.file1, 'r') as f:
+            assertx(f.read(), '==', 'hello world')
 
     def teardown(self):
         """
-        Post steps.
+        Remove the temporary workdir.
         """
-        self.info('Start teardown')
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)
         self.sleep(1)

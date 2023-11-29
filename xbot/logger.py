@@ -9,7 +9,7 @@ import os
 import sys
 
 
-class XbotLogger(logging.Logger):
+class XLogger(logging.Logger):
     """
     Custom Logger.
 
@@ -67,7 +67,7 @@ class XbotLogger(logging.Logger):
         self.handle(record)
 
 
-logging.setLoggerClass(XbotLogger)
+logging.setLoggerClass(XLogger)
 
 
 class StdoutFilter(logging.Filter):
@@ -91,15 +91,18 @@ class CaseLogHandler(logging.Handler):
     """
     def __init__(self, level=logging.NOTSET):
         super(CaseLogHandler, self).__init__(level)
-        self.stage_records = {
-            'setup': [],
-            'process': [],
-            'teardown': [],
-        }
-        self.stage = 'setup'
+        self.records = {}
+        self.stage = None
+
+    def set_stage(self, stage: str):
+        self.stage = stage
+        if self.stage not in self.records:
+            self.records[self.stage] = []
 
     def emit(self, record):
-        self.stage_records[self.stage].append(record.__dict__)
+        if self.stage not in self.records:
+            self.records[self.stage] = []
+        self.records[self.stage].append(record.__dict__)
 
 
 ROOT_LOGGER = logging.getLogger('xbot')
@@ -112,7 +115,7 @@ if not ROOT_LOGGER.handlers:
     stderr = logging.StreamHandler(sys.stderr)
     stderr.setLevel('ERROR')
     formater = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] [%(module)s:%(lineno)s] %(message)s'
+        '[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)s] %(message)s'
     )
     stdout.setFormatter(formater)
     stderr.setFormatter(formater)
@@ -120,7 +123,7 @@ if not ROOT_LOGGER.handlers:
     ROOT_LOGGER.addHandler(stderr)
 
 
-def getlogger(name) -> XbotLogger:
+def getlogger(name) -> XLogger:
     """
     Create logger with name.
     """

@@ -51,9 +51,9 @@ def init(directory: str) -> None:
     :param directory: directory to init.
     """
     if os.path.exists(directory):
-        printerr('%s already exists.' % directory)
+        printerr('%s already exists' % directory)
     shutil.copytree(INIT_DIR, directory)
-    xprint('Initialized %s.' % directory)
+    xprint('Initialized %s' % directory)
 
 
 def is_projdir(directory: str) -> bool:
@@ -102,6 +102,7 @@ def main(tbcls: type = TestBed, internal: bool = False) -> None:
 
 
 internal_main = lambda: main(internal=True)
+
 
 if __name__ == '__main__':
     internal_main()
