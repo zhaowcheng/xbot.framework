@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Logging module.
+日志模块。
 """
 
 import logging
@@ -11,14 +11,11 @@ import sys
 
 class XLogger(logging.Logger):
     """
-    Custom Logger.
-
-    findCaller() and _log() are copied from logging.Logger of Python3.8
+    自定义 Logger。
     """
     def findCaller(self, stacklevel= 1):
         """
-        Find the stack frame of the caller so that we can note the source
-        file name, line number and function name.
+        拷贝自 Python3.8
         """
         f = logging.currentframe()
         #On some versions of IronPython, currentframe() returns None if
@@ -44,8 +41,7 @@ class XLogger(logging.Logger):
 
     def _log(self, level, msg, args, exc_info=None, extra=None, stacklevel=1):
         """
-        Low-level logging routine which creates a LogRecord and then calls
-        all the handlers of this logger to handle the record.
+        拷贝自 Python3.8
         """
         if logging._srcfile:
             #IronPython doesn't track Python frames, so findCaller raises an
@@ -79,7 +75,7 @@ class StdoutFilter(logging.Filter):
 
 class CaseLogFilter(logging.Filter):
     """
-    Filter records for testcase.
+    用例日志过滤器。
     """
     def filter(self, record):
         return self.name == record.threadName
@@ -87,7 +83,7 @@ class CaseLogFilter(logging.Filter):
 
 class CaseLogHandler(logging.Handler):
     """
-    Handler for testcase.
+    用例日志处理器。
     """
     def __init__(self, level=logging.NOTSET):
         super(CaseLogHandler, self).__init__(level)
@@ -125,6 +121,6 @@ if not ROOT_LOGGER.handlers:
 
 def getlogger(name) -> XLogger:
     """
-    Create logger with name.
+    返回 xbot 子 Logger。
     """
     return ROOT_LOGGER.getChild(name)

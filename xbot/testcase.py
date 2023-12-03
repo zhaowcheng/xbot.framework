@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-TestCase base.
+用例基类。
 """
 
 import os
@@ -10,14 +10,13 @@ import logging
 import traceback
 import re
 import time
-import operator
 import inspect
 
 from typing import Any, List
 from datetime import datetime, timedelta
 from importlib import import_module
 
-from xbot import logger, util, common
+from xbot import logger, common, utils
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.errors import TestCaseTimeout
@@ -25,19 +24,19 @@ from xbot.errors import TestCaseTimeout
 
 class TestCase(object):
     """
-    TestCase base.
+    用例基类。
     """
-    # Max execution time(seconds).
+    # 最大执行时长（单位：秒），超过该时长将会被强制结束。
     TIMEOUT = 60
-    # Stop the test run on the first fail.
+    # 如果为 True，当第一个断言失败发生时则跳过所有未执行的 step，直接执行 teardown。
     FAILFAST = True
-    # Testcase tags.
+    # 用例标签。
     TAGS = []
 
     def __init__(self, testbed: TestBed, testset: TestSet, logfile: str):
         """
-        :param testbed: TestBed instance.
-        :param logfile: logfile path.
+        :param testbed: 测试床实例。
+        :param logfile: 日志文件路径。
         """
         self.__testbed = testbed
         self.__testset = testset
@@ -54,14 +53,14 @@ class TestCase(object):
     @property
     def testbed(self) -> TestBed:
         """
-        TestBed instance.
+        测试床实例。
         """
         return self.__testbed
 
     @property
     def caseid(self) -> str:
         """
-        TestCase filename without extension.
+        用例 id（不带后缀的文件名）。
         """
         return os.path.basename(
             sys.modules[self.__module__].__file__.replace('.py', '')
@@ -70,35 +69,35 @@ class TestCase(object):
     @property
     def steps(self) -> List[str]:
         """
-        Test steps.
+        测试步骤列表。
         """
         return sorted([n for n in dir(self.__class__) if re.match(r'step\d+', n)])
     
     @property
     def starttime(self) -> datetime:
         """
-        Execution start time.
+        开始执行时间。
         """
         return self.__starttime
 
     @property
     def endtime(self) -> datetime:
         """
-        Execution end time.
+        结束执行时间。
         """
         return self.__endtime
 
     @property
     def duration(self) -> timedelta:
         """
-        Execution duration.
+        执行时长。
         """
         return self.__duration
 
     @property
     def timestamp(self) -> str:
         """
-        <caseid>_<starttime>
+        时间戳：<caseid>_<starttime>
         """
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
@@ -106,68 +105,67 @@ class TestCase(object):
     @property
     def result(self) -> str:
         """
-        Execution result.
+        执行结果。
         """
         return self.__result
     
     def debug(self, msg, *args, **kwargs):
         """
-        DEBUG log.
+        DEBUG 级别日志。
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         """
-        INFO log.
+        INFO 级别日志。
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.info(msg, *args, **kwargs)
 
     def warn(self, msg, *args, **kwargs):
         """
-        WARN log.
+        WARN 级别日志。
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.warn(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
-        ERROR log.
+        ERROR 级别日志。
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.error(msg, *args, **kwargs)
 
     def sleep(self, seconds: float) -> None:
         """
-        Sleep with logging.
+        打印一条日志，然后睡眠指定时长的秒数。
         """
         self.info('Sleep %s second(s)...' % seconds, stacklevel=3)
         time.sleep(seconds)
 
     def setup(self) -> None:
         """
-        Preset steps.
+        用例预置步骤。
         """
         raise NotImplementedError
 
     def step1(self) -> None:
         """
-        Test step 1, you can add step2, step3, etc., these 
-        steps will be executed in the order of their names, 
-        a testcase requires at lease one step.
+        用例测试步骤 1，根据需要可继续添加 step2, step3, ...
+        一个用例至少需要一个测试步骤，即 step1。
         """
         raise NotImplementedError
 
     def teardown(self) -> None:
         """
-        Cleanup steps.
+        清理步骤。
         """
         raise NotImplementedError
 
     def run(self) -> None:
         """
-        Execute testcase.
+        执行当前用例。
         """
         self.__starttime = datetime.now().replace(microsecond=0)
         etags = self.__testset.exclude_tags
@@ -196,7 +194,7 @@ class TestCase(object):
 
     def __run_stage(self, stage: str) -> None:
         """
-        Execute one stage(setup, step1, teardown, etc).
+        执行用例指定阶段（setup, step1, step2, ..., teardown）。
         """
         func = getattr(self, stage)
         try:
@@ -217,9 +215,9 @@ class TestCase(object):
 
     def __dump_log(self) -> None:
         """
-        Dump testcase log.
+        将用例日志转储到 html 文件。
         """
-        util.render_write(
+        utils.render_write(
             common.LOG_TEMPLATE,
             self.__logfile,
             caseid=self.caseid,
@@ -235,7 +233,7 @@ class TestCase(object):
 
 class ErrorTestCase(TestCase):
     """
-    Construct an error testcase for runner.
+    错误的测试用例。
     """
     def __init__(
         self, 
@@ -246,7 +244,7 @@ class ErrorTestCase(TestCase):
         exc: Exception
     ) -> None:
         """
-        :param exc: Exception instance to raise.
+        :param exc: 抛出的异常类型。
         """
         self.__caseid = caseid
         self.__exc = exc
@@ -258,18 +256,18 @@ class ErrorTestCase(TestCase):
     
     def setup(self) -> None:
         """
-        Preset steps.
+        预置步骤。
         """
         raise self.__exc from None
 
     def step1(self) -> None:
         """
-        Test step 1.
+        测试步骤 1。
         """
         pass
 
     def teardown(self) -> None:
         """
-        Post steps.
+        清理步骤。
         """
         pass

@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-TestBed management.
+测试床模块。
 """
 
 import os
@@ -9,16 +9,16 @@ import os
 from typing import Any
 
 from ruamel import yaml
-from xbot.util import deepget
+from xbot.utils import deepget
 
 
 class TestBed(object):
     """
-    TestBed management.
+    测试床类。
     """
     def __init__(self, filepath: str):
         """
-        :param filepath: Testbed filepath.
+        :param filepath: 测试床文件路径。
         """
         self.__data = self.__parse(filepath)
         self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
@@ -27,7 +27,7 @@ class TestBed(object):
 
     def __parse(self, filepath: str) -> dict:
         """
-        Parse testbed file.
+        解析测试床。
         """
         with open(filepath) as f:
             return yaml.YAML(typ='safe').load(f)
@@ -35,20 +35,20 @@ class TestBed(object):
     @property
     def name(self) -> str:
         """
-        Testbed name.
+        测试床名称（不带后缀的文件名）。
         """
         return self.__name
     
     @property
     def content(self) -> str:
         """
-        Testbed file content.
+        测试床文件内容。
         """
         return self.__content
 
     def get(self, deepkey: str, default: Any = None) -> Any:
         """
-        Get value from testbed file.
+        获取指定路径的值。
 
         ----------yamlfile--------
         a:
@@ -65,9 +65,9 @@ class TestBed(object):
         >>> get('a.b3', default='x')
         'x'
 
-        :param deepkey: Key paths separated by dot.
-        :param default: Default value if key not exists.
-        :return: value.
+        :param deepkey: 用 `.` 连接的路径。
+        :param default: 如果路径不存在返回的默认值。
+        :return: 获取到的值或默认值。
         """
         try:
             return deepget(self.__data, deepkey)

@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Xbot command line interface.
+命令行接口。
 """
 
 import os
@@ -14,15 +14,15 @@ from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.runner import Runner
 from xbot.report import gen_report
-from xbot.util import printerr, xprint
+from xbot.utils import printerr, xprint
 from xbot.common import INIT_DIR
 
 
 def create_parser(internal: bool = False) -> argparse.ArgumentParser:
     """
-    Create command line interface parser.
+    创建命令行参数解析器。
 
-    :param internal: True if internal command line interface.
+    :param internal: 是否内部使用，根据该参数创建包含不同参数的解析器。
     """
     if internal:
         cmds = ['init', 'run']
@@ -46,9 +46,9 @@ def create_parser(internal: bool = False) -> argparse.ArgumentParser:
 
 def init(directory: str) -> None:
     """
-    Initialize directory.
+    初始化测试项目目录。
 
-    :param directory: directory to init.
+    :param directory: 待初始化的目录。
     """
     if os.path.exists(directory):
         printerr('%s already exists' % directory)
@@ -58,20 +58,20 @@ def init(directory: str) -> None:
 
 def is_projdir(directory: str) -> bool:
     """
-    Check if directory is a project directory.
+    检测当前目录是否为测试项目目录。
 
-    :param directory: directory to check.
+    :param directory: 待检测的目录。
     """
     return os.path.exists(os.path.join(directory, 'testcases'))
     
 
 def run(tbcls: type, testbed: str, testset: str) -> None:
     """
-    Run testcases.
+    执行测试。
 
-    :param tbcls: TestBed class.
-    :param testbed: testbed file.
-    :param testset: testset file.
+    :param tbcls: 测试床类。
+    :param testbed: 测试床文件。
+    :param testset: 测试床文件。
     """
     if not is_projdir(os.getcwd()):
         printerr("No `testcases` directory in current directory, "
@@ -88,10 +88,10 @@ def run(tbcls: type, testbed: str, testset: str) -> None:
 
 def main(tbcls: type = TestBed, internal: bool = False) -> None:
     """
-    Main function.
+    入口函数。
 
-    :param tbcls: TestBed class.
-    :param internal: True if internal command line interface.
+    :param tbcls: 测试床类。
+    :param internal: 是否内部调用。
     """
     parser = create_parser(internal=internal)
     args = parser.parse_args()

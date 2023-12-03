@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-TestCase runner.
+执行器。
 """
 
 import os
@@ -18,7 +18,7 @@ from xbot.common import LOG_TEMPLATE
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.testcase import TestCase, ErrorTestCase
-from xbot.util import stop_thread, xprint
+from xbot.utils import stop_thread, xprint
 
 sys.path.insert(0, '.')
 
@@ -27,21 +27,21 @@ logger = getlogger('runner')
 
 class Runner(object):
     """
-    TestCase runner.
+    执行器。
     """
     def __init__(self, testbed: TestBed, testset: TestSet):
         """
-        :param testbed: TestBed instance.
-        :param testset: TestSet instance.
+        :param testbed: 测试床实例。
+        :param testset: 测试套实例。
         """
         self.testbed = testbed
         self.testset = testset
 
     def run(self) -> str:
         """
-        Run testcases.
+        执行所有用例。
 
-        :return: logdir of this execution.
+        :return: 本次执行的日志根目录。
         """
         logdir = self._make_logdir()
         casecnt = len(self.testset.paths)
@@ -61,10 +61,9 @@ class Runner(object):
         
     def _make_logdir(self) -> str:
         """
-        Create log directory.
+        创建日志根目录。
 
-        :param self.testbed: self.testbed instance.
-        :return: logdir path.
+        :return: 日志目录路径。
         """
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         logdir = os.path.join(os.getcwd(), 'logs', self.testbed.name, timestamp)
@@ -73,11 +72,11 @@ class Runner(object):
 
     def _make_logfile(self, logdir: str, casepath: str) -> str:
         """
-        Create log file.
+        创建用例日志文件。
 
-        :param logdir: logdir path.
-        :param casepath: TestCase path.
-        :return: logfile path.
+        :param logdir: 日志根目录。
+        :param casepath: 用例相对路径。
+        :return: 用例日志文件路径。
         """
         logfile = os.path.normpath(
             os.path.join(logdir, casepath.replace('testcases/', ''))
@@ -89,10 +88,10 @@ class Runner(object):
 
     def _import_case(self, casepath: str) -> type:
         """
-        Import testcase module.
+        导入用例。
 
-        :param casepath: TestCase path.
-        :return: TestCase class.
+        :param casepath: 用例相对路径。
+        :return: 用例类。
         """
         caseid = casepath.split('/')[-1].replace('.py', '')
         modname = casepath.replace('/', '.').replace('.py', '')
@@ -102,11 +101,11 @@ class Runner(object):
 
     def _run_case(self, caseinst: TestCase) -> None:
         """
-        Execute testcase.
+        执行指定用例。
         """
         t = Thread(target=caseinst.run, name=caseinst.caseid)
         t.start()
         t.join(caseinst.TIMEOUT)
         if t.is_alive():
             stop_thread(t, TestCaseTimeout)
-            t.join(60)  # wait for teardown to finished.
+            t.join(60)  # 登台 teardown 完成。

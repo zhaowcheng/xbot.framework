@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Utility functions.
+实用函数。
 """
 
 import os
@@ -23,7 +23,7 @@ logger = getlogger('util')
 
 class ColorText(object):
     """
-    Terminal text color.
+    给终端字符添加 ascii 颜色码。
     """
 
     COLORS = {
@@ -35,7 +35,7 @@ class ColorText(object):
     @staticmethod
     def wrap(s, color):
         """
-        Color the str `s`.
+        给字符串 `s` 添加颜色。
         """
         code = ColorText.COLORS.get(color, None)
         if not code:
@@ -45,12 +45,12 @@ class ColorText(object):
 
 def xprint(*values, **kwargs) -> None:
     """
-    Print function for xbot.
+    专用 print 函数。
 
-    :param values: values to print.
-    :param color: color of values.
-    :param do_exit: exit after print.
-    :param exit_code: exit code, default -1.
+    :param values: 待打印的值。
+    :param color: 字符颜色。
+    :param do_exit: 打印后是否退出程序。
+    :param exit_code: 退出码，默认 -1。
     """
     color = kwargs.pop('color', None)
     do_exit = kwargs.pop('do_exit', False)
@@ -67,10 +67,10 @@ printerr = partial(xprint, 'error:', color='red', do_exit=True)
 
 def render_write(template: str, outfile: str, **kwargs) -> None:
     """
-    Render the `template` and write to `outfile`.
+    渲染 HTML 模板 `template` 并输出到 `outfile`。
     
-    :param template: html template.
-    :param outfile: output file.
+    :param template: HTML 模板字符串。
+    :param outfile: 输出文件。
     """
     rendered_content = ''
     with open(template) as fp:
@@ -84,11 +84,12 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
 
 def stop_thread(thread, exc=SystemExit) -> None:
     """
-    Stop thread by raising an exception.
+    通过让线程抛出异常来结束线程。
     
-    :param thread: Thread instance.
-    :param exc: Exception to raise.
-    :raises SystemError: If stop thread failed.
+    :param thread: 线程实例。
+    :param exc: 抛出的异常类。
+    :raises SystemError: 如果停止线程失败。
+            ValueError: 如果线程 ident 无效。
     """
     r = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             ctypes.c_long(thread.ident), ctypes.py_object(exc))
@@ -102,7 +103,7 @@ def stop_thread(thread, exc=SystemExit) -> None:
 
 def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     """
-    Parse deepkey to list.
+    把路径 `deepkey` 按照 `sep` 分隔为列表，其中数字会转为 int 类型。
 
     >>> parse_deepkey('a.b1')
     ['a', 'b1']
@@ -111,9 +112,9 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     >>> parse_deepkey('a.b2[0].c2')
     ['a', 'b2', 0, 'c2']
 
-    :param deepkey: deepkey string.
-    :param sep: separator.
-    :return: list of keys.
+    :param deepkey: 路径。
+    :param sep: 分隔符
+    :return: 分隔后的路径列表。
     """
     keys = []
     for k in re.split(r'%s|\[' % re.escape(sep), deepkey):
@@ -126,7 +127,7 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
 
 def deepget(obj, deepkey: str, sep: str = '.') -> Any:
     """
-    Deep get value from object.
+    深度获取 `obj` 中的元素的值。
 
     >>> d = {
     ...     'a': {
@@ -139,10 +140,10 @@ def deepget(obj, deepkey: str, sep: str = '.') -> Any:
     >>> deepget(d, 'a.b2[0]')
     1
 
-    :param obj: object.
-    :param deepkey: deepkey string.
-    :param sep: separator for deepkey.
-    :return: value.
+    :param obj: 被获取对象。
+    :param deepkey: 元素路径。
+    :param sep: 路径分隔符。
+    :return: 获取到的值。
     """
     keys = parse_deepkey(deepkey, sep)
     return reduce(operator.getitem, keys, obj)
@@ -150,8 +151,8 @@ def deepget(obj, deepkey: str, sep: str = '.') -> Any:
 
 def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
     """
-    Deep set value to object.
-    Create path if not exists(except for path with index, e.g. a.b[0])
+    深度设置 `obj` 中的元素的值。
+    如果路径不存在会自动创建（路径中包含索引的情况除外，如 a.b[0]）。
 
     >>> d = {
     ...     'a': {
@@ -169,10 +170,10 @@ def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
     >>> d
     {'a': {'b1': 'd', 'b2': ['-1', 2, 3]}, 'i': {'j': 'x'}}
 
-    :param obj: Object.
-    :param deepkey: deepkey string.
-    :param value: value to set.
-    :param sep: separator for deepkey.
+    :param obj: 被设置对象。.
+    :param deepkey: 元素路径。
+    :param value: 被设置的值
+    :param sep: 路径分隔符。
     """
     keys = parse_deepkey(deepkey, sep)
     for k in keys[:-1]:
@@ -186,10 +187,10 @@ def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
 
 def ip_reachable(ip: str) -> bool:
     """
-    Check if IP address is reachable.
+    检查 IP 地址是否可达
 
-    :param ip: IP address.
-    :return: True if reachable, else False.
+    :param ip: IP 地址。
+    :return: 可达返回 True，否则 False。
     """
     try:
         conn = socket.create_connection((ip, 22), 0.1)
@@ -203,11 +204,11 @@ def ip_reachable(ip: str) -> bool:
 
 def port_opened(ip: str, port: int) -> bool:
     """
-    Check if port is opened.
+    检查端口是否开放。
 
-    :param ip: IP address.
-    :param port: Port number.
-    :return: True if opened, else False.
+    :param ip: IP 地址
+    :param port: 端口号
+    :return: 开放返回 True，否则 False。
     """
     try:
         conn = socket.create_connection((ip, port), 0.1)
@@ -219,7 +220,7 @@ def port_opened(ip: str, port: int) -> bool:
 
 def wrapstr(s: str, title: str = '') -> str:
     """
-    Wrap str with character borders.
+    使用字符边框包裹字符串 `s`。
 
     >>> print(wrapstr('hello world'))
     +-------------+
@@ -249,7 +250,7 @@ def wrapstr(s: str, title: str = '') -> str:
 
 def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     """
-    Similar to os.walk, but accessed in name order.
+    按名称顺序对目录进行遍历。
 
     >>> import tempfile
     >>> tmpdir = tempfile.mkdtemp()
@@ -272,7 +273,7 @@ def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     dirs: [], files: ['file1_1', 'file1_2']
     dirs: [], files: ['file2_1', 'file2_2']
 
-    :param path: path to walk.
+    :param path: 被遍历路径。
     :yield: (top, dirs, files)
     """
     top, dirs, files = path, [], []
@@ -298,7 +299,7 @@ def assertx(
         verbose: bool = True
     ) -> None:
     """
-    Assertion.
+    断言函数。
 
     >>> assertx(1, '==', 1)
     >>> assertx(1, '!=', 2)
@@ -315,12 +316,13 @@ def assertx(
     >>> assertx('abc', 'search', r'[a-z]')
     >>> assertx('abc', 'not search', r'[0-9]')
 
-    :param a: Operation object a.
-    :param op: Operator.
-    :param b: Operation object b.
-    :param errmsg: Error message.
-    :param verbose: logging when successful.
-    :raises AssertionError: Assertion failed.
+    :param a: 操作对象 a。
+    :param op: 操作符。
+    :param b: 操作对象 b。
+    :param errmsg: 断言失败时的错误消息，如果未制定则自动生成。
+    :param verbose: 如果为 True，断言成功时也打印打印一条日志。
+    :raises AssertionError: 如果断言失败。
+            ValueError: 不支持的操作符。
     """
     funcs = {
         '==': operator.eq,

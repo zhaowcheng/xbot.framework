@@ -1,6 +1,5 @@
-# This is just an example, you can add whatever you want, 
-# but it must be in yaml format, these values can be accessed
-# in the test case through the self.testbed.get() method.
+# 测试床文件必须时 YAML 格式，具体字段信息自定义，
+# 测试用例中可通过 self.testbed.get() 获取信息。
 example:
   key1: value1
   key2: 

@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-Report module.
+报告模块。
 """
 
 import os
@@ -9,27 +9,27 @@ import re
 
 from datetime import datetime
 
-from xbot import util
+from xbot import utils
 from xbot import common
 
 
-def find_value(content: str, key: str) -> str:
+def find_value(html: str, id_: str) -> str:
     """
-    Find value in html logfile by key.
+    通过 id 获取 html 元素的文本。
 
-    :param data: html logfile content.
-    :param key: key.
-    :return: value.
+    :param html: html 内容。
+    :param id_: 元素 id。
+    :return: 元素的文本。
     """
-    return re.search(r'id="%s".*>(.*)<.*' % key, content).group(1)
+    return re.search(r'id="%s".*>(.*)<.*' % id_, html).group(1)
 
 
 def gen_report(logdir: str) -> (str, bool):
     """
-    Generate report.
+    生成报告。
 
-    :param logdir: log directory.
-    :return: (report_filepath, is_allpassed)。
+    :param logdir: 日志目录。
+    :return: (report_filepath, is_allpassed)
     """
     cases = []
     counter = {
@@ -41,7 +41,7 @@ def gen_report(logdir: str) -> (str, bool):
     }
     report = os.path.join(logdir, 'report.html')
     allpassed = True
-    for top, dirs, files in util.ordered_walk(logdir):
+    for top, dirs, files in utils.ordered_walk(logdir):
         for f in files:
             if f.endswith('.html'):
                 reltop = os.path.relpath(top, logdir)
@@ -69,7 +69,7 @@ def gen_report(logdir: str) -> (str, bool):
     total_duration = str(
         strptime(cases[-1]['endtime']) - strptime(cases[0]['starttime'])
     )
-    util.render_write(
+    utils.render_write(
         common.REPORT_TEMPLATE,
         report,
         passcnt=counter['PASS'],

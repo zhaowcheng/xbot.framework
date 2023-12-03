@@ -4,11 +4,11 @@ import sys
 import os
 sys.path.append(os.path.abspath(f'{__file__}/../..'))
 
-from xbot import util
+from xbot import utils
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(util))
+    tests.addTests(doctest.DocTestSuite(utils))
     return tests
 
 

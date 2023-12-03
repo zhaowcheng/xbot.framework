@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-TestSet management.
+测试套模块。
 """
 
 import os
@@ -9,17 +9,17 @@ import os
 from ruamel import yaml
 from copy import deepcopy
 
-from xbot.util import ordered_walk
+from xbot.utils import ordered_walk
 from xbot.errors import TestSetError
 
 
 class TestSet(object):
     """
-    TestSet management.
+    测试套类。
     """
     def __init__(self, filepath: str):
         """
-        :param filepath: Testset filepath。
+        :param filepath: 测试套文件路径。
         """
         self._data = self._parse(filepath)
         self._include_tags = None
@@ -28,7 +28,7 @@ class TestSet(object):
 
     def _parse(self, filepath: str) -> dict:
         """
-        Parse testset file.
+        解析测试套。
         """
         with open(filepath) as f:
             return yaml.YAML(typ='safe').load(f)
@@ -36,7 +36,7 @@ class TestSet(object):
     @property
     def include_tags(self) -> list:
         """
-        Include tags in testset.
+        用来筛选用例的 tags。
         """
         if not self._include_tags:
             self._include_tags = self._data['tags'].get('include') or []
@@ -45,7 +45,7 @@ class TestSet(object):
     @property
     def exclude_tags(self) -> list:
         """
-        Exclude tags in testset.
+        用来排除用例的 tags。
         """
         if not self._exclude_tags:
             self._exclude_tags = self._data['tags'].get('exclude') or []
@@ -54,7 +54,7 @@ class TestSet(object):
     @property
     def paths(self) -> tuple:
         """
-        Testcase paths.
+        待执行的测试用例或目录路径列表。
         """
         if not self._paths:
             paths = []
