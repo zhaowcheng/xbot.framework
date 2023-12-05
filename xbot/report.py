@@ -43,7 +43,8 @@ def gen_report(logdir: str) -> (str, bool):
     allpassed = True
     for top, dirs, files in utils.ordered_walk(logdir):
         for f in files:
-            if f.endswith('.html'):
+            # report.ok.html 是单元测试时用于对比生成的报告是否正确的文件。
+            if f.endswith('.html') and f not in ['report.html', 'report.ok.html']:
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
                 casepath = 'testcases/' + caselog.replace('.html', '.py')
