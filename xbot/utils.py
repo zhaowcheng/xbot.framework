@@ -6,6 +6,7 @@
 
 import os
 import re
+import sys
 import ctypes
 import operator
 import socket
@@ -49,12 +50,12 @@ def xprint(*values, **kwargs) -> None:
 
     :param values: 待打印的值。
     :param color: 字符颜色。
-    :param do_exit: 打印后是否退出程序。
-    :param exit_code: 退出码，默认 -1。
+    :param do_exit: 打印后是否退出程序，默认 False。
+    :param exit_code: 退出码，默认 0。
     """
     color = kwargs.pop('color', None)
     do_exit = kwargs.pop('do_exit', False)
-    exit_code = kwargs.pop('exit_code', -1)
+    exit_code = kwargs.pop('exit_code', 0)
     if color:
         values = [ColorText.wrap(v, color) for v in values]
     print(*values, **kwargs)
@@ -62,7 +63,7 @@ def xprint(*values, **kwargs) -> None:
         exit(exit_code)
 
 
-printerr = partial(xprint, 'error:', color='red', do_exit=True)
+printerr = partial(xprint, file=sys.stderr, color='red', do_exit=True, exit_code=1)
 
 
 def render_write(template: str, outfile: str, **kwargs) -> None:
@@ -188,6 +189,11 @@ def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
 def ip_reachable(ip: str) -> bool:
     """
     检查 IP 地址是否可达
+
+    >>> ip_reachable('127.0.0.1')
+    True
+    >>> ip_reachable('128.0.0.1')
+    False
 
     :param ip: IP 地址。
     :return: 可达返回 True，否则 False。

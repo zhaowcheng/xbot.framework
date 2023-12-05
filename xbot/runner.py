@@ -108,4 +108,4 @@ class Runner(object):
         t.join(caseinst.TIMEOUT)
         if t.is_alive():
             stop_thread(t, TestCaseTimeout)
-            t.join(60)  # 登台 teardown 完成。
+            t.join(60)  # 等待 teardown 完成。
