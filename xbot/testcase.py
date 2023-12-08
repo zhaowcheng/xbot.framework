@@ -15,6 +15,7 @@ import inspect
 from typing import Any, List
 from datetime import datetime, timedelta
 from importlib import import_module
+from threading import Thread
 
 from xbot import logger, common, utils
 from xbot.testbed import TestBed
@@ -162,8 +163,19 @@ class TestCase(object):
         清理步骤。
         """
         raise NotImplementedError
-
+    
     def run(self) -> None:
+        """
+        以线程方式执行当前用例。
+        """
+        t = Thread(target=self.__run, name=self.caseid)
+        t.start()
+        t.join(self.TIMEOUT)
+        if t.is_alive():
+            utils.stop_thread(t, TestCaseTimeout)
+            t.join(60)  # 等待 teardown 完成。
+
+    def __run(self) -> None:
         """
         执行当前用例。
         """

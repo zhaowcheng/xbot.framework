@@ -55,7 +55,7 @@ class Runner(object):
             except (ImportError, AttributeError) as e:
                 caseinst = ErrorTestCase(self.testbed, self.testset, 
                                          caselog, caseid, e)
-            self._run_case(caseinst)
+            caseinst.run()
             xprint(f'End: {caseid} ({i+1}/{casecnt})'.center(100, '='), '\n')
         return logdir
         
@@ -98,14 +98,3 @@ class Runner(object):
         casemod = import_module(modname)
         casecls = getattr(casemod, caseid)
         return casecls
-
-    def _run_case(self, caseinst: TestCase) -> None:
-        """
-        执行指定用例。
-        """
-        t = Thread(target=caseinst.run, name=caseinst.caseid)
-        t.start()
-        t.join(caseinst.TIMEOUT)
-        if t.is_alive():
-            stop_thread(t, TestCaseTimeout)
-            t.join(60)  # 等待 teardown 完成。
