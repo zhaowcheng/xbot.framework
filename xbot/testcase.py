@@ -34,14 +34,14 @@ class TestCase(object):
     # 用例标签。
     TAGS = []
 
-    def __init__(self, testbed: TestBed, testset: TestSet, logfile: str):
+    def __init__(self, testbed: TestBed, testset: TestSet, logroot: str):
         """
         :param testbed: 测试床实例。
-        :param logfile: 日志文件路径。
+        :param logroot: 日志根目录。
         """
         self.__testbed = testbed
         self.__testset = testset
-        self.__logfile = logfile
+        self.__logroot = logroot
         self.__starttime = None
         self.__endtime = None
         self.__duration = None
@@ -63,8 +63,30 @@ class TestCase(object):
         """
         用例 id（不带后缀的文件名）。
         """
-        return os.path.basename(
-            sys.modules[self.__module__].__file__.replace('.py', '')
+        return os.path.basename(self.abspath.replace('.py', ''))
+    
+    @property
+    def abspath(self) -> str:
+        """
+        用例文件绝对路径。
+        """
+        return sys.modules[self.__module__].__file__
+    
+    @property
+    def relpath(self) -> str:
+        """
+        用例文件相对路径。（`testcases`开头，路径分隔符为 `/`）
+        """
+        paths = self.abspath.split(os.path.sep)
+        return '/'.join(paths[paths.index('testcases'):])
+    
+    @property
+    def logfile(self) -> str:
+        """
+        日志文件路径。
+        """
+        return os.path.normpath(
+            os.path.join(self.__logroot, self.relpath.replace('.py', '.html'))
         )
     
     @property
@@ -219,7 +241,7 @@ class TestCase(object):
                        'complete within %s second(s).' % self.TIMEOUT)
             self.__result = 'TIMEOUT'
         except Exception as e:
-            self.error(traceback.format_exc())
+            self.error(traceback.format_exc().strip())
             if isinstance(e, AssertionError):
                 self.__result = 'FAIL'
             else:
@@ -229,9 +251,10 @@ class TestCase(object):
         """
         将用例日志转储到 html 文件。
         """
+        os.makedirs(os.path.dirname(self.logfile), exist_ok=True)
         utils.render_write(
             common.LOG_TEMPLATE,
-            self.__logfile,
+            self.logfile,
             caseid=self.caseid,
             result=self.result,
             starttime=self.starttime.strftime('%Y-%m-%d %H:%M:%S'),
@@ -251,7 +274,7 @@ class ErrorTestCase(TestCase):
         self, 
         testbed: TestBed, 
         testset: TestSet, 
-        logfile: str,
+        logroot: str,
         caseid: str,
         exc: Exception
     ) -> None:
@@ -260,7 +283,7 @@ class ErrorTestCase(TestCase):
         """
         self.__caseid = caseid
         self.__exc = exc
-        super().__init__(testbed, testset, logfile)
+        super().__init__(testbed, testset, logroot)
 
     @property
     def caseid(self) -> str:

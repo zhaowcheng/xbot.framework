@@ -6,19 +6,15 @@
 
 import os
 import sys
-import shutil
 
-from threading import Thread
 from importlib import import_module
 from datetime import datetime
 
 from xbot.logger import getlogger
-from xbot.errors import TestCaseTimeout
-from xbot.common import LOG_TEMPLATE
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
-from xbot.testcase import TestCase, ErrorTestCase
-from xbot.utils import stop_thread, xprint
+from xbot.testcase import ErrorTestCase
+from xbot.utils import xprint
 
 sys.path.insert(0, '.')
 
@@ -43,48 +39,31 @@ class Runner(object):
 
         :return: 本次执行的日志根目录。
         """
-        logdir = self._make_logdir()
+        logroot = self._make_logroot()
         casecnt = len(self.testset.paths)
         for i, casepath in enumerate(self.testset.paths):
             caseid = casepath.split('/')[-1].replace('.py', '')
             xprint(f'Start: {caseid} ({i+1}/{casecnt})'.center(100, '='))
-            caselog = self._make_logfile(logdir, casepath)
             try:
                 casecls = self._import_case(casepath)
-                caseinst = casecls(self.testbed, self.testset, caselog)
+                caseinst = casecls(self.testbed, self.testset, logroot)
             except (ImportError, AttributeError) as e:
                 caseinst = ErrorTestCase(self.testbed, self.testset, 
-                                         caselog, caseid, e)
+                                         logroot, caseid, e)
             caseinst.run()
             xprint(f'End: {caseid} ({i+1}/{casecnt})'.center(100, '='), '\n')
-        return logdir
+        return logroot
         
-    def _make_logdir(self) -> str:
+    def _make_logroot(self) -> str:
         """
-        创建日志根目录。
+        创建本次执行的日志根目录。
 
-        :return: 日志目录路径。
+        :return: 目录路径。
         """
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logdir = os.path.join(os.getcwd(), 'logs', self.testbed.name, timestamp)
-        os.makedirs(logdir)
-        return logdir
-
-    def _make_logfile(self, logdir: str, casepath: str) -> str:
-        """
-        创建用例日志文件。
-
-        :param logdir: 日志根目录。
-        :param casepath: 用例相对路径。
-        :return: 用例日志文件路径。
-        """
-        logfile = os.path.normpath(
-            os.path.join(logdir, casepath.replace('testcases/', ''))
-        ).replace('.py', '.html')
-        if not os.path.exists(os.path.dirname(logfile)):
-            os.makedirs(os.path.dirname(logfile))
-        shutil.copyfile(LOG_TEMPLATE, logfile)
-        return logfile
+        logroot = os.path.join(os.getcwd(), 'logs', self.testbed.name, timestamp)
+        os.makedirs(logroot)
+        return logroot
 
     def _import_case(self, casepath: str) -> type:
         """

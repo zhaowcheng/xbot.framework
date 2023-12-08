@@ -70,7 +70,7 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
     """
     渲染 HTML 模板 `template` 并输出到 `outfile`。
     
-    :param template: HTML 模板字符串。
+    :param template: HTML 模板文件。
     :param outfile: 输出文件。
     """
     rendered_content = ''
