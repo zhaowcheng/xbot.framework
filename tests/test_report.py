@@ -19,7 +19,8 @@ class TestReport(unittest.TestCase):
         report, _ = gen_report(LOGDIR)
         with open(report) as f1:
             with open(OKREPORT) as f2:
-                self.assertEqual(f1.read(), f2.read())
+                self.assertEqual(f1.read(), f2.read(), 
+                                 f'{report} != {OKREPORT}')
         os.remove(report)
 
 

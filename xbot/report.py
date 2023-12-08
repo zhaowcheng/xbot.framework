@@ -47,7 +47,7 @@ def gen_report(logdir: str) -> (str, bool):
             if f.endswith('.html') and f not in ['report.html', 'report.ok.html']:
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
-                casepath = 'testcases/' + caselog.replace('.html', '.py')
+                casepath = caselog.replace('.html', '.py')
                 with open(os.path.join(top, f)) as fp:
                     content = fp.read()
                     result = find_value(content, 'result')
