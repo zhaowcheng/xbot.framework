@@ -62,7 +62,7 @@
         }
 
         .location {
-            width: 180px;
+            width: 300px;
         }
 
         .ERROR {
@@ -86,57 +86,39 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2">tc_eg_01</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_timeout</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-# 类名将被作为用例编号，且应与文件名保持一致。
-class tc_eg_01(TestCase):
+class tc_eg_nonpass_timeout(TestCase):
     """
-    从示例测试床中获取信息并检查。
+    超时的测试用例。
     """
-    # 用例最大执行时长（秒）。
-    TIMEOUT = 60
-    # 当第一个 FAIL(断言失败) 出现时是否立即停止用例执行
+    TIMEOUT = 2
     FAILFAST = True
-    # 用例标签。
     TAGS = ['tag1']
 
     def setup(self):
         """
-        无
+        预置步骤。
         """
-        pass
+        self.info('开始执行预置步骤')
 
     def step1(self):
         """
-        获取 `example.key1` 的值并检查，值应为 `value1`。
+        睡眠 3 秒。
         """
-        value1 = self.testbed.get('example.key1')
-        assertx(value1, '==', 'value1')
-
-    def step2(self):
-        """
-        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-1`。
-        """
-        value2 = self.testbed.get('example.key2.key2-1')
-        assertx(value2, '==', 'value2-1')
-
-    def step3(self):
-        """
-        获取 `example.key3[1]` 的值并检查，值应为 `value3-2`。
-        """
-        value3 = self.testbed.get('example.key3[1]')
-        assertx(value3, '==', 'value3-2')
+        # 此处因超时而 error，会被强行终止，然后立即执行清理步骤。
+        self.sleep(3)
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤。
+        清理步骤。
         """
-        self.sleep(1)
+        self.info('开始执行清理步骤')
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
@@ -156,19 +138,19 @@ example:
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="result" colspan="2">PASS</td>
+                    <td id="result" colspan="2">TIMEOUT</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-05 18:44:30</td>
+                    <td id="starttime" colspan="2">2023-12-11 22:37:34</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-05 18:44:31</td>
+                    <td id="endtime" colspan="2">2023-12-11 22:37:37</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
-                    <td id="duration" colspan="2">0:00:01</td>
+                    <td id="duration" colspan="2">0:00:03</td>
                 </tr>
             </table>
         </div>
@@ -185,6 +167,16 @@ example:
                         <th class="levelname">level</th>
                         <th class="location">location</th>
                         <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="INFO">
+                        <td>2023-12-11 22:37:34,963</td>
+                        <td>INFO</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:18</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>开始执行预置步骤</pre>
+                            
+                        </td>
                     </tr>
                     
                 </table>
@@ -205,65 +197,21 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-05 18:44:30,186</td>
+                        <td>2023-12-11 22:37:34,963</td>
                         <td>INFO</td>
-                        <td>tc_eg_01.py:29</td>
-                        <td>
-                            <pre>AssertionOK: value1 == value1</pre>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:25</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Sleep 3 second(s)...</pre>
                             
                         </td>
                     </tr>
                     
-                </table>
-            </div>
-            <br>
-            <br>
-            
-            <div>
-                <button>step2</button>
-            </div>
-            <div id="step2">
-                <table>
-                    <tr style="height: 25px;">
-                        <th class="asctime">time</th>
-                        <th class="levelname">level</th>
-                        <th class="location">location</th>
-                        <th class="message">message</th>
-                    </tr>
-                    
-                    <tr class="INFO">
-                        <td>2023-12-05 18:44:30,187</td>
-                        <td>INFO</td>
-                        <td>tc_eg_01.py:36</td>
-                        <td>
-                            <pre>AssertionOK: value2-1 == value2-1</pre>
-                            
-                        </td>
-                    </tr>
-                    
-                </table>
-            </div>
-            <br>
-            <br>
-            
-            <div>
-                <button>step3</button>
-            </div>
-            <div id="step3">
-                <table>
-                    <tr style="height: 25px;">
-                        <th class="asctime">time</th>
-                        <th class="levelname">level</th>
-                        <th class="location">location</th>
-                        <th class="message">message</th>
-                    </tr>
-                    
-                    <tr class="INFO">
-                        <td>2023-12-05 18:44:30,187</td>
-                        <td>INFO</td>
-                        <td>tc_eg_01.py:43</td>
-                        <td>
-                            <pre>AssertionOK: value3-2 == value3-2</pre>
+                    <tr class="ERROR">
+                        <td>2023-12-11 22:37:37,968</td>
+                        <td>ERROR</td>
+                        <td style="word-wrap: break-word;">testcase.py:254</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>TestCaseTimeout: Execution did not complete within 2 second(s).</pre>
                             
                         </td>
                     </tr>
@@ -286,11 +234,11 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-05 18:44:30,188</td>
+                        <td>2023-12-11 22:37:37,969</td>
                         <td>INFO</td>
-                        <td>tc_eg_01.py:49</td>
-                        <td>
-                            <pre>Sleep 1 second(s)...</pre>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:31</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>开始执行清理步骤</pre>
                             
                         </td>
                     </tr>

@@ -62,7 +62,7 @@
         }
 
         .location {
-            width: 180px;
+            width: 300px;
         }
 
         .ERROR {
@@ -86,38 +86,45 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2">tc_eg_07</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_setup</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_07(TestCase):
+class tc_eg_nonpass_fail_setup(TestCase):
     """
-    超时的测试用例。
+    预置步骤失败的用例。
     """
-    TIMEOUT = 2
+    TIMEOUT = 60
     FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
         """
-        预置步骤。
+        断言 1 == 0。
         """
-        self.info('开始执行预置步骤')
+        # 此处 fail，会跳过后续测试步骤并立即执行清理步骤。
+        assertx(1, '==', 0)
 
     def step1(self):
         """
-        睡眠 3 秒。
+        断言 1 == 1。
         """
-        self.sleep(3)
+        assertx(1, '==', 1)
+
+    def step2(self):
+        """
+        断言 2 == 2。
+        """
+        assertx(2, '==', 2)
 
     def teardown(self):
         """
-        清理步骤。
+        睡 1 秒模拟清理步骤。
         """
-        self.info('开始执行清理步骤')
+        self.sleep(1)
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
@@ -137,19 +144,19 @@ example:
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="result" colspan="2">TIMEOUT</td>
+                    <td id="result" colspan="2">FAIL</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-05 18:44:34</td>
+                    <td id="starttime" colspan="2">2023-12-11 22:37:31</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-05 18:44:37</td>
+                    <td id="endtime" colspan="2">2023-12-11 22:37:32</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
-                    <td id="duration" colspan="2">0:00:03</td>
+                    <td id="duration" colspan="2">0:00:01</td>
                 </tr>
             </table>
         </div>
@@ -168,49 +175,19 @@ example:
                         <th class="message">message</th>
                     </tr>
                     
-                    <tr class="INFO">
-                        <td>2023-12-05 18:44:34,362</td>
-                        <td>INFO</td>
-                        <td>tc_eg_07.py:18</td>
-                        <td>
-                            <pre>开始执行预置步骤</pre>
-                            
-                        </td>
-                    </tr>
-                    
-                </table>
-            </div>
-            <br>
-            <br>
-            
-            <div>
-                <button>step1</button>
-            </div>
-            <div id="step1">
-                <table>
-                    <tr style="height: 25px;">
-                        <th class="asctime">time</th>
-                        <th class="levelname">level</th>
-                        <th class="location">location</th>
-                        <th class="message">message</th>
-                    </tr>
-                    
-                    <tr class="INFO">
-                        <td>2023-12-05 18:44:34,363</td>
-                        <td>INFO</td>
-                        <td>tc_eg_07.py:24</td>
-                        <td>
-                            <pre>Sleep 3 second(s)...</pre>
-                            
-                        </td>
-                    </tr>
-                    
                     <tr class="ERROR">
-                        <td>2023-12-05 18:44:37,365</td>
+                        <td>2023-12-11 22:37:31,832</td>
                         <td>ERROR</td>
-                        <td>testcase.py:207</td>
-                        <td>
-                            <pre>TestCaseTimeout: Execution did not complete within 2 second(s).</pre>
+                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Traceback (most recent call last):
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+    func()
+  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_setup.py", line 19, in setup
+    assertx(1, '==', 0)
+  File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
+    raise AssertionError(errmsg)
+AssertionError: 1 == 0</pre>
                             
                         </td>
                     </tr>
@@ -233,11 +210,11 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-05 18:44:37,365</td>
+                        <td>2023-12-11 22:37:31,832</td>
                         <td>INFO</td>
-                        <td>tc_eg_07.py:30</td>
-                        <td>
-                            <pre>开始执行清理步骤</pre>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_setup.py:37</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Sleep 1 second(s)...</pre>
                             
                         </td>
                     </tr>

@@ -3,9 +3,9 @@ from xbot.utils import assertx
 from lib.testcase import TestCase
 
 
-class tc_eg_04(TestCase):
+class tc_eg_nonpass_error_step(TestCase):
     """
-    错误的测试用例。
+    测试步骤错误的用例。
     """
     TIMEOUT = 60
     FAILFAST = False
@@ -21,14 +21,13 @@ class tc_eg_04(TestCase):
         """
         访问 self.mylist[2]
         """
-        # 测试步骤 1
+        # 此处 error，虽然 FAILFAST = False，但是仍然会跳过后续测试步骤并立即执行清理步骤。
         self.mylist[2]
 
     def step2(self):
         """
         访问 self.mylist[1]
         """
-        # 测试步骤 1
         self.mylist[1]
 
     def teardown(self):

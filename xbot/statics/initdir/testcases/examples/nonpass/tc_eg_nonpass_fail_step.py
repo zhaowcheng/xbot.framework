@@ -3,9 +3,9 @@ from xbot.utils import assertx
 from lib.testcase import TestCase
 
 
-class tc_eg_03(TestCase):
+class tc_eg_nonpass_fail_step(TestCase):
     """
-    失败的测试用例。
+    测试步骤失败的用例。
     """
     TIMEOUT = 60
     FAILFAST = True

@@ -150,10 +150,10 @@
     </script>
 
     <div id='filter_button_line' style=" float: left;  width: 100%;">
-        <a class="all filter_button" href='javascript:filterCase(0)'>ALL[8]</a>
+        <a class="all filter_button" href='javascript:filterCase(0)'>ALL[11]</a>
         <a class="pass filter_button" href='javascript:filterCase(1)'>PASS[2]</a>
-        <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[2]</a>
-        <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[1]</a>
+        <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[3]</a>
+        <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[3]</a>
         <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[1]</a>
         <a class="skip filter_button" href='javascript:filterCase(5)'>SKIP[2]</a>
     </div>
@@ -163,88 +163,118 @@
             <th width="55%">用例路径</th>
             <th width="14%">开始时间</th>
             <th width="14%">结束时间</th>
-            <th width="11%">执行时长[0:00:08]</th>
+            <th width="11%">执行时长[0:00:09]</th>
             <th width="6%">执行结果</th>
         </tr>
 
         
         <tr class="PASS">
-            <td >testcases/examples/subdir1/tc_eg_01.py</td>
-            <td align='center'>2023-12-05 18:44:30</td>
-            <td align='center'>2023-12-05 18:44:31</td>
+            <td >testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py</td>
+            <td align='center'>2023-12-11 22:37:28</td>
+            <td align='center'>2023-12-11 22:37:29</td>
             <td align='center'>0:00:01</td>
             <td align='center'>
-                <a href="testcases/examples/subdir1/tc_eg_01.html" target="_blank">PASS</a>
+                <a href="testcases/examples/pass/tc_eg_pass_get_values_from_testbed.html" target="_blank">PASS</a>
             </td>
         </tr>
         
         <tr class="PASS">
-            <td >testcases/examples/subdir1/tc_eg_02.py</td>
-            <td align='center'>2023-12-05 18:44:31</td>
-            <td align='center'>2023-12-05 18:44:32</td>
+            <td >testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py</td>
+            <td align='center'>2023-12-11 22:37:29</td>
+            <td align='center'>2023-12-11 22:37:30</td>
             <td align='center'>0:00:01</td>
             <td align='center'>
-                <a href="testcases/examples/subdir1/tc_eg_02.html" target="_blank">PASS</a>
-            </td>
-        </tr>
-        
-        <tr class="FAIL">
-            <td >testcases/examples/subdir2/tc_eg_03.py</td>
-            <td align='center'>2023-12-05 18:44:32</td>
-            <td align='center'>2023-12-05 18:44:33</td>
-            <td align='center'>0:00:01</td>
-            <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_03.html" target="_blank">FAIL</a>
+                <a href="testcases/examples/pass/tc_eg_pass_create_dirs_and_files.html" target="_blank">PASS</a>
             </td>
         </tr>
         
         <tr class="ERROR">
-            <td >testcases/examples/subdir2/tc_eg_04.py</td>
-            <td align='center'>2023-12-05 18:44:33</td>
-            <td align='center'>2023-12-05 18:44:34</td>
+            <td >testcases/examples/nonpass/tc_eg_nonpass_error_clsname.py</td>
+            <td align='center'>2023-12-11 22:37:30</td>
+            <td align='center'>2023-12-11 22:37:30</td>
+            <td align='center'>0:00:00</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_error_clsname.html" target="_blank">ERROR</a>
+            </td>
+        </tr>
+        
+        <tr class="ERROR">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_error_step.py</td>
+            <td align='center'>2023-12-11 22:37:30</td>
+            <td align='center'>2023-12-11 22:37:31</td>
             <td align='center'>0:00:01</td>
             <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_04.html" target="_blank">ERROR</a>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_error_step.html" target="_blank">ERROR</a>
             </td>
         </tr>
         
-        <tr class="SKIP">
-            <td >testcases/examples/subdir2/tc_eg_05.py</td>
-            <td align='center'>2023-12-05 18:44:34</td>
-            <td align='center'>2023-12-05 18:44:34</td>
+        <tr class="ERROR">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py</td>
+            <td align='center'>2023-12-11 22:37:31</td>
+            <td align='center'>2023-12-11 22:37:31</td>
             <td align='center'>0:00:00</td>
             <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_05.html" target="_blank">SKIP</a>
-            </td>
-        </tr>
-        
-        <tr class="SKIP">
-            <td >testcases/examples/subdir2/tc_eg_06.py</td>
-            <td align='center'>2023-12-05 18:44:34</td>
-            <td align='center'>2023-12-05 18:44:34</td>
-            <td align='center'>0:00:00</td>
-            <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_06.html" target="_blank">SKIP</a>
-            </td>
-        </tr>
-        
-        <tr class="TIMEOUT">
-            <td >testcases/examples/subdir2/tc_eg_07.py</td>
-            <td align='center'>2023-12-05 18:44:34</td>
-            <td align='center'>2023-12-05 18:44:37</td>
-            <td align='center'>0:00:03</td>
-            <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_07.html" target="_blank">TIMEOUT</a>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_error_syntax.html" target="_blank">ERROR</a>
             </td>
         </tr>
         
         <tr class="FAIL">
-            <td >testcases/examples/subdir2/tc_eg_08.py</td>
-            <td align='center'>2023-12-05 18:44:37</td>
-            <td align='center'>2023-12-05 18:44:38</td>
+            <td >testcases/examples/nonpass/tc_eg_nonpass_fail_setup.py</td>
+            <td align='center'>2023-12-11 22:37:31</td>
+            <td align='center'>2023-12-11 22:37:32</td>
             <td align='center'>0:00:01</td>
             <td align='center'>
-                <a href="testcases/examples/subdir2/tc_eg_08.html" target="_blank">FAIL</a>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_fail_setup.html" target="_blank">FAIL</a>
+            </td>
+        </tr>
+        
+        <tr class="FAIL">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_fail_step.py</td>
+            <td align='center'>2023-12-11 22:37:32</td>
+            <td align='center'>2023-12-11 22:37:33</td>
+            <td align='center'>0:00:01</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_fail_step.html" target="_blank">FAIL</a>
+            </td>
+        </tr>
+        
+        <tr class="FAIL">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_failfast_false.py</td>
+            <td align='center'>2023-12-11 22:37:33</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>0:00:01</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_failfast_false.html" target="_blank">FAIL</a>
+            </td>
+        </tr>
+        
+        <tr class="SKIP">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.py</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>0:00:00</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.html" target="_blank">SKIP</a>
+            </td>
+        </tr>
+        
+        <tr class="SKIP">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.py</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>0:00:00</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.html" target="_blank">SKIP</a>
+            </td>
+        </tr>
+        
+        <tr class="TIMEOUT">
+            <td >testcases/examples/nonpass/tc_eg_nonpass_timeout.py</td>
+            <td align='center'>2023-12-11 22:37:34</td>
+            <td align='center'>2023-12-11 22:37:37</td>
+            <td align='center'>0:00:03</td>
+            <td align='center'>
+                <a href="testcases/examples/nonpass/tc_eg_nonpass_timeout.html" target="_blank">TIMEOUT</a>
             </td>
         </tr>
         

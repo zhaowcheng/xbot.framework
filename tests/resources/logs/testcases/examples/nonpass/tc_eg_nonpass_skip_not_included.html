@@ -62,7 +62,7 @@
         }
 
         .location {
-            width: 180px;
+            width: 300px;
         }
 
         .ERROR {
@@ -86,46 +86,38 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2">tc_eg_04</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_skip_not_included</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_04(TestCase):
+class tc_eg_nonpass_skip_not_included(TestCase):
     """
-    错误的测试用例。
+    因不被 testset.tags.include 包含而跳过的测试用例。
     """
     TIMEOUT = 60
-    FAILFAST = False
-    TAGS = ['tag1']
+    FAILFAST = True
+    TAGS = []
 
     def setup(self):
         """
-        创建列表 self.mylist = [1, 2]
+        预置步骤。
         """
-        self.mylist = [1, 2]
+        self.info('开始执行预置步骤')
 
     def step1(self):
         """
-        访问 self.mylist[2]
+        测试步骤 1。
         """
-        # 测试步骤 1
-        self.mylist[2]
-
-    def step2(self):
-        """
-        访问 self.mylist[1]
-        """
-        # 测试步骤 1
-        self.mylist[1]
+        self.info('开始执行测试步骤 1')
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤
+        清理步骤。
         """
-        self.sleep(1)
+        self.info('开始执行清理步骤')
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
@@ -145,19 +137,19 @@ example:
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="result" colspan="2">ERROR</td>
+                    <td id="result" colspan="2">SKIP</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-05 18:44:33</td>
+                    <td id="starttime" colspan="2">2023-12-11 22:37:34</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-05 18:44:34</td>
+                    <td id="endtime" colspan="2">2023-12-11 22:37:34</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
-                    <td id="duration" colspan="2">0:00:01</td>
+                    <td id="duration" colspan="2">0:00:00</td>
                 </tr>
             </table>
         </div>
@@ -176,62 +168,12 @@ example:
                         <th class="message">message</th>
                     </tr>
                     
-                </table>
-            </div>
-            <br>
-            <br>
-            
-            <div>
-                <button>step1</button>
-            </div>
-            <div id="step1">
-                <table>
-                    <tr style="height: 25px;">
-                        <th class="asctime">time</th>
-                        <th class="levelname">level</th>
-                        <th class="location">location</th>
-                        <th class="message">message</th>
-                    </tr>
-                    
-                    <tr class="ERROR">
-                        <td>2023-12-05 18:44:33,294</td>
-                        <td>ERROR</td>
-                        <td>testcase.py:210</td>
-                        <td>
-                            <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 204, in __run_stage
-    func()
-  File "./testcases/examples/subdir2/tc_eg_04.py", line 25, in step1
-    self.mylist[2]
-IndexError: list index out of range
-</pre>
-                            
-                        </td>
-                    </tr>
-                    
-                </table>
-            </div>
-            <br>
-            <br>
-            
-            <div>
-                <button>teardown</button>
-            </div>
-            <div id="teardown">
-                <table>
-                    <tr style="height: 25px;">
-                        <th class="asctime">time</th>
-                        <th class="levelname">level</th>
-                        <th class="location">location</th>
-                        <th class="message">message</th>
-                    </tr>
-                    
-                    <tr class="INFO">
-                        <td>2023-12-05 18:44:33,294</td>
-                        <td>INFO</td>
-                        <td>tc_eg_04.py:38</td>
-                        <td>
-                            <pre>Sleep 1 second(s)...</pre>
+                    <tr class="WARNING">
+                        <td>2023-12-11 22:37:34,939</td>
+                        <td>WARNING</td>
+                        <td style="word-wrap: break-word;">testcase.py:171</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Skipped: self.TAGS=[], testset.tags.include=('tag1',), testset.tags.exclude=('tag2',)</pre>
                             
                         </td>
                     </tr>

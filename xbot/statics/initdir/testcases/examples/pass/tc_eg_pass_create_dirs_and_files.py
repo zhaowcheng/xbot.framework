@@ -7,7 +7,7 @@ from xbot.utils import assertx
 from lib.testcase import TestCase
 
 
-class tc_eg_02(TestCase):
+class tc_eg_pass_create_dirs_and_files(TestCase):
     """
     测试创建目录和文件。
     """

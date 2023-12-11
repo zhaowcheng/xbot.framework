@@ -90,6 +90,23 @@ class TestCase(object):
         )
     
     @property
+    def sourcecode(self) -> str:
+        """
+        用例源码。
+        """
+        return inspect.getsource(import_module(self.__module__))
+    
+    @property
+    def skipped(self) -> bool:
+        """
+        是否被跳过。
+        """
+        etags = self.__testset.exclude_tags
+        itags = self.__testset.include_tags
+        return (etags and not set(etags).isdisjoint(self.TAGS)) or \
+               (itags and set(itags).isdisjoint(self.TAGS))
+    
+    @property
     def steps(self) -> List[str]:
         """
         测试步骤列表。
@@ -202,16 +219,12 @@ class TestCase(object):
         执行当前用例。
         """
         self.__starttime = datetime.now().replace(microsecond=0)
-        etags = self.__testset.exclude_tags
-        itags = self.__testset.include_tags
-        if etags and not set(etags).isdisjoint(self.TAGS):
+        if self.skipped:
             self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
-            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.exclude={etags}')
-        elif itags and set(itags).isdisjoint(self.TAGS):
-            self.__loghdlr.set_stage('setup')
-            self.__result = 'SKIP'
-            self.warn(f'Skipped: self.TAGS={self.TAGS}, testset.tags.include={itags}')
+            self.warn(f'Skipped: self.TAGS={self.TAGS}, ' + 
+                      f'testset.tags.include={self.__testset.include_tags}, ' + 
+                      f'testset.tags.exclude={self.__testset.exclude_tags}')
         else:
             self.__run_stage('setup')
             if not self.__result:
@@ -236,7 +249,7 @@ class TestCase(object):
             if not callable(func):
                 raise TypeError(f'`{stage}` is not callable')
             func()
-        except TestCaseTimeout:
+        except TestCaseTimeout as e:
             self.error('TestCaseTimeout: Execution did not '
                        'complete within %s second(s).' % self.TIMEOUT)
             self.__result = 'TIMEOUT'
@@ -260,7 +273,7 @@ class TestCase(object):
             starttime=self.starttime.strftime('%Y-%m-%d %H:%M:%S'),
             endtime=self.endtime.strftime('%Y-%m-%d %H:%M:%S'),
             duration=str(self.duration),
-            sourcecode=inspect.getsource(import_module(self.__module__)),
+            sourcecode=self.sourcecode.replace('<','&lt').replace('>','&gt'),
             testbed=self.testbed.content.replace('<','&lt').replace('>','&gt'),
             stage_records=self.__loghdlr.records
         )
@@ -272,22 +285,42 @@ class ErrorTestCase(TestCase):
     """
     def __init__(
         self, 
+        caseid: str,
+        filepath: str,
         testbed: TestBed, 
         testset: TestSet, 
         logroot: str,
-        caseid: str,
         exc: Exception
     ) -> None:
         """
+        :param caseid: 用例 id。
+        :param filepath: 用例文件路径。
+        :param testbed: 测试床实例。
+        :param testset: 测试集实例。
+        :param logroot: 日志根目录。
         :param exc: 抛出的异常类型。
         """
         self.__caseid = caseid
+        self.__filepath = filepath
         self.__exc = exc
         super().__init__(testbed, testset, logroot)
 
     @property
     def caseid(self) -> str:
         return self.__caseid
+    
+    @property
+    def abspath(self) -> str:
+        return self.__filepath
+    
+    @property
+    def skipped(self) -> bool:
+        return False
+    
+    @property
+    def sourcecode(self) -> str:
+        with open(self.__filepath) as f:
+            return f.read()
     
     def setup(self) -> None:
         """

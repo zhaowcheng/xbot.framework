@@ -43,13 +43,14 @@ class Runner(object):
         casecnt = len(self.testset.paths)
         for i, casepath in enumerate(self.testset.paths):
             caseid = casepath.split('/')[-1].replace('.py', '')
+            abspath = os.path.abspath(casepath)
             xprint(f'Start: {caseid} ({i+1}/{casecnt})'.center(100, '='))
             try:
                 casecls = self._import_case(casepath)
                 caseinst = casecls(self.testbed, self.testset, logroot)
-            except (ImportError, AttributeError) as e:
-                caseinst = ErrorTestCase(self.testbed, self.testset, 
-                                         logroot, caseid, e)
+            except (ImportError, AttributeError, SyntaxError) as e:
+                caseinst = ErrorTestCase(caseid, abspath, self.testbed, 
+                                         self.testset, logroot, e)
             caseinst.run()
             xprint(f'End: {caseid} ({i+1}/{casecnt})'.center(100, '='), '\n')
         return logroot

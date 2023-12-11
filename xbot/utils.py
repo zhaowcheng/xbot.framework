@@ -10,6 +10,7 @@ import sys
 import ctypes
 import operator
 import socket
+import traceback
 
 import jinja2
 
@@ -354,3 +355,4 @@ def assertx(
         raise AssertionError(errmsg)
     if verbose:
         logger.info('AssertionOK: %s %s %s', a, op, b, stacklevel=2)
+

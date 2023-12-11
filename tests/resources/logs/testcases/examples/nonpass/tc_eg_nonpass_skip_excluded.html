@@ -62,7 +62,7 @@
         }
 
         .location {
-            width: 180px;
+            width: 300px;
         }
 
         .ERROR {
@@ -86,20 +86,20 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2">tc_eg_05</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_skip_excluded</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_05(TestCase):
+class tc_eg_nonpass_skip_excluded(TestCase):
     """
-    因不被 testset.tags.include 包含而跳过的测试用例。
+    因被 testset.tags.exclude 包含而跳过的测试用例。
     """
     TIMEOUT = 60
     FAILFAST = True
-    TAGS = []
+    TAGS = ['tag1', 'tag2']
 
     def setup(self):
         """
@@ -141,11 +141,11 @@ example:
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-05 18:44:34</td>
+                    <td id="starttime" colspan="2">2023-12-11 22:37:34</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-05 18:44:34</td>
+                    <td id="endtime" colspan="2">2023-12-11 22:37:34</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -169,11 +169,11 @@ example:
                     </tr>
                     
                     <tr class="WARNING">
-                        <td>2023-12-05 18:44:34,323</td>
+                        <td>2023-12-11 22:37:34,912</td>
                         <td>WARNING</td>
-                        <td>testcase.py:131</td>
-                        <td>
-                            <pre>Skipped: self.TAGS=[], testset.tags.include=('tag1',)</pre>
+                        <td style="word-wrap: break-word;">testcase.py:171</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Skipped: self.TAGS=['tag1', 'tag2'], testset.tags.include=('tag1',), testset.tags.exclude=('tag2',)</pre>
                             
                         </td>
                     </tr>

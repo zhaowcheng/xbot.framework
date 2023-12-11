@@ -62,6 +62,18 @@ class XLogger(logging.Logger):
                                  exc_info, func, extra)
         self.handle(record)
 
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info,
+                   func=None, extra=None, sinfo=None):
+        """
+        extra 中包含 LogRecord 保留字段时不报错。
+        """
+        rv = logging._logRecordFactory(name, level, fn, lno, msg, args, 
+                                       exc_info, func,sinfo)
+        if extra is not None:
+            for key in extra:
+                rv.__dict__[key] = extra[key]
+        return rv
+
 
 logging.setLoggerClass(XLogger)
 

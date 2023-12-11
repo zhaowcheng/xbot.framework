@@ -62,7 +62,7 @@
         }
 
         .location {
-            width: 180px;
+            width: 300px;
         }
 
         .ERROR {
@@ -86,7 +86,7 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2">{{caseid}}</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">{{caseid}}</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">{{sourcecode}}</pre>
                     </td>
@@ -130,8 +130,8 @@
                     <tr class="{{record.levelname}}">
                         <td>{{record.asctime}}</td>
                         <td>{{record.levelname}}</td>
-                        <td>{{record.filename}}:{{record.lineno}}</td>
-                        <td>
+                        <td style="word-wrap: break-word;">{{record.filename}}:{{record.lineno}}</td>
+                        <td style="padding-left: 0.5%;">
                             <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %}  <a id="a{{record.asctime}}" href="javascript:switchElementDisplayState('{{record.asctime}}');switchMoreOrLess('a{{record.asctime}}')">@more</a>{% endif %}</pre>
                             {% if 'hook' in record and 'more' in record.hook %}
                             <pre id='{{record.asctime}}'

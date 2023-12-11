@@ -3,13 +3,13 @@ from xbot.utils import assertx
 from lib.testcase import TestCase
 
 
-class tc_eg_07(TestCase):
+class tc_eg_nonpass_skip_excluded(TestCase):
     """
-    超时的测试用例。
+    因被 testset.tags.exclude 包含而跳过的测试用例。
     """
-    TIMEOUT = 2
+    TIMEOUT = 60
     FAILFAST = True
-    TAGS = ['tag1']
+    TAGS = ['tag1', 'tag2']
 
     def setup(self):
         """
@@ -19,9 +19,9 @@ class tc_eg_07(TestCase):
 
     def step1(self):
         """
-        睡眠 3 秒。
+        测试步骤 1。
         """
-        self.sleep(3)
+        self.info('开始执行测试步骤 1')
 
     def teardown(self):
         """
