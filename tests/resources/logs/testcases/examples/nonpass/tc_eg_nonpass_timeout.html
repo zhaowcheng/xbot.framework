@@ -114,6 +114,12 @@ class tc_eg_nonpass_timeout(TestCase):
         # 此处因超时而 error，会被强行终止，然后立即执行清理步骤。
         self.sleep(3)
 
+    def step2(self):
+        """
+        测试步骤 2。
+        """
+        self.info('开始执行测试步骤 2')
+
     def teardown(self):
         """
         清理步骤。
@@ -122,7 +128,7 @@ class tc_eg_nonpass_timeout(TestCase):
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须时 YAML 格式，具体字段信息自定义，
+                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
 # 测试用例中可通过 self.testbed.get() 获取信息。
 example:
   key1: value1
@@ -142,11 +148,11 @@ example:
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-11 22:37:34</td>
+                    <td id="starttime" colspan="2">2023-12-13 22:53:18</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-11 22:37:37</td>
+                    <td id="endtime" colspan="2">2023-12-13 22:53:21</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -170,7 +176,7 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-11 22:37:34,963</td>
+                        <td>2023-12-13 22:53:18,263</td>
                         <td>INFO</td>
                         <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:18</td>
                         <td style="padding-left: 0.5%;">
@@ -197,7 +203,7 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-11 22:37:34,963</td>
+                        <td>2023-12-13 22:53:18,263</td>
                         <td>INFO</td>
                         <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:25</td>
                         <td style="padding-left: 0.5%;">
@@ -207,7 +213,7 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-11 22:37:37,968</td>
+                        <td>2023-12-13 22:53:21,267</td>
                         <td>ERROR</td>
                         <td style="word-wrap: break-word;">testcase.py:254</td>
                         <td style="padding-left: 0.5%;">
@@ -234,9 +240,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-11 22:37:37,969</td>
+                        <td>2023-12-13 22:53:21,267</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:31</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_timeout.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>开始执行清理步骤</pre>
                             

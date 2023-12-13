@@ -19,18 +19,18 @@ class tc_eg_nonpass_failfast_false(TestCase):
 
     def step1(self):
         """
-        获取 `example.key1` 的值并检查，值应为 `value1`。
+        获取 `example.key1` 的值并检查，值应为 `value2`。
         """
         value1 = self.testbed.get('example.key1')
-        assertx(value1, '==', 'value1')
+        # 此处 fail，但是由于 FAILFAST=False，所以会继续执行后续测试步骤。
+        assertx(value1, '==', 'value2')
 
     def step2(self):
         """
-        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-2`。
+        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-1`。
         """
         value2 = self.testbed.get('example.key2.key2-1')
-        # 此处 fail，但是由于 FAILFAST=False，所以会继续执行后续测试步骤。
-        assertx(value2, '==', 'value2-2')
+        assertx(value2, '==', 'value2-1')
 
     def step3(self):
         """

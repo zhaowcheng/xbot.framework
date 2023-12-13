@@ -24,6 +24,12 @@ class tc_eg_nonpass_timeout(TestCase):
         # 此处因超时而 error，会被强行终止，然后立即执行清理步骤。
         self.sleep(3)
 
+    def step2(self):
+        """
+        测试步骤 2。
+        """
+        self.info('开始执行测试步骤 2')
+
     def teardown(self):
         """
         清理步骤。

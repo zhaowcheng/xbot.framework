@@ -21,7 +21,8 @@ class tc_eg_nonpass_error_step(TestCase):
         """
         访问 self.mylist[2]
         """
-        # 此处 error，虽然 FAILFAST = False，但是仍然会跳过后续测试步骤并立即执行清理步骤。
+        # 此处 error，无论 FAILFAST 是何值，
+        # 都会跳过后续测试步骤并立即执行清理步骤。
         self.mylist[2]
 
     def step2(self):
