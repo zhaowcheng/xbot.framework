@@ -42,9 +42,6 @@ class TestTestCase(unittest.TestCase):
         return caseinst
 
     def test_tc_eg_pass_get_values_from_testbed(self):
-        """
-        测试 “从测试床中获取信息并检查的用例“。
-        """
         caseid = 'tc_eg_pass_get_values_from_testbed'
         caseinst = self.instcase('pass', caseid)
         caseinst.run()
@@ -77,45 +74,8 @@ class TestTestCase(unittest.TestCase):
         self.assertEqual(caseinst.result, 'PASS')
         self.assertTrue(os.path.exists(caseinst.logfile))
 
-    def test_tc_eg_nonpass_error_step(self):
-        """
-        测试 “测试步骤错误的用例”。
-        """
-        caseid = 'tc_eg_nonpass_error_step'
-        caseinst = self.instcase('nonpass', caseid)
-        self.assertEqual(caseinst.FAILFAST, False)
-        caseinst.step2 = MagicMock()
-        caseinst.teardown = MagicMock()
-        caseinst.run()
-        self.assertEqual(caseinst.result, 'ERROR')
-        self.assertEqual(caseinst.skipped, False)
-        caseinst.step2.assert_not_called()
-        caseinst.teardown.assert_called_once()
-        self.assertTrue(os.path.exists(caseinst.logfile))
-
-    def test_tc_eg_nonpass_error_setup(self):
-        """
-        测试 “预置步骤错误的用例”。
-        """
-        caseid = 'tc_eg_nonpass_error_setup'
-        caseinst = self.instcase('nonpass', caseid)
-        self.assertEqual(caseinst.FAILFAST, False)
-        caseinst.step1 = MagicMock()
-        caseinst.step2 = MagicMock()
-        caseinst.teardown = MagicMock()
-        caseinst.run()
-        self.assertEqual(caseinst.result, 'ERROR')
-        self.assertEqual(caseinst.skipped, False)
-        caseinst.step1.assert_not_called()
-        caseinst.step2.assert_not_called()
-        caseinst.teardown.assert_called_once()
-        self.assertTrue(os.path.exists(caseinst.logfile))
-
-    def test_tc_eg_nonpass_fail_setup(self):
-        """
-        测试 “预置步骤失败的用例”。
-        """
-        caseid = 'tc_eg_nonpass_fail_setup'
+    def test_tc_eg_nonpass_fail_setup_with_failfast_false(self):
+        caseid = 'tc_eg_nonpass_fail_setup_with_failfast_false'
         caseinst = self.instcase('nonpass', caseid)
         self.assertEqual(caseinst.FAILFAST, False)
         caseinst.step1 = MagicMock()
@@ -129,11 +89,36 @@ class TestTestCase(unittest.TestCase):
         caseinst.teardown.assert_called_once()
         self.assertTrue(os.path.exists(caseinst.logfile))
 
-    def test_tc_eg_nonpass_fail_step(self):
-        """
-        测试 “测试步骤失败的用例”。
-        """
-        caseid = 'tc_eg_nonpass_fail_step'
+    def test_tc_eg_nonpass_fail_setup_with_failfast_true(self):
+        caseid = 'tc_eg_nonpass_fail_setup_with_failfast_true'
+        caseinst = self.instcase('nonpass', caseid)
+        self.assertEqual(caseinst.FAILFAST, True)
+        caseinst.step1 = MagicMock()
+        caseinst.step2 = MagicMock()
+        caseinst.teardown = MagicMock()
+        caseinst.run()
+        self.assertEqual(caseinst.result, 'FAIL')
+        self.assertEqual(caseinst.skipped, False)
+        caseinst.step1.assert_not_called()
+        caseinst.step2.assert_not_called()
+        caseinst.teardown.assert_called_once()
+        self.assertTrue(os.path.exists(caseinst.logfile))
+
+    def test_tc_eg_nonpass_fail_step_with_failfast_false(self):
+        caseid = 'tc_eg_nonpass_fail_step_with_failfast_false'
+        caseinst = self.instcase('nonpass', caseid)
+        self.assertEqual(caseinst.FAILFAST, False)
+        caseinst.step2 = MagicMock()
+        caseinst.teardown = MagicMock()
+        caseinst.run()
+        self.assertEqual(caseinst.result, 'FAIL')
+        self.assertEqual(caseinst.skipped, False)
+        caseinst.step2.assert_called_once()
+        caseinst.teardown.assert_called_once()
+        self.assertTrue(os.path.exists(caseinst.logfile))
+
+    def test_tc_eg_nonpass_fail_step_with_failfast_true(self):
+        caseid = 'tc_eg_nonpass_fail_step_with_failfast_true'
         caseinst = self.instcase('nonpass', caseid)
         self.assertEqual(caseinst.FAILFAST, True)
         caseinst.step2 = MagicMock()
@@ -145,28 +130,7 @@ class TestTestCase(unittest.TestCase):
         caseinst.teardown.assert_called_once()
         self.assertTrue(os.path.exists(caseinst.logfile))
 
-    def test_tc_eg_nonpass_failfast_false(self):
-        """
-        测试 “FAILFAST 属性为 False 的用例”。
-        """
-        caseid = 'tc_eg_nonpass_failfast_false'
-        caseinst = self.instcase('nonpass', caseid)
-        self.assertEqual(caseinst.FAILFAST, False)
-        caseinst.step2 = MagicMock()
-        caseinst.step3 = MagicMock()
-        caseinst.teardown = MagicMock()
-        caseinst.run()
-        self.assertEqual(caseinst.result, 'FAIL')
-        self.assertEqual(caseinst.skipped, False)
-        caseinst.step2.assert_called_once()
-        caseinst.step3.assert_called_once()
-        caseinst.teardown.assert_called_once()
-        self.assertTrue(os.path.exists(caseinst.logfile))
-
     def test_tc_eg_nonpass_skip_excluded(self):
-        """
-        测试 “因被 testset.tags.exclude 包含而跳过的测试用例”。
-        """
         caseid = 'tc_eg_nonpass_skip_excluded'
         caseinst = self.instcase('nonpass', caseid)
         caseinst.setup = MagicMock()
@@ -181,9 +145,6 @@ class TestTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(caseinst.logfile))
 
     def test_tc_eg_nonpass_skip_not_included(self):
-        """
-        测试 “因不被 testset.tags.include 包含而跳过的测试用例”。
-        """
         caseid = 'tc_eg_nonpass_skip_not_included'
         caseinst = self.instcase('nonpass', caseid)
         caseinst.setup = MagicMock()
@@ -198,9 +159,6 @@ class TestTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(caseinst.logfile))
 
     def test_tc_eg_nonpass_timeout(self):
-        """
-        测试 “超时的测试用例”。
-        """
         caseid = 'tc_eg_nonpass_timeout'
         caseinst = self.instcase('nonpass', caseid)
         caseinst.step2 = MagicMock()

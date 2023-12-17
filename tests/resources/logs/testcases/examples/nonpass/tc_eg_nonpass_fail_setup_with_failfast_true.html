@@ -86,26 +86,26 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_setup</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_true</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_fail_setup(TestCase):
+class tc_eg_nonpass_fail_setup_with_failfast_true(TestCase):
     """
-    预置步骤失败的用例。
+    在 FAILFAST 为 True 的情况下预置步骤失败。
     """
     TIMEOUT = 60
-    FAILFAST = False
+    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
         """
         断言 1 == 0。
         """
-        # setup 出现 fail，无论 FAILFAST 是何值，
+        # setup 出现失败，无论 FAILFAST 是何值，
         # 都会跳过后续测试步骤并立即执行清理步骤。
         assertx(1, '==', 0)
 
@@ -149,11 +149,11 @@ example:
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-13 22:53:15</td>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:22</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-13 22:53:16</td>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:23</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -177,14 +177,14 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-13 22:53:15,150</td>
+                        <td>2023-12-17 16:35:22,084</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
     func()
-  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_setup.py", line 20, in setup
+  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_true.py", line 20, in setup
     assertx(1, '==', 0)
   File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
     raise AssertionError(errmsg)
@@ -211,9 +211,9 @@ AssertionError: 1 == 0</pre>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-13 22:53:15,150</td>
+                        <td>2023-12-17 16:35:22,084</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_setup.py:38</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_true.py:38</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

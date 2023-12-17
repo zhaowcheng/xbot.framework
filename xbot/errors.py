@@ -7,13 +7,20 @@
 
 class TestCaseTimeout(Exception):
     """
-    Testcase execution timeout.
+    测试用例执行超时。
+    """
+    pass
+
+
+class TestCaseError(Exception):
+    """
+    测试用例错误。
     """
     pass
 
 
 class TestSetError(Exception):
     """
-    Testset error.
+    测试套错误。
     """
     pass

@@ -86,16 +86,16 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_error_setup</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_false</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_error_setup(TestCase):
+class tc_eg_nonpass_fail_step_with_failfast_false(TestCase):
     """
-    预置步骤错误的用例。
+    在 FAILFAST 为 False 的情况下测试步骤失败。
     """
     TIMEOUT = 60
     FAILFAST = False
@@ -103,23 +103,22 @@ class tc_eg_nonpass_error_setup(TestCase):
 
     def setup(self):
         """
-        访问 {'k': 'v'}['x']。
+        无
         """
-        # setup 出现 error，无论 FAILFAST 是何值，
-        # 都会跳过后续测试步骤并立即执行清理步骤。
-        {'k': 'v'}['x']
+        pass
 
     def step1(self):
+        """
+        断言 1 == 2。
+        """
+        # 此处失败，由于 FAILFAST=False，将会继续执行后续测试步骤。
+        assertx(1, '==', 2)
+
+    def step2(self):
         """
         断言 1 == 1。
         """
         assertx(1, '==', 1)
-
-    def step2(self):
-        """
-        断言 2 == 2。
-        """
-        assertx(2, '==', 2)
 
     def teardown(self):
         """
@@ -145,15 +144,15 @@ example:
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="result" colspan="2">ERROR</td>
+                    <td id="result" colspan="2">FAIL</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-13 22:53:13</td>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:23</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-13 22:53:14</td>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:24</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -176,17 +175,63 @@ example:
                         <th class="message">message</th>
                     </tr>
                     
+                </table>
+            </div>
+            <br>
+            <br>
+            
+            <div>
+                <button>step1</button>
+            </div>
+            <div id="step1">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
                     <tr class="ERROR">
-                        <td>2023-12-13 22:53:13,079</td>
+                        <td>2023-12-17 16:35:23,119</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
     func()
-  File "./testcases/examples/nonpass/tc_eg_nonpass_error_setup.py", line 20, in setup
-    {'k': 'v'}['x']
-KeyError: 'x'</pre>
+  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_false.py", line 25, in step1
+    assertx(1, '==', 2)
+  File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
+    raise AssertionError(errmsg)
+AssertionError: 1 == 2</pre>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <br>
+            <br>
+            
+            <div>
+                <button>step2</button>
+            </div>
+            <div id="step2">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="INFO">
+                        <td>2023-12-17 16:35:23,119</td>
+                        <td>INFO</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_false.py:31</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>AssertionOK: 1 == 1</pre>
                             
                         </td>
                     </tr>
@@ -209,9 +254,9 @@ KeyError: 'x'</pre>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-13 22:53:13,079</td>
+                        <td>2023-12-17 16:35:23,119</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_nonpass_error_setup.py:38</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_false.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

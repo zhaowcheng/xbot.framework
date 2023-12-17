@@ -142,11 +142,11 @@ example:
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-13 22:53:15</td>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:21</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-13 22:53:15</td>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:21</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -170,33 +170,16 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-13 22:53:15,132</td>
+                        <td>2023-12-17 16:35:21,039</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
     func()
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 329, in setup
-    raise self.__exc from None
-  File "/Users/wan/CodeProjects/xbot/xbot/runner.py", line 49, in run
-    casecls = self._import_case(casepath)
-  File "/Users/wan/CodeProjects/xbot/xbot/runner.py", line 78, in _import_case
-    casemod = import_module(modname)
-  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-  File "&ltfrozen importlib._bootstrap&gt", line 994, in _gcd_import
-  File "&ltfrozen importlib._bootstrap&gt", line 971, in _find_and_load
-  File "&ltfrozen importlib._bootstrap&gt", line 955, in _find_and_load_unlocked
-  File "&ltfrozen importlib._bootstrap&gt", line 665, in _load_unlocked
-  File "&ltfrozen importlib._bootstrap_external&gt", line 674, in exec_module
-  File "&ltfrozen importlib._bootstrap_external&gt", line 781, in get_code
-  File "&ltfrozen importlib._bootstrap_external&gt", line 741, in source_to_code
-  File "&ltfrozen importlib._bootstrap&gt", line 219, in _call_with_frames_removed
-  File "./testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py", line 27
-    def teardown(self):
-      ^
-SyntaxError: invalid syntax</pre>
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 328, in setup
+    raise TestCaseError(str(self.__exc)) from None
+xbot.errors.TestCaseError: invalid syntax (tc_eg_nonpass_error_syntax.py, line 27)</pre>
                             
                         </td>
                     </tr>

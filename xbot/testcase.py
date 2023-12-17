@@ -20,7 +20,7 @@ from threading import Thread
 from xbot import logger, common, utils
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
-from xbot.errors import TestCaseTimeout
+from xbot.errors import TestCaseTimeout, TestCaseError
 
 
 class TestCase(object):
@@ -229,8 +229,7 @@ class TestCase(object):
             self.__run_stage('setup')
             if not self.__result:
                 for step in self.steps:
-                    if not self.__result or (self.__result == 'FAIL' and 
-                                             self.FAILFAST == False):
+                    if not self.__result or not self.FAILFAST:
                         self.__run_stage(step)
             self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
@@ -250,15 +249,15 @@ class TestCase(object):
                 raise TypeError(f'`{stage}` is not callable')
             func()
         except TestCaseTimeout as e:
+            self.__result = 'TIMEOUT'
             self.error('TestCaseTimeout: Execution did not '
                        'complete within %s second(s).' % self.TIMEOUT)
-            self.__result = 'TIMEOUT'
         except Exception as e:
-            self.error(traceback.format_exc().strip())
-            if isinstance(e, AssertionError):
-                self.__result = 'FAIL'
-            else:
+            if isinstance(e, TestCaseError):
                 self.__result = 'ERROR'
+            else:
+                self.__result = 'FAIL'
+            self.error(traceback.format_exc().strip())
 
     def __dump_log(self) -> None:
         """
@@ -326,7 +325,7 @@ class ErrorTestCase(TestCase):
         """
         预置步骤。
         """
-        raise self.__exc from None
+        raise TestCaseError(str(self.__exc)) from None
 
     def step1(self) -> None:
         """

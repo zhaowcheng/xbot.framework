@@ -141,11 +141,11 @@ example:
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-13 22:53:13</td>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:21</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-13 22:53:13</td>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:21</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -169,20 +169,16 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-13 22:53:13,062</td>
+                        <td>2023-12-17 16:35:21,022</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
     func()
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 329, in setup
-    raise self.__exc from None
-  File "/Users/wan/CodeProjects/xbot/xbot/runner.py", line 49, in run
-    casecls = self._import_case(casepath)
-  File "/Users/wan/CodeProjects/xbot/xbot/runner.py", line 79, in _import_case
-    casecls = getattr(casemod, caseid)
-AttributeError: module 'testcases.examples.nonpass.tc_eg_nonpass_error_clsname' has no attribute 'tc_eg_nonpass_error_clsname'</pre>
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 328, in setup
+    raise TestCaseError(str(self.__exc)) from None
+xbot.errors.TestCaseError: module 'testcases.examples.nonpass.tc_eg_nonpass_error_clsname' has no attribute 'tc_eg_nonpass_error_clsname'</pre>
                             
                         </td>
                     </tr>

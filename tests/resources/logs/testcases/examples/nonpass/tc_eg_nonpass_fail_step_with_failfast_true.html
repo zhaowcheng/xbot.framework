@@ -86,44 +86,43 @@
                 </tr>
                 <tr>
                     <th>用例编号</th>
-                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_error_step</td>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_true</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_error_step(TestCase):
+class tc_eg_nonpass_fail_step_with_failfast_true(TestCase):
     """
-    测试步骤错误的用例。
+    在 FAILFAST 为 True 的情况下测试步骤失败。
     """
     TIMEOUT = 60
-    FAILFAST = False
+    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
         """
-        创建列表 self.mylist = [1, 2]
+        无
         """
-        self.mylist = [1, 2]
+        pass
 
     def step1(self):
         """
-        访问 self.mylist[2]
+        断言 1 == 2。
         """
-        # 此处 error，无论 FAILFAST 是何值，
-        # 都会跳过后续测试步骤并立即执行清理步骤。
-        self.mylist[2]
+        # 此处失败，由于 FAILFAST=True，将会跳过后续测试步骤并立即执行 teardown。
+        assertx(1, '==', 2)
 
     def step2(self):
         """
-        访问 self.mylist[1]
+        断言 1 == 1。
         """
-        self.mylist[1]
+        assertx(1, '==', 1)
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤
+        睡 1 秒模拟清理步骤。
         """
         self.sleep(1)
 </pre>
@@ -145,15 +144,15 @@ example:
                 </tr>
                 <tr>
                     <th>执行结果</th>
-                    <td id="result" colspan="2">ERROR</td>
+                    <td id="result" colspan="2">FAIL</td>
                 </tr>
                 <tr>
                     <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-13 22:53:14</td>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:24</td>
                 </tr>
                 <tr>
                     <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-13 22:53:15</td>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:25</td>
                 </tr>
                 <tr>
                     <th>执行时长</th>
@@ -194,16 +193,18 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-13 22:53:14,105</td>
+                        <td>2023-12-17 16:35:24,144</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:257</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 251, in __run_stage
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
     func()
-  File "./testcases/examples/nonpass/tc_eg_nonpass_error_step.py", line 26, in step1
-    self.mylist[2]
-IndexError: list index out of range</pre>
+  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py", line 25, in step1
+    assertx(1, '==', 2)
+  File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
+    raise AssertionError(errmsg)
+AssertionError: 1 == 2</pre>
                             
                         </td>
                     </tr>
@@ -226,9 +227,9 @@ IndexError: list index out of range</pre>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-13 22:53:14,105</td>
+                        <td>2023-12-17 16:35:24,144</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_nonpass_error_step.py:38</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_true.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             
