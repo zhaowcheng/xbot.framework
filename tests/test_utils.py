@@ -2,6 +2,7 @@ import unittest
 import doctest
 import socket
 import threading
+import tempfile
 import time
 import sys
 import os
@@ -103,6 +104,16 @@ class TestUtils(unittest.TestCase):
                 self.assertEqual(cm.exception.code, 1)
                 self.assertEqual(mockerr.getvalue().strip(), 
                                  utils.ColorText.wrap(s, 'red'))
+                
+    def test_cd(self):
+        """
+        测试 cd 函数。
+        """
+        cwd = os.getcwd()
+        parent = os.path.dirname(cwd)
+        with utils.cd(parent):
+            self.assertEqual(os.getcwd(), parent)
+        self.assertEqual(os.getcwd(), cwd)
 
 
 if __name__ == '__main__':

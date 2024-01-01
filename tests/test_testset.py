@@ -47,10 +47,12 @@ class TestTestSet(unittest.TestCase):
         for tc in [tc1, tc2, tc3, tc4, tc5, tc6, txtfile]:
             with open(tc, 'w'):
                 pass
+        cls.oldcwd = os.getcwd()
         os.chdir(cls.tmpdir)
 
     @classmethod
     def tearDownClass(cls):
+        os.chdir(cls.oldcwd)
         shutil.rmtree(cls.tmpdir)
 
     def mock_testset(self, content: str) -> TestSet:
