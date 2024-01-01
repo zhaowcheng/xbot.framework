@@ -3,8 +3,10 @@ import sys
 import unittest
 import tempfile
 import shutil
+import importlib
 
-from importlib import import_module
+from importlib import util
+from io import StringIO
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
@@ -12,8 +14,8 @@ from xbot.testcase import TestCase
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.common import INIT_DIR
+from xbot.logger import ROOT_LOGGER
 
-sys.path.append(INIT_DIR)
 
 class TestTestCase(unittest.TestCase):
     """
@@ -21,22 +23,40 @@ class TestTestCase(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls) -> None:
+        cls.workdir = tempfile.mktemp()
+        shutil.copytree(INIT_DIR, cls.workdir)
+        sys.path.insert(0, cls.workdir)
         cls.logroot = tempfile.mkdtemp()
-        cls.testbed = TestBed(os.path.join(INIT_DIR, 'testbeds', 'testbed_example.yml'))
-        cls.testset = TestSet(os.path.join(INIT_DIR, 'testsets', 'testset_example.yml'))
+        cls.testbed = TestBed(os.path.join(cls.workdir, 'testbeds', 
+                                           'testbed_example.yml'))
+        cls.testset = TestSet(os.path.join(cls.workdir, 'testsets', 
+                                           'testset_example.yml'))
+        # 将用例执行时的控制台日志重定向到 StringIO
+        ROOT_LOGGER.handlers[0].stream = StringIO()
+        ROOT_LOGGER.handlers[1].stream = StringIO()
 
     @classmethod
     def tearDownClass(cls) -> None:
         shutil.rmtree(cls.logroot)
+        sys.path.remove(cls.workdir)
 
     def instcase(self, parent: str, caseid: str) -> TestCase:
         """
         实例化测试用例。
 
+        通过 importlib.util 来导入，避免批量执行所有单元测试的情况下导入
+        了别的测试模块中已导入的用例（import 导入同名模块时会用已导入的缓存）
+
         :param parent: 测试用例所在父目录：pass/nonpass。
         :param caseid: 测试用例 id。
         """
-        casemod = import_module(f'testcases.examples.{parent}.{caseid}')
+        name = f'testcases.examples.{parent}.{caseid}'
+        path = os.path.join(self.workdir, 'testcases', 'examples',
+                            parent, f'{caseid}.py')
+        spec = util.spec_from_file_location(name, path)
+        casemod = util.module_from_spec(spec)
+        sys.modules[name] = casemod
+        spec.loader.exec_module(casemod)
         casecls = getattr(casemod, caseid)
         caseinst = casecls(self.testbed, self.testset, self.logroot)
         return caseinst
@@ -48,7 +68,7 @@ class TestTestCase(unittest.TestCase):
         self.assertEqual(caseinst.testbed, self.testbed)
         self.assertEqual(caseinst.caseid, caseid)
         self.assertEqual(caseinst.abspath, 
-                         os.path.join(INIT_DIR, 
+                         os.path.join(self.workdir, 
                                       'testcases', 
                                       'examples', 
                                       'pass', 

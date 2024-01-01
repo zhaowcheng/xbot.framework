@@ -1,18 +1,19 @@
 import os
-import sys
 import re
 import unittest
 import tempfile
 import shutil
 
 from io import StringIO
+from unittest.mock import patch
 
+from xbot import utils
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.runner import Runner
 from xbot.common import INIT_DIR
+from xbot.logger import ROOT_LOGGER
 
-sys.path.append(INIT_DIR)
 
 class TestRunner(unittest.TestCase):
     """
@@ -26,6 +27,9 @@ class TestRunner(unittest.TestCase):
             TestBed(os.path.join(cls.workdir, 'testbeds', 'testbed_example.yml')),
             TestSet(os.path.join(cls.workdir, 'testsets', 'testset_example.yml'))
         )
+        # 将用例执行时的控制台日志重定向到 StringIO
+        ROOT_LOGGER.handlers[0].stream = StringIO()
+        ROOT_LOGGER.handlers[1].stream = StringIO()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -45,8 +49,10 @@ class TestRunner(unittest.TestCase):
         """
         测试 run 函数。
         """
-        os.chdir(self.workdir)
-        logroot = self.runner.run()
+        with utils.cd(self.workdir):
+            with patch('sys.stdout', new_callable=StringIO):
+                with patch('sys.stderr', new_callable=StringIO):
+                    logroot = self.runner.run()
         self.assertTrue(os.path.exists(logroot))
         self.assertEqual(
             self.get_case_result_from_logfile(

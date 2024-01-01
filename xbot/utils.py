@@ -10,12 +10,12 @@ import sys
 import ctypes
 import operator
 import socket
-import traceback
 
 import jinja2
 
 from typing import Any, Iterator, Tuple, List
 from functools import reduce, partial
+from contextlib import contextmanager
 
 from xbot.logger import getlogger
 
@@ -356,3 +356,17 @@ def assertx(
     if verbose:
         logger.info('AssertionOK: %s %s %s', a, op, b, stacklevel=2)
 
+
+@contextmanager
+def cd(path):
+    """
+    切换当前工作目录。（支持 with 语句）
+
+    :param path: 目标目录。
+    """
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)

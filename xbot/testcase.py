@@ -168,7 +168,7 @@ class TestCase(object):
         WARN 级别日志。
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
-        self.__logger.warn(msg, *args, **kwargs)
+        self.__logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """

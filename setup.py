@@ -29,7 +29,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'xbot = xbot.main:internal_main'
+            'xbot = xbot.main:main'
         ]
     },
     include_package_data=True,
