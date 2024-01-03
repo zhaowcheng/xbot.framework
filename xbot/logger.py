@@ -114,10 +114,15 @@ class CaseLogHandler(logging.Handler):
 
 
 ROOT_LOGGER = logging.getLogger('xbot')
+ROOT_LOGGER.setLevel('DEBUG')
 
 
-if not ROOT_LOGGER.handlers:
-    ROOT_LOGGER.setLevel('DEBUG')
+def enable_console_logging() -> None:
+    """
+    开启控制台日志输出。
+    """
+    if 'console_logging_enabled' in globals():
+        return
     stdout = logging.StreamHandler(sys.stdout)
     stdout.addFilter(StdoutFilter())
     stderr = logging.StreamHandler(sys.stderr)
@@ -129,6 +134,8 @@ if not ROOT_LOGGER.handlers:
     stderr.setFormatter(formater)
     ROOT_LOGGER.addHandler(stdout)
     ROOT_LOGGER.addHandler(stderr)
+    global console_logging_enabled
+    console_logging_enabled = True
 
 
 def getlogger(name) -> XLogger:

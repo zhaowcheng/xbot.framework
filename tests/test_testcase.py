@@ -3,7 +3,7 @@ import sys
 import unittest
 import tempfile
 import shutil
-import importlib
+import logging
 
 from importlib import util
 from io import StringIO
@@ -32,8 +32,10 @@ class TestTestCase(unittest.TestCase):
         cls.testset = TestSet(os.path.join(cls.workdir, 'testsets', 
                                            'testset_example.yml'))
         # 将用例执行时的控制台日志重定向到 StringIO
-        ROOT_LOGGER.handlers[0].stream = StringIO()
-        ROOT_LOGGER.handlers[1].stream = StringIO()
+        for hdlr in ROOT_LOGGER.handlers:
+            if isinstance(hdlr, logging.StreamHandler) \
+                    and hdlr.stream in [sys.stdout, sys.stderr]:
+                hdlr.stream = StringIO()
 
     @classmethod
     def tearDownClass(cls) -> None:

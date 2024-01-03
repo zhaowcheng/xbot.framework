@@ -32,6 +32,8 @@ def create_parser() -> argparse.ArgumentParser:
                         help='testbed filepath (required by `run` command)')
     parser.add_argument('-s', '--testset', required=('run' in sys.argv), 
                         help='testset filepath (required by `run` command)')
+    parser.add_argument('-f', '--outfmt', choices=['verbose', 'brief'], default='brief',
+                        help='output format (option for `run` command, options: verbose/brief, default: brief)')
     parser.add_argument('-v', '--version', action='version', version=f'xbot {__version__}')
     return parser
 
@@ -57,12 +59,13 @@ def is_projdir(directory: str) -> bool:
     return os.path.exists(os.path.join(directory, 'testcases'))
     
 
-def run(testbed: str, testset: str) -> None:
+def run(testbed: str, testset: str, outfmt: str = 'brief') -> None:
     """
     执行测试。
 
     :param testbed: 测试床文件。
     :param testset: 测试床文件。
+    :param outfmt: 输出模式。
     """
     if not is_projdir(os.getcwd()):
         printerr("No `testcases` directory in current directory, "
@@ -71,11 +74,10 @@ def run(testbed: str, testset: str) -> None:
     tb = import_module('lib.testbed').TestBed(testbed)
     ts = TestSet(testset)
     runner = Runner(tb, ts)
-    logdir = runner.run()
-    xprint('Generating report...  ', end='')
-    report_filepath, is_allpassed = gen_report(logdir)
-    xprint(report_filepath, '\n', color='green', 
-           do_exit=True, exit_code=(not is_allpassed))
+    logdir = runner.run(outfmt)
+    xprint('\nreport: ', end='')
+    report, is_allpassed = gen_report(logdir)
+    xprint(report, '\n', do_exit=True, exit_code=(not is_allpassed))
 
 
 def main() -> None:
@@ -87,7 +89,7 @@ def main() -> None:
     if args.command == 'init':
         init(args.directory)
     elif args.command == 'run':
-        run(args.testbed, args.testset)
+        run(args.testbed, args.testset, args.outfmt)
 
 
 

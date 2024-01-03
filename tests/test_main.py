@@ -5,6 +5,7 @@ import unittest
 import tempfile
 import shutil
 import filecmp
+import logging
 
 from io import StringIO
 from unittest.mock import patch, MagicMock
@@ -24,8 +25,10 @@ class TestMain(unittest.TestCase):
         cls.workdir = tempfile.mktemp()
         shutil.copytree(INIT_DIR, cls.workdir)
         # 将用例执行时的控制台日志重定向到 StringIO
-        ROOT_LOGGER.handlers[0].stream = StringIO()
-        ROOT_LOGGER.handlers[1].stream = StringIO()
+        for hdlr in ROOT_LOGGER.handlers:
+            if isinstance(hdlr, logging.StreamHandler) \
+                    and hdlr.stream in [sys.stdout, sys.stderr]:
+                hdlr.stream = StringIO()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -94,7 +97,7 @@ class TestMain(unittest.TestCase):
         with patch('xbot.main.run', new_callable=MagicMock) as mockrun:
             sys.argv = ['xbot', 'run', '-b', 'mytb.yml', '-s', 'myts.yml']
             main.main()
-            mockrun.assert_called_once_with('mytb.yml', 'myts.yml')
+            mockrun.assert_called_once_with('mytb.yml', 'myts.yml', 'brief')
         with patch('sys.stdout', new_callable=StringIO) as mockout:
             sys.argv = ['xbot', '-v']
             with self.assertRaises(SystemExit) as cm:

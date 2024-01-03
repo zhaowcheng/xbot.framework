@@ -9,8 +9,10 @@ import sys
 
 from importlib import import_module
 from datetime import datetime
+from contextlib import contextmanager
+from threading import Thread
 
-from xbot.logger import getlogger
+from xbot.logger import getlogger, enable_console_logging
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.testcase import ErrorTestCase
@@ -33,27 +35,61 @@ class Runner(object):
         self.testbed = testbed
         self.testset = testset
 
-    def run(self) -> str:
+    def run(self, outfmt: str = 'brief') -> str:
         """
         执行所有用例。
 
+        :param outfmt: 输出模式（verbose/brief）。
         :return: 本次执行的日志根目录。
         """
+        fmts = ['verbose', 'brief']
+        if outfmt not in fmts:
+            raise ValueError(f'`outfmt` must be one of {fmts}')
+        if outfmt == 'verbose':
+            enable_console_logging()
         logroot = self._make_logroot()
         casecnt = len(self.testset.paths)
         for i, casepath in enumerate(self.testset.paths):
             caseid = casepath.split('/')[-1].replace('.py', '')
             abspath = os.path.abspath(casepath)
-            xprint(f'Start: {caseid} ({i+1}/{casecnt})'.center(100, '='))
+            order = f'({i+1}/{casecnt})'
             try:
                 casecls = self._import_case(casepath)
                 caseinst = casecls(self.testbed, self.testset, logroot)
             except (ImportError, AttributeError, SyntaxError) as e:
                 caseinst = ErrorTestCase(caseid, abspath, self.testbed, 
                                          self.testset, logroot, e)
-            caseinst.run()
-            xprint(f'End: {caseid} ({i+1}/{casecnt})'.center(100, '='), '\n')
+            if outfmt == 'verbose':
+                xprint(f'Start: {caseid} {order}'.center(100, '='))
+            if outfmt == 'brief':
+                with self._timer(order, caseinst):
+                    caseinst.run()
+            else:
+                caseinst.run()
+            if outfmt == 'verbose':
+                xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
         return logroot
+    
+    @contextmanager
+    def _timer(self, order: str, caseinst) -> None:
+        """
+        打印执行时长。
+        """
+        def _timer():
+            while not caseinst.endtime:
+                if not caseinst.starttime:
+                    xprint(f'\r{order}  {caseinst.caseid}  0:00:00', end='')
+                    continue
+                duration = datetime.now().replace(microsecond=0) - caseinst.starttime
+                xprint(f'\r{order}  {caseinst.caseid}  {duration}', end='')
+        t = Thread(target=_timer)
+        t.start()
+        try:
+            yield
+        finally:
+            if t.is_alive():
+                t.join()
+            xprint(f'\r{order}  {caseinst.caseid}  {caseinst.duration}  {caseinst.result}')
         
     def _make_logroot(self) -> str:
         """

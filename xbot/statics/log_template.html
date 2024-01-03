@@ -132,7 +132,7 @@
                         <td>{{record.levelname}}</td>
                         <td style="word-wrap: break-word;">{{record.filename}}:{{record.lineno}}</td>
                         <td style="padding-left: 0.5%;">
-                            <pre>{{record.message.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %}  <a id="a{{record.asctime}}" href="javascript:switchElementDisplayState('{{record.asctime}}');switchMoreOrLess('a{{record.asctime}}')">@more</a>{% endif %}</pre>
+                            <pre>{{record.msg.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %}  <a id="a{{record.asctime}}" href="javascript:switchElementDisplayState('{{record.asctime}}');switchMoreOrLess('a{{record.asctime}}')">@more</a>{% endif %}</pre>
                             {% if 'hook' in record and 'more' in record.hook %}
                             <pre id='{{record.asctime}}'
                                 style="display: none;font-family: monospace;">{{record.hook.more.replace('<','&lt').replace('>','&gt')}}</pre>
