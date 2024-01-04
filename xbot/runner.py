@@ -15,7 +15,7 @@ from threading import Thread
 from xbot.logger import getlogger, enable_console_logging
 from xbot.testbed import TestBed
 from xbot.testset import TestSet
-from xbot.testcase import ErrorTestCase
+from xbot.testcase import TestCase, ErrorTestCase
 from xbot.utils import xprint
 
 sys.path.insert(0, '.')
@@ -62,34 +62,30 @@ class Runner(object):
             if outfmt == 'verbose':
                 xprint(f'Start: {caseid} {order}'.center(100, '='))
             if outfmt == 'brief':
-                with self._timer(order, caseinst):
-                    caseinst.run()
-            else:
-                caseinst.run()
+                self._timer(caseinst, i+1, casecnt)
+            caseinst.run()
             if outfmt == 'verbose':
                 xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
         return logroot
     
-    @contextmanager
-    def _timer(self, order: str, caseinst) -> None:
+    def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> None:
         """
         打印执行时长。
         """
         def _timer():
-            while not caseinst.endtime:
+            order = f'({seq}/{casecnt})'
+            order_width = len(f'{casecnt}') * 2 + 3
+            fmtstr = f'\r{order:{order_width}}  %-7s  %s  {caseinst.caseid}'
+            while not caseinst.endtime or not caseinst.result:
                 if not caseinst.starttime:
-                    xprint(f'\r{order}  {caseinst.caseid}  0:00:00', end='')
-                    continue
-                duration = datetime.now().replace(microsecond=0) - caseinst.starttime
-                xprint(f'\r{order}  {caseinst.caseid}  {duration}', end='')
+                    duration = '0:00:00'
+                else:
+                    duration = datetime.now().replace(microsecond=0) - caseinst.starttime
+                xprint(fmtstr % ('RUNNING', duration), end='')
+            duration = caseinst.endtime - caseinst.starttime
+            xprint(fmtstr % (caseinst.result, duration))
         t = Thread(target=_timer)
         t.start()
-        try:
-            yield
-        finally:
-            if t.is_alive():
-                t.join()
-            xprint(f'\r{order}  {caseinst.caseid}  {caseinst.duration}  {caseinst.result}')
         
     def _make_logroot(self) -> str:
         """
