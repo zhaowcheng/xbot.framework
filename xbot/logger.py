@@ -110,6 +110,7 @@ class CaseLogHandler(logging.Handler):
     def emit(self, record):
         if self.stage not in self.records:
             self.records[self.stage] = []
+        record.msg = record.getMessage()
         self.records[self.stage].append(record.__dict__)
 
 
