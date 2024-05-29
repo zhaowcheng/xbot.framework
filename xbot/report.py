@@ -7,6 +7,7 @@
 import os
 import re
 
+from typing import Tuple
 from datetime import datetime
 
 from xbot import utils
@@ -24,7 +25,7 @@ def find_value(html: str, id_: str) -> str:
     return re.search(r'id="%s".*>(.*)<.*' % id_, html).group(1)
 
 
-def gen_report(logdir: str) -> (str, bool):
+def gen_report(logdir: str) -> Tuple[str, bool]:
     """
     生成报告。
 
