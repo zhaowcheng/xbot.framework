@@ -4,21 +4,15 @@ __pycache__/
 *$py.class
 
 # IDE config files
-.vscode/
-.idea/
+.vscode/*
+.idea/*
 
-# log files
-log/*
-!log/log_template.html
-!log/report_template.html
+# setuptools
+build/
+xbot.egg-info/
 
-# testbed files
-testbed/*
-!testbed/testbed_template.xml
-!testbed/testbed_example.xml
-!testbed/testbed_example.xsd
+# venv
+venv/
 
-# testset files
-testset/*
-!testset/testset_template.xml
-!testset/testset_example.xml
+# testproj
+testproj/

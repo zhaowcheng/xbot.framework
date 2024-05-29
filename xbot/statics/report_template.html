@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <style type="text/css" media="screen">
+        body {
+            font-family: verdana, arial, helvetica, sans-serif;
+            font-size: 80%;
+        }
+
+        table {
+            font-size: 100%;
+        }
+
+        .filter_button {
+            width: 130px;
+            text-decoration: none;
+            line-height: 38px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffff;
+            border-radius: 6px;
+            padding: 5px 10px 5px 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter_button.all {
+            background-color: blue;
+        }
+
+        .filter_button.pass {
+            background-color: #66cc66;
+        }
+
+        .filter_button.fail {
+            background-color: red;
+        }
+
+        .filter_button.error {
+            background-color: red;
+        }
+
+        .filter_button.timeout {
+            background-color: orange;
+        }
+
+        .filter_button.skip {
+            background-color: gray;
+        }
+
+        #filter_button_line {
+            float: left;
+            width: 100%;
+        }
+
+        #result_table {
+            margin: 1em 0;
+            width: 100%;
+            overflow: hidden;
+            background: #FFF;
+            color: #024457;
+            border-radius: 10px;
+            border: 1px solid #167F92;
+        }
+
+        #result_table th {
+            border: 1px solid #FFFFFF;
+            background-color: #167F92;
+            color: #FFF;
+            padding: 0.5em;
+        }
+
+        #result_table td {
+            word-wrap: break-word;
+            max-width: 7em;
+            padding: 0.3em;
+        }
+
+        .PASS {
+            background-color: rgba(88, 204, 73, 0.3) !important;
+        }
+
+        .FAIL {
+            background-color: rgba(249, 62, 62, .3) !important;
+        }
+
+        .ERROR {
+            background-color: rgba(249, 62, 62, .3) !important;
+        }
+
+        .TIMEOUT {
+            background-color: rgba(252, 161, 48, .3) !important;
+        }
+
+        .SKIP {
+            background-color: rgba(87, 86, 85, 0.3) !important;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <script language="javascript" type="text/javascript">
+        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: SKIP*/
+        function filterCase(level) {
+            trs = document.getElementsByTagName("tr");
+            for (var i = 1; i < trs.length; i++) {
+                tr = trs[i];
+                result = tr.querySelector("td:nth-child(5) > a").text;
+                if (level == 0) {
+                    tr.style.display = null;
+                } else if (level == 1) {
+                    if (result == 'PASS') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 2) {
+                    if (result == 'FAIL') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 3) {
+                    if (result == 'ERROR') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 4) {
+                    if (result == 'TIMEOUT') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 5) {
+                    if (result == 'SKIP') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+    </script>
+
+    <div id='filter_button_line' style=" float: left;  width: 100%;">
+        <a class="all filter_button" href='javascript:filterCase(0)'>ALL[{{allcnt}}]</a>
+        <a class="pass filter_button" href='javascript:filterCase(1)'>PASS[{{passcnt}}]</a>
+        <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[{{failcnt}}]</a>
+        <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[{{errorcnt}}]</a>
+        <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[{{timeoutcnt}}]</a>
+        <a class="skip filter_button" href='javascript:filterCase(5)'>SKIP[{{skipcnt}}]</a>
+    </div>
+
+    <table id='result_table'>
+        <tr id='header_row'>
+            <th width="55%">用例路径</th>
+            <th width="14%">开始时间</th>
+            <th width="14%">结束时间</th>
+            <th width="11%">执行时长[{{total_duration}}]</th>
+            <th width="6%">执行结果</th>
+        </tr>
+
+        {% for case in cases %}
+        <tr class="{{case.result}}">
+            <td>{{case.path}}</td>
+            <td align='center'>{{case.starttime}}</td>
+            <td align='center'>{{case.endtime}}</td>
+            <td align='center'>{{case.duration}}</td>
+            <td align='center'>
+                <a href="{{case.log}}" target="_blank">{{case.result}}</a>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+
+</html>

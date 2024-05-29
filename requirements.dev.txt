@@ -1,2 +1,3 @@
 jinja2; python_version >= '3.6'
 ruamel.yaml; python_version >= '3.6'
+setuptools; python_version >= '3.6'

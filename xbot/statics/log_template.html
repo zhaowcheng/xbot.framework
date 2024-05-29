@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <style type="text/css">
+        body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 12px;
+        }
+
+        table {
+            TABLE-LAYOUT: fixed;
+            border: 1px solid black;
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        pre {
+            overflow: auto;
+            white-space: pre;
+            height: 100%;
+            text-align: left;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            background-color: #f5f0f0;
+            width: 100%;
+            height: 25px;
+            font-weight: bold;
+            border: 1px solid black;
+            border-bottom: none;
+        }
+
+        #content {
+            position: absolute;
+            top: 4%;
+            left: 1%;
+            right: 1%;
+            width: auto;
+            height: auto;
+            margin: -15px 0 0 0;
+        }
+
+        .asctime {
+            width: 180px;
+        }
+
+        .levelname {
+            width: 80px;
+        }
+
+        .location {
+            width: 300px;
+        }
+
+        .ERROR {
+            color: red;
+        }
+
+        .WARNING {
+            color: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <div>
+            <table style="border-collapse: separate; height: 240px;">
+                <tr>
+                    <th colspan="3">执行概况</th>
+                    <th colspan="3">用例源码</th>
+                    <th colspan="3">测试床</th>
+                </tr>
+                <tr>
+                    <th>用例编号</th>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">{{caseid}}</td>
+                    <td colspan="3" rowspan="5">
+                        <pre id="sourcecode" style="overflow-y: scroll;">{{sourcecode}}</pre>
+                    </td>
+                    <td colspan="3" rowspan="5">
+                        <pre id="testbed" style="overflow-y: scroll;">{{testbed}}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>执行结果</th>
+                    <td id="result" colspan="2">{{result}}</td>
+                </tr>
+                <tr>
+                    <th>开始时间</th>
+                    <td id="starttime" colspan="2">{{starttime}}</td>
+                </tr>
+                <tr>
+                    <th>结束时间</th>
+                    <td id="endtime" colspan="2">{{endtime}}</td>
+                </tr>
+                <tr>
+                    <th>执行时长</th>
+                    <td id="duration" colspan="2">{{duration}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="position: relative; margin-top: 30px;">
+            {% for stage, records in stage_records.items() %}
+            <div>
+                <button>{{stage}}</button>
+            </div>
+            <div id="{{stage}}">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    {% for record in records %}
+                    <tr class="{{record.levelname}}">
+                        <td>{{record.asctime}}</td>
+                        <td>{{record.levelname}}</td>
+                        <td style="word-wrap: break-word;">{{record.filename}}:{{record.lineno}}</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>{{record.msg.replace('<','&lt').replace('>','&gt')}}{% if 'hook' in record and 'more' in record.hook %}  <a id="a{{record.asctime}}" href="javascript:switchElementDisplayState('{{record.asctime}}');switchMoreOrLess('a{{record.asctime}}')">@more</a>{% endif %}</pre>
+                            {% if 'hook' in record and 'more' in record.hook %}
+                            <pre id='{{record.asctime}}'
+                                style="display: none;font-family: monospace;">{{record.hook.more.replace('<','&lt').replace('>','&gt')}}</pre>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <br>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+<script language="javascript" type="text/javascript">
+    function switchElementDisplayState(eid) {
+        var element = document.getElementById(eid)
+        if (element.style.display == 'none') {
+            element.style.display = ''
+        }
+        else {
+            element.style.display = 'none'
+        }
+    }
+
+    function switchMoreOrLess(eid) {
+        var element = document.getElementById(eid)
+        if (element.textContent == '@more') {
+            element.textContent = '@less'
+        }
+        else {
+            element.textContent = '@more'
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <style type="text/css">
+        body {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 12px;
+        }
+
+        table {
+            TABLE-LAYOUT: fixed;
+            border: 1px solid black;
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        pre {
+            overflow: auto;
+            white-space: pre;
+            height: 100%;
+            text-align: left;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            background-color: #f5f0f0;
+            width: 100%;
+            height: 25px;
+            font-weight: bold;
+            border: 1px solid black;
+            border-bottom: none;
+        }
+
+        #content {
+            position: absolute;
+            top: 4%;
+            left: 1%;
+            right: 1%;
+            width: auto;
+            height: auto;
+            margin: -15px 0 0 0;
+        }
+
+        .asctime {
+            width: 180px;
+        }
+
+        .levelname {
+            width: 80px;
+        }
+
+        .location {
+            width: 300px;
+        }
+
+        .ERROR {
+            color: red;
+        }
+
+        .WARNING {
+            color: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <div>
+            <table style="border-collapse: separate; height: 240px;">
+                <tr>
+                    <th colspan="3">执行概况</th>
+                    <th colspan="3">用例源码</th>
+                    <th colspan="3">测试床</th>
+                </tr>
+                <tr>
+                    <th>用例编号</th>
+                    <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_false</td>
+                    <td colspan="3" rowspan="5">
+                        <pre id="sourcecode" style="overflow-y: scroll;">from xbot.utils import assertx
+
+from lib.testcase import TestCase
+
+
+class tc_eg_nonpass_fail_setup_with_failfast_false(TestCase):
+    """
+    在 FAILFAST 为 False 的情况下预置步骤失败。
+    """
+    TIMEOUT = 60
+    FAILFAST = False
+    TAGS = ['tag1']
+
+    def setup(self):
+        """
+        断言 1 == 0。
+        """
+        # setup 出现失败，无论 FAILFAST 是何值，
+        # 都会跳过后续测试步骤并立即执行清理步骤。
+        assertx(1, '==', 0)
+
+    def step1(self):
+        """
+        断言 1 == 1。
+        """
+        assertx(1, '==', 1)
+
+    def step2(self):
+        """
+        断言 2 == 2。
+        """
+        assertx(2, '==', 2)
+
+    def teardown(self):
+        """
+        睡 1 秒模拟清理步骤。
+        """
+        self.sleep(1)
+</pre>
+                    </td>
+                    <td colspan="3" rowspan="5">
+                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
+# 测试用例中可通过 self.testbed.get() 获取信息。
+example:
+  key1: value1
+  key2: 
+    key2-1: value2-1
+    key2-2: value2-2
+  key3:
+    - value3-1
+    - value3-2
+    - value3-3
+</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>执行结果</th>
+                    <td id="result" colspan="2">FAIL</td>
+                </tr>
+                <tr>
+                    <th>开始时间</th>
+                    <td id="starttime" colspan="2">2023-12-17 16:35:21</td>
+                </tr>
+                <tr>
+                    <th>结束时间</th>
+                    <td id="endtime" colspan="2">2023-12-17 16:35:22</td>
+                </tr>
+                <tr>
+                    <th>执行时长</th>
+                    <td id="duration" colspan="2">0:00:01</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="position: relative; margin-top: 30px;">
+            
+            <div>
+                <button>setup</button>
+            </div>
+            <div id="setup">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="ERROR">
+                        <td>2023-12-17 16:35:21,056</td>
+                        <td>ERROR</td>
+                        <td style="word-wrap: break-word;">testcase.py:260</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Traceback (most recent call last):
+  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
+    func()
+  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py", line 20, in setup
+    assertx(1, '==', 0)
+  File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
+    raise AssertionError(errmsg)
+AssertionError: 1 == 0</pre>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <br>
+            <br>
+            
+            <div>
+                <button>teardown</button>
+            </div>
+            <div id="teardown">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="INFO">
+                        <td>2023-12-17 16:35:21,057</td>
+                        <td>INFO</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_false.py:38</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>Sleep 1 second(s)...</pre>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <br>
+            <br>
+            
+        </div>
+    </div>
+</body>
+
+<script language="javascript" type="text/javascript">
+    function switchElementDisplayState(eid) {
+        var element = document.getElementById(eid)
+        if (element.style.display == 'none') {
+            element.style.display = ''
+        }
+        else {
+            element.style.display = 'none'
+        }
+    }
+
+    function switchMoreOrLess(eid) {
+        var element = document.getElementById(eid)
+        if (element.textContent == '@more') {
+            element.textContent = '@less'
+        }
+        else {
+            element.textContent = '@more'
+        }
+    }
+</script>
+
+</html>

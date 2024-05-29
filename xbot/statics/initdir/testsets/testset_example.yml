@@ -1,0 +1,11 @@
+tags:
+  include:  # 0 个或多个
+    - tag1
+  exclude:  # 0 个或多个
+    - tag2
+
+paths:
+  - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
+  - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
+  # 自动解析目录及子目录下的所有 .py 文件（__init__.py 除外）
+  - testcases/examples/nonpass/

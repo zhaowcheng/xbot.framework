@@ -1,0 +1,11 @@
+# 测试床文件必须是 YAML 格式，具体字段信息自定义。
+# 测试用例中可通过 self.testbed.get() 获取信息。
+example:
+  key1: value1
+  key2: 
+    key2-1: value2-1
+    key2-2: value2-2
+  key3:
+    - value3-1
+    - value3-2
+    - value3-3
