@@ -11,7 +11,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 使用 pip 进行安装::
 
-    pip install xbot
+    pip install xbot.framework
 
 安装成功后即可调用 xbot 命令:
 

@@ -31,7 +31,7 @@ def find_long_description():
 
 
 setup(
-    name='xbot',
+    name='xbot.framework',
     version=find_version(),
     description='A lightweight, easy-to-use, and extensible automation testing framework.',
     long_description=find_long_description(),
