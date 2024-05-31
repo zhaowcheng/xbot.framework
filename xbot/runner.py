@@ -9,8 +9,8 @@ import sys
 
 from importlib import import_module
 from datetime import datetime
-from contextlib import contextmanager
 from threading import Thread
+from time import sleep
 
 from xbot.logger import getlogger, enable_console_logging
 from xbot.testbed import TestBed
@@ -62,13 +62,15 @@ class Runner(object):
             if outfmt == 'verbose':
                 xprint(f'Start: {caseid} {order}'.center(100, '='))
             if outfmt == 'brief':
-                self._timer(caseinst, i+1, casecnt)
+                timer = self._timer(caseinst, i+1, casecnt)
             caseinst.run()
+            if outfmt == 'brief':
+                timer.join()
             if outfmt == 'verbose':
                 xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
         return logroot
     
-    def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> None:
+    def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> Thread:
         """
         打印执行时长。
         """
@@ -82,10 +84,12 @@ class Runner(object):
                 else:
                     duration = datetime.now().replace(microsecond=0) - caseinst.starttime
                 xprint(fmtstr % ('RUNNING', duration), end='')
+                sleep(1)
             duration = caseinst.endtime - caseinst.starttime
             xprint(fmtstr % (caseinst.result, duration))
         t = Thread(target=_timer)
         t.start()
+        return t
         
     def _make_logroot(self) -> str:
         """

@@ -2,12 +2,12 @@ xbot
 =====
 
 简介
-----
+-----
 
 xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架。
 
 安装
-----
+-----
 
 使用 pip 进行安装::
 
@@ -32,13 +32,12 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     -s TESTSET, --testset TESTSET
                             testset filepath (required by `run` command)
     -f {verbose,brief}, --outfmt {verbose,brief}
-                            output format (option for `run` command, options:
-                            verbose/brief, default: brief)
+                            output format (option for `run` command, options: verbose/brief, default: brief)
     -v, --version         show program's version number and exit
 
 
-使用
-----
+快速上手
+---------
 
 初始化工程目录:
 
@@ -141,15 +140,15 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 测试报告:
 
-.. image:: xbot/statics/report_example.png
+.. image:: https://github.com/zhaowcheng/xbot/blob/master/xbot/statics/report_example.png?raw=True
 
 用例日志:
 
-.. image:: xbot/statics/log_example.png
+.. image:: https://github.com/zhaowcheng/xbot/blob/master/xbot/statics/log_example.png?raw=True
 
 
 用例开发
---------
+---------
 
 测试用例存放在工程目录的 ``testcases`` 子目录下，以下为 ``testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py`` 用例内容:
 
@@ -222,6 +221,6 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 
 测试库开发
----------
+-----------
 
 测试库存放在工程目录的 ``lib`` 子目录下，根据业务开发所需测试库放入该目录下，然后在测试用例中导入使用即可。

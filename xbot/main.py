@@ -12,7 +12,6 @@ import argparse
 from importlib import import_module
 
 from xbot.version import __version__
-from xbot.testbed import TestBed
 from xbot.testset import TestSet
 from xbot.runner import Runner
 from xbot.report import gen_report

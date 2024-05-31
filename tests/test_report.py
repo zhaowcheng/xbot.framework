@@ -17,8 +17,8 @@ class TestReport(unittest.TestCase):
         测试 gen_report 函数。
         """
         report, _ = gen_report(LOGDIR)
-        with open(report) as f1:
-            with open(OKREPORT) as f2:
+        with open(report, encoding='utf8') as f1:
+            with open(OKREPORT, encoding='utf8') as f2:
                 self.assertEqual(f1.read(), f2.read(), 
                                  f'{report} != {OKREPORT}')
         os.remove(report)

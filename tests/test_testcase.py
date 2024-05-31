@@ -84,7 +84,7 @@ class TestTestCase(unittest.TestCase):
                                       'pass', 
                                       f'{caseid}.html')
                         )
-        with open(caseinst.abspath) as f:
+        with open(caseinst.abspath, encoding='utf8') as f:
             self.assertEqual(caseinst.sourcecode, f.read())
         self.assertEqual(caseinst.skipped, False)
         self.assertEqual(caseinst.steps, ['step1', 'step2', 'step3'])

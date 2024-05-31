@@ -318,7 +318,7 @@ class ErrorTestCase(TestCase):
     
     @property
     def sourcecode(self) -> str:
-        with open(self.__filepath) as f:
+        with open(self.__filepath, encoding='utf8') as f:
             return f.read()
     
     def setup(self) -> None:

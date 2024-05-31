@@ -49,7 +49,7 @@ def gen_report(logdir: str) -> Tuple[str, bool]:
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
                 casepath = caselog.replace('.html', '.py')
-                with open(os.path.join(top, f)) as fp:
+                with open(os.path.join(top, f), encoding='utf8') as fp:
                     content = fp.read()
                     result = find_value(content, 'result')
                     if result not in counter:

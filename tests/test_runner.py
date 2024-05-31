@@ -45,7 +45,7 @@ class TestRunner(unittest.TestCase):
 
         :param logfile: 用例日志路径。
         """
-        with open(logfile, 'r') as f:
+        with open(logfile, 'r', encoding='utf8') as f:
             m = re.search(rf'<td id="result" colspan="2">(.+)</td>', f.read())
             return m.group(1)
 
