@@ -9,7 +9,10 @@ __pycache__/
 
 # setuptools
 build/
-xbot.egg-info/
+*.egg-info/
+
+# build
+dist/
 
 # venv
 venv/

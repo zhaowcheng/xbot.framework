@@ -75,12 +75,12 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
     :param outfile: 输出文件。
     """
     rendered_content = ''
-    with open(template) as fp:
+    with open(template, encoding='utf8') as fp:
         tpl = jinja2.Template(fp.read())
         rendered_content = tpl.render(**kwargs)
     if not os.path.exists(os.path.dirname(outfile)):
         os.makedirs(os.path.dirname(outfile))
-    with open(outfile, 'w') as fp:
+    with open(outfile, 'w', encoding='utf8') as fp:
         fp.write(rendered_content)
 
 
@@ -272,7 +272,7 @@ def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     >>> os.makedirs(os.path.join(tmpdir, 'dir1'))
     >>> os.makedirs(os.path.join(tmpdir, 'dir2'))
     >>> for file in [file1, file2, file1_1, file1_2, file2_1, file2_2]:
-    ...     with open(file, 'w') as fp:
+    ...     with open(file, 'w', encoding='utf8') as fp:
     ...         _ = fp.write('hello world')
     >>> for top, dirs, files in ordered_walk(tmpdir):
     ...     print(f'dirs: {dirs}, files: {files}')

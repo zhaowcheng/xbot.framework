@@ -22,14 +22,14 @@ class TestBed(object):
         """
         self.__data = self.__parse(filepath)
         self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
-        with open(filepath) as f:
+        with open(filepath, encoding='utf8') as f:
             self.__content = f.read()
 
     def __parse(self, filepath: str) -> dict:
         """
         解析测试床。
         """
-        with open(filepath) as f:
+        with open(filepath, encoding='utf8') as f:
             return yaml.YAML(typ='safe').load(f)
 
     @property

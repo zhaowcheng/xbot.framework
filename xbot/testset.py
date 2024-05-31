@@ -30,7 +30,7 @@ class TestSet(object):
         """
         解析测试套。
         """
-        with open(filepath) as f:
+        with open(filepath, encoding='utf8') as f:
             data = yaml.YAML(typ='safe').load(f)
             if 'tags' not in data:
                 raise TestSetError('No `tags` found in testset.')

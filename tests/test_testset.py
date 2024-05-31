@@ -35,7 +35,7 @@ class TestTestSet(unittest.TestCase):
         subdir2_1 = os.path.join(cls.tmpdir, 'testcases', 'dir2', 'subdir2_1')
         for d in [dir1, dir2, subdir2_1]:
             os.makedirs(d)
-            with open(os.path.join(d, '__init__.py'), 'w'):
+            with open(os.path.join(d, '__init__.py'), 'w', encoding='utf8'):
                 pass
         tc1 = os.path.join(dir1, 'tc_01.py')
         tc2 = os.path.join(dir1, 'tc_02.py')
@@ -45,7 +45,7 @@ class TestTestSet(unittest.TestCase):
         tc6 = os.path.join(subdir2_1, 'tc_06.py')
         txtfile = os.path.join(subdir2_1, 'testfile.txt')
         for tc in [tc1, tc2, tc3, tc4, tc5, tc6, txtfile]:
-            with open(tc, 'w'):
+            with open(tc, 'w', encoding='utf8'):
                 pass
         cls.oldcwd = os.getcwd()
         os.chdir(cls.tmpdir)
