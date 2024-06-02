@@ -20,7 +20,7 @@ from xbot.utils import xprint
 
 sys.path.insert(0, '.')
 
-logger = getlogger('runner')
+logger = getlogger(__name__)
 
 
 class Runner(object):

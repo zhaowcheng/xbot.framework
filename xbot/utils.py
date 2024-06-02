@@ -20,7 +20,7 @@ from contextlib import contextmanager
 from xbot.logger import getlogger
 
 
-logger = getlogger('util')
+logger = getlogger(__name__)
 
 
 class ColorText(object):
