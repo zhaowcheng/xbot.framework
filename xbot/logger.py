@@ -114,6 +114,15 @@ class CaseLogHandler(logging.Handler):
         self.records[self.stage].append(record.__dict__)
 
 
+class ExtraAdapter(logging.LoggerAdapter):
+    """
+    日志消息包含额外信息（前缀）。
+    """
+    def process(self, msg, kwargs):
+        msg = '[{}] {}'.format(self.extra, msg) if self.extra else msg
+        return msg, kwargs
+
+
 ROOT_LOGGER = logging.getLogger('xbot')
 ROOT_LOGGER.setLevel('DEBUG')
 FORMATTER = logging.Formatter(
