@@ -110,12 +110,15 @@ class CaseLogHandler(logging.Handler):
     def emit(self, record):
         if self.stage not in self.records:
             self.records[self.stage] = []
-        record.msg = record.getMessage()
+        self.format(record)
         self.records[self.stage].append(record.__dict__)
 
 
 ROOT_LOGGER = logging.getLogger('xbot')
 ROOT_LOGGER.setLevel('DEBUG')
+FORMATTER = logging.Formatter(
+    '[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)s] %(message)s'
+)
 
 
 def enable_console_logging() -> None:
@@ -128,11 +131,8 @@ def enable_console_logging() -> None:
     stdout.addFilter(StdoutFilter())
     stderr = logging.StreamHandler(sys.stderr)
     stderr.setLevel('ERROR')
-    formater = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)s] %(message)s'
-    )
-    stdout.setFormatter(formater)
-    stderr.setFormatter(formater)
+    stdout.setFormatter(FORMATTER)
+    stderr.setFormatter(FORMATTER)
     ROOT_LOGGER.addHandler(stdout)
     ROOT_LOGGER.addHandler(stderr)
     global console_logging_enabled

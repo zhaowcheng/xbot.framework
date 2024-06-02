@@ -12,7 +12,7 @@ import re
 import time
 import inspect
 
-from typing import Any, List
+from typing import List
 from datetime import datetime, timedelta
 from importlib import import_module
 from threading import Thread
@@ -49,6 +49,7 @@ class TestCase(object):
         self.__logger = logger.getlogger(self.caseid)
         self.__loghdlr = logger.CaseLogHandler(logging.DEBUG)
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
+        self.__loghdlr.setFormatter(logger.FORMATTER)
         logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
