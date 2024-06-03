@@ -121,11 +121,11 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 .. code:: console
 
-    $ xbot run -b ./testbeds/testbed_example.yml -s testsets/testset_example.yml           
+    $ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml 
     (1/11)   PASS     0:00:01  tc_eg_pass_get_values_from_testbed
-    (4/11)   ERROR    0:00:00  tc_eg_nonpass_error_syntaxith_failfast_false
-    (3/11)   ERROR    0:00:00  tc_eg_nonpass_error_clsnamefiles
-    (5/11)   RUNNING  0:00:00  tc_eg_nonpass_fail_setup_with_failfast_false
+    (2/11)   PASS     0:00:01  tc_eg_pass_create_dirs_and_files
+    (3/11)   ERROR    0:00:00  tc_eg_nonpass_error_clsname
+    (4/11)   ERROR    0:00:00  tc_eg_nonpass_error_syntax
     (5/11)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_false
     (6/11)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_true
     (7/11)   FAIL     0:00:01  tc_eg_nonpass_fail_step_with_failfast_false
@@ -133,18 +133,19 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     (9/11)   SKIP     0:00:00  tc_eg_nonpass_skip_excluded
     (10/11)  SKIP     0:00:00  tc_eg_nonpass_skip_not_included
     (11/11)  TIMEOUT  0:00:03  tc_eg_nonpass_timeout
+    
+    report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-06-03_16-48-37/report.html 
 
-    report: /Users/wan/CodeProjects/xbot/testproj/logs/testbed_example/2024-05-29_16-51-09/report.html
 
 执行完成后会在测试工程下根据测试床名称和时间戳生成日志目录保存 html 格式的用例日志和测试报告。
 
 测试报告:
 
-.. image:: https://github.com/zhaowcheng/xbot/blob/master/xbot/statics/report_example.png?raw=True
+.. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/report_example.png?raw=True
 
 用例日志:
 
-.. image:: https://github.com/zhaowcheng/xbot/blob/master/xbot/statics/log_example.png?raw=True
+.. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework.statics/log_example.png?raw=True
 
 
 用例开发
@@ -158,7 +159,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     import tempfile
     import shutil
 
-    from xbot.utils import assertx
+    from xbot.framework.utils import assertx
 
     from lib.testcase import TestCase
 

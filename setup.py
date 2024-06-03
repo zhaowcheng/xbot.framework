@@ -2,14 +2,14 @@
 
 import os
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def find_version():
-    verfile = os.path.join(BASEDIR, 'xbot', 'version.py')
+    verfile = os.path.join(BASEDIR, 'xbot', 'framework', 'version.py')
     with open(verfile, 'r', encoding='utf8') as f:
         for line in f.readlines():
             if line.startswith('__version__'):
@@ -25,8 +25,8 @@ def find_requires():
 def find_long_description():
     with open('README.rst', encoding='utf8') as f:
         desc = f.read()
-        desc = desc.replace('github.com/zhaowcheng/xbot/blob/master',
-                            f'github.com/zhaowcheng/xbot/blob/v{find_version()}')
+        desc = desc.replace('github.com/zhaowcheng/xbot.framework/blob/master',
+                            f'github.com/zhaowcheng/xbot.framework/blob/v{find_version()}')
         return desc
 
 
@@ -39,10 +39,10 @@ setup(
     author='zhaowcheng',
     author_email='zhaowcheng@163.com',
     install_requires=find_requires(),
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     entry_points={
         'console_scripts': [
-            'xbot = xbot.main:main'
+            'xbot = xbot.framework.main:main'
         ]
     },
     include_package_data=True,
@@ -58,10 +58,10 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12"
     ],
-    url='https://github.com/zhaowcheng/xbot',
+    url='https://github.com/zhaowcheng/xbot.framework',
     python_requires='>=3.6',
     project_urls={
-        'Homepage': 'https://github.com/zhaowcheng/xbot',
-        'Issues': 'https://github.com/zhaowcheng/xbot/issues'
+        'Homepage': 'https://github.com/zhaowcheng/xbot.framework',
+        'Issues': 'https://github.com/zhaowcheng/xbot.framework/issues'
     }
 )

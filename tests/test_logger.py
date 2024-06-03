@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(f'{__file__}/../..'))
 
 from io import StringIO
 
-from xbot.logger import (XLogger, StdoutFilter, CaseLogFilter, 
+from xbot.framework.logger import (XLogger, StdoutFilter, CaseLogFilter, 
                          CaseLogHandler, ROOT_LOGGER, getlogger)
 
 

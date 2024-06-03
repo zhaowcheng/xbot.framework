@@ -10,11 +10,11 @@ from io import StringIO
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from xbot.testcase import TestCase
-from xbot.testbed import TestBed
-from xbot.testset import TestSet
-from xbot.common import INIT_DIR
-from xbot.logger import ROOT_LOGGER
+from xbot.framework.testcase import TestCase
+from xbot.framework.testbed import TestBed
+from xbot.framework.testset import TestSet
+from xbot.framework.common import INIT_DIR
+from xbot.framework.logger import ROOT_LOGGER
 
 
 class TestTestCase(unittest.TestCase):
