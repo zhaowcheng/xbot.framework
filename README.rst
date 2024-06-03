@@ -145,7 +145,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 用例日志:
 
-.. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework.statics/log_example.png?raw=True
+.. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/log_example.png?raw=True
 
 
 用例开发
