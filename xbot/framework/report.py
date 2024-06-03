@@ -10,8 +10,8 @@ import re
 from typing import Tuple
 from datetime import datetime
 
-from xbot import utils
-from xbot import common
+from xbot.framework import utils
+from xbot.framework import common
 
 
 def find_value(html: str, id_: str) -> str:

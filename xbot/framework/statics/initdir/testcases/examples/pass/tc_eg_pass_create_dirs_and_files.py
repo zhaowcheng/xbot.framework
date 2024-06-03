@@ -2,7 +2,7 @@ import os
 import tempfile
 import shutil
 
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 

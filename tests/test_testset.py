@@ -5,7 +5,7 @@ import shutil
 
 from unittest.mock import patch, mock_open
 
-from xbot.testset import TestSet, TestSetError
+from xbot.framework.testset import TestSet, TestSetError
 
 class TestTestSet(unittest.TestCase):
     """

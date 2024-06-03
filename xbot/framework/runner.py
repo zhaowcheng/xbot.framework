@@ -12,11 +12,11 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 
-from xbot.logger import getlogger, enable_console_logging
-from xbot.testbed import TestBed
-from xbot.testset import TestSet
-from xbot.testcase import TestCase, ErrorTestCase
-from xbot.utils import xprint
+from xbot.framework.logger import getlogger, enable_console_logging
+from xbot.framework.testbed import TestBed
+from xbot.framework.testset import TestSet
+from xbot.framework.testcase import TestCase, ErrorTestCase
+from xbot.framework.utils import xprint
 
 sys.path.insert(0, '.')
 

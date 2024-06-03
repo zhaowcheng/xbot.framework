@@ -1,15 +1,15 @@
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_skip_not_included(TestCase):
+class tc_eg_nonpass_error_syntax(TestCase):
     """
-    因不被 testset.tags.include 包含而跳过的测试用例。
+    存在语法错误的用例。
     """
     TIMEOUT = 60
-    FAILFAST = True
-    TAGS = []
+    FAILFAST = False
+    TAGS = ['tag1']
 
     def setup(self):
         """
@@ -21,7 +21,8 @@ class tc_eg_nonpass_skip_not_included(TestCase):
         """
         测试步骤 1。
         """
-        self.info('开始执行测试步骤 1')
+        # noinspection PyUnreachableCode
+        self.info('开始执行测试步骤 1'  # type: ignore
 
     def teardown(self):
         """

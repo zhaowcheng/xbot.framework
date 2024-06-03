@@ -10,10 +10,10 @@ import logging
 from io import StringIO
 from unittest.mock import patch, MagicMock
 
-from xbot import main, utils
-from xbot.common import INIT_DIR
-from xbot.logger import ROOT_LOGGER
-from xbot.version import __version__
+from xbot.framework import main, utils
+from xbot.framework.common import INIT_DIR
+from xbot.framework.logger import ROOT_LOGGER
+from xbot.framework.version import __version__
 
 
 class TestMain(unittest.TestCase):
@@ -90,11 +90,11 @@ class TestMain(unittest.TestCase):
                     self.assertTrue(os.path.exists(report))
 
     def test_main(self):
-        with patch('xbot.main.init', new_callable=MagicMock) as mockinit:
+        with patch('xbot.framework.main.init', new_callable=MagicMock) as mockinit:
             sys.argv = ['xbot', 'init', '-d', 'myproj']
             main.main()
             mockinit.assert_called_once_with('myproj')
-        with patch('xbot.main.run', new_callable=MagicMock) as mockrun:
+        with patch('xbot.framework.main.run', new_callable=MagicMock) as mockrun:
             sys.argv = ['xbot', 'run', '-b', 'mytb.yml', '-s', 'myts.yml']
             main.main()
             mockrun.assert_called_once_with('mytb.yml', 'myts.yml', 'brief')

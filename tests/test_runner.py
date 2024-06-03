@@ -9,12 +9,12 @@ import logging
 from io import StringIO
 from unittest.mock import patch
 
-from xbot import utils
-from xbot.testbed import TestBed
-from xbot.testset import TestSet
-from xbot.runner import Runner
-from xbot.common import INIT_DIR
-from xbot.logger import ROOT_LOGGER
+from xbot.framework import utils
+from xbot.framework.testbed import TestBed
+from xbot.framework.testset import TestSet
+from xbot.framework.runner import Runner
+from xbot.framework.common import INIT_DIR
+from xbot.framework.logger import ROOT_LOGGER
 
 
 class TestRunner(unittest.TestCase):

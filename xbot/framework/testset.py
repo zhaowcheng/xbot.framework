@@ -9,8 +9,8 @@ import os
 from ruamel import yaml
 from copy import deepcopy
 
-from xbot.utils import ordered_walk
-from xbot.errors import TestSetError
+from xbot.framework.utils import ordered_walk
+from xbot.framework.errors import TestSetError
 
 
 class TestSet(object):

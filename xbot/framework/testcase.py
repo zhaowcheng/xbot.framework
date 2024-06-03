@@ -17,10 +17,10 @@ from datetime import datetime, timedelta
 from importlib import import_module
 from threading import Thread
 
-from xbot import logger, common, utils
-from xbot.testbed import TestBed
-from xbot.testset import TestSet
-from xbot.errors import TestCaseTimeout, TestCaseError
+from xbot.framework import logger, common, utils
+from xbot.framework.testbed import TestBed
+from xbot.framework.testset import TestSet
+from xbot.framework.errors import TestCaseTimeout, TestCaseError
 
 
 class TestCase(object):

@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch, mock_open
 
-from xbot.testbed import TestBed
+from xbot.framework.testbed import TestBed
 
 class TestTestBed(unittest.TestCase):
     """

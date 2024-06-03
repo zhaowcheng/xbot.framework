@@ -1,2 +1,2 @@
-recursive-include xbot/statics *
+recursive-include xbot/framework/statics *
 include requirements.txt

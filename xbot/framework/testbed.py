@@ -9,7 +9,7 @@ import os
 from typing import Any
 
 from ruamel import yaml
-from xbot.utils import deepget
+from xbot.framework.utils import deepget
 
 
 class TestBed(object):

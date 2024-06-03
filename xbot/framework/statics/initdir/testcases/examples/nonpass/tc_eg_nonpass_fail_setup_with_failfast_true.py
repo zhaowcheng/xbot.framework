@@ -1,14 +1,14 @@
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_fail_setup_with_failfast_false(TestCase):
+class tc_eg_nonpass_fail_setup_with_failfast_true(TestCase):
     """
-    在 FAILFAST 为 False 的情况下预置步骤失败。
+    在 FAILFAST 为 True 的情况下预置步骤失败。
     """
     TIMEOUT = 60
-    FAILFAST = False
+    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):

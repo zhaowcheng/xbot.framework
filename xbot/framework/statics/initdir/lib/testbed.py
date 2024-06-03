@@ -1,4 +1,4 @@
-from xbot import testbed
+from xbot.framework import testbed
 
 
 class TestBed(testbed.TestBed):

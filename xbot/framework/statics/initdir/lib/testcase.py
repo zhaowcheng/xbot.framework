@@ -1,4 +1,4 @@
-from xbot import testcase
+from xbot.framework import testcase
 
 
 class TestCase(testcase.TestCase):

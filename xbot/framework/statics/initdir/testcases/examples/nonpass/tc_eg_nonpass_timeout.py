@@ -1,4 +1,4 @@
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 

@@ -11,12 +11,12 @@ import argparse
 
 from importlib import import_module
 
-from xbot.version import __version__
-from xbot.testset import TestSet
-from xbot.runner import Runner
-from xbot.report import gen_report
-from xbot.utils import printerr, xprint
-from xbot.common import INIT_DIR
+from xbot.framework.version import __version__
+from xbot.framework.testset import TestSet
+from xbot.framework.runner import Runner
+from xbot.framework.report import gen_report
+from xbot.framework.utils import printerr, xprint
+from xbot.framework.common import INIT_DIR
 
 
 def create_parser() -> argparse.ArgumentParser:

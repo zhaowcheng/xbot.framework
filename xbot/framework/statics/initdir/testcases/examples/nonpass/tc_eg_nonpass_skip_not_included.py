@@ -1,15 +1,15 @@
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_class_name_incorrect(TestCase):
+class tc_eg_nonpass_skip_not_included(TestCase):
     """
-    类名错误（与文件名不一致）的用例。
+    因不被 testset.tags.include 包含而跳过的测试用例。
     """
     TIMEOUT = 60
-    FAILFAST = False
-    TAGS = ['tag1']
+    FAILFAST = True
+    TAGS = []
 
     def setup(self):
         """

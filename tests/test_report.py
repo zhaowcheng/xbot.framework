@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from xbot.report import gen_report
+from xbot.framework.report import gen_report
 
 
 LOGDIR = os.path.join(os.path.dirname(__file__), 'resources', 'logs')

@@ -17,7 +17,7 @@ from typing import Any, Iterator, Tuple, List
 from functools import reduce, partial
 from contextlib import contextmanager
 
-from xbot.logger import getlogger
+from xbot.framework.logger import getlogger
 
 
 logger = getlogger(__name__)

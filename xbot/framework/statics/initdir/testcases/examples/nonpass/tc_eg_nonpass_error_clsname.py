@@ -1,11 +1,11 @@
-from xbot.utils import assertx
+from xbot.framework.utils import assertx
 
 from lib.testcase import TestCase
 
 
-class tc_eg_nonpass_error_syntax(TestCase):
+class tc_eg_nonpass_class_name_incorrect(TestCase):
     """
-    存在语法错误的用例。
+    类名错误（与文件名不一致）的用例。
     """
     TIMEOUT = 60
     FAILFAST = False
@@ -21,8 +21,7 @@ class tc_eg_nonpass_error_syntax(TestCase):
         """
         测试步骤 1。
         """
-        # noinspection PyUnreachableCode
-        self.info('开始执行测试步骤 1'  # type: ignore
+        self.info('开始执行测试步骤 1')
 
     def teardown(self):
         """

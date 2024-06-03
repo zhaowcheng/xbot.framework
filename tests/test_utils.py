@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(f'{__file__}/../..'))
 from io import StringIO
 from unittest.mock import patch
 
-from xbot import utils
+from xbot.framework import utils
 
 
 def load_tests(loader, tests, ignore):
