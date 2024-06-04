@@ -1,1 +1,1 @@
-xbot
+xbot.framework; python_version >= '3.6'
