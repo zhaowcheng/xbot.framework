@@ -119,7 +119,8 @@ class ExtraAdapter(logging.LoggerAdapter):
     日志消息包含额外信息（前缀）。
     """
     def process(self, msg, kwargs):
-        msg = '[{}] {}'.format(self.extra, msg) if self.extra else msg
+        if 'prefix' in self.extra:
+            msg = f'[{self.extra["prefix"]}] {msg}'
         return msg, kwargs
 
 
