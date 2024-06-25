@@ -23,11 +23,15 @@ def find_requires():
     
 
 def find_long_description():
-    with open('README.rst', encoding='utf8') as f:
-        desc = f.read()
-        desc = desc.replace('github.com/zhaowcheng/xbot.framework/blob/master',
-                            f'github.com/zhaowcheng/xbot.framework/blob/v{find_version()}')
-        return desc
+    desc = ''
+    for readme in ('README.rst', 'README.zh.rst'):
+        if desc:
+            desc += '\n' + '-' * 80 + '\n\n'
+        with open(readme, encoding='utf8') as f:
+            desc += ''.join(f.readlines()[4:])
+    desc = desc.replace('github.com/zhaowcheng/xbot.framework/blob/master',
+                        f'github.com/zhaowcheng/xbot.framework/blob/v{find_version()}')
+    return desc
 
 
 setup(

@@ -80,68 +80,62 @@
         <div>
             <table style="border-collapse: separate; height: 240px;">
                 <tr>
-                    <th colspan="3">执行概况</th>
-                    <th colspan="3">用例源码</th>
-                    <th colspan="3">测试床</th>
+                    <th colspan="3">Summary</th>
+                    <th colspan="3">TestCase</th>
+                    <th colspan="3">TestBed</th>
                 </tr>
                 <tr>
-                    <th>用例编号</th>
+                    <th>CaseID</th>
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
-
 from lib.testcase import TestCase
 
-
-# 类名将被作为用例编号，且应与文件名保持一致。
 class tc_eg_pass_get_values_from_testbed(TestCase):
     """
-    从示例测试床中获取信息并检查。
+    Get information from the testbed and perform checks.
     """
-    # 用例最大执行时长（秒）。
     TIMEOUT = 60
-    # 当第一个 FAIL(断言失败) 出现时是否立即停止用例执行
     FAILFAST = True
-    # 用例标签。
     TAGS = ['tag1']
 
     def setup(self):
         """
-        无
+        Prepare test environment.
         """
         pass
 
     def step1(self):
         """
-        获取 `example.key1` 的值并检查，值应为 `value1`。
+        Expect the value of `example.key1` to be `value1`.
         """
         value1 = self.testbed.get('example.key1')
         assertx(value1, '==', 'value1')
 
     def step2(self):
         """
-        获取 `example.key2.key2-1` 的值并检查，值应为 `value2-1`。
+        Expect the value of `example.key2.key2-1` to be `value2-1`.
         """
         value2 = self.testbed.get('example.key2.key2-1')
         assertx(value2, '==', 'value2-1')
 
     def step3(self):
         """
-        获取 `example.key3[1]` 的值并检查，值应为 `value3-2`。
+        Expect the value of `example.key3[1]` to be `value3-2`.
         """
         value3 = self.testbed.get('example.key3[1]')
         assertx(value3, '==', 'value3-2')
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤。
+        Clean up test environment.
         """
         self.sleep(1)
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
-# 测试用例中可通过 self.testbed.get() 获取信息。
+                        <pre id="testbed" style="overflow-y: scroll;"># Testbeds are used to store the information about the test environment.
+# The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
   key2: 
@@ -155,19 +149,19 @@ example:
                     </td>
                 </tr>
                 <tr>
-                    <th>执行结果</th>
+                    <th>Result</th>
                     <td id="result" colspan="2">PASS</td>
                 </tr>
                 <tr>
-                    <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-17 16:35:18</td>
+                    <th>StartTime</th>
+                    <td id="starttime" colspan="2">2024-06-25 19:17:14</td>
                 </tr>
                 <tr>
-                    <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-17 16:35:19</td>
+                    <th>EndTime</th>
+                    <td id="endtime" colspan="2">2024-06-25 19:17:15</td>
                 </tr>
                 <tr>
-                    <th>执行时长</th>
+                    <th>Duration</th>
                     <td id="duration" colspan="2">0:00:01</td>
                 </tr>
             </table>
@@ -205,9 +199,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:18,950</td>
+                        <td>2024-06-25 19:17:14,783</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:29</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:23</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value1 == value1</pre>
                             
@@ -232,9 +226,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:18,950</td>
+                        <td>2024-06-25 19:17:14,784</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:36</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:30</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value2-1 == value2-1</pre>
                             
@@ -259,9 +253,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:18,950</td>
+                        <td>2024-06-25 19:17:14,784</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:43</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value3-2 == value3-2</pre>
                             
@@ -286,9 +280,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:18,950</td>
+                        <td>2024-06-25 19:17:14,784</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:49</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:43</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

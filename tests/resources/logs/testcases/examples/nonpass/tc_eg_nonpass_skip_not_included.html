@@ -80,12 +80,12 @@
         <div>
             <table style="border-collapse: separate; height: 240px;">
                 <tr>
-                    <th colspan="3">执行概况</th>
-                    <th colspan="3">用例源码</th>
-                    <th colspan="3">测试床</th>
+                    <th colspan="3">Summary</th>
+                    <th colspan="3">TestCase</th>
+                    <th colspan="3">TestBed</th>
                 </tr>
                 <tr>
-                    <th>用例编号</th>
+                    <th>CaseID</th>
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_skip_not_included</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
@@ -95,7 +95,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_skip_not_included(TestCase):
     """
-    因不被 testset.tags.include 包含而跳过的测试用例。
+    Testcase skipped due to not containing tag matching the `testset.tags.include`.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -103,26 +103,26 @@ class tc_eg_nonpass_skip_not_included(TestCase):
 
     def setup(self):
         """
-        预置步骤。
+        Prepare test environment.
         """
-        self.info('开始执行预置步骤')
+        self.info('Starting setup')
 
     def step1(self):
         """
-        测试步骤 1。
+        Test step 1.
         """
-        self.info('开始执行测试步骤 1')
+        self.info('Starting test step 1')
 
     def teardown(self):
         """
-        清理步骤。
+        Clean up test environment.
         """
-        self.info('开始执行清理步骤')
+        self.info('Starting teardown')
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
-# 测试用例中可通过 self.testbed.get() 获取信息。
+                        <pre id="testbed" style="overflow-y: scroll;"># Testbeds are used to store the information about the test environment.
+# The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
   key2: 
@@ -136,19 +136,19 @@ example:
                     </td>
                 </tr>
                 <tr>
-                    <th>执行结果</th>
+                    <th>Result</th>
                     <td id="result" colspan="2">SKIP</td>
                 </tr>
                 <tr>
-                    <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-17 16:35:25</td>
+                    <th>StartTime</th>
+                    <td id="starttime" colspan="2">2024-06-25 19:17:29</td>
                 </tr>
                 <tr>
-                    <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-17 16:35:25</td>
+                    <th>EndTime</th>
+                    <td id="endtime" colspan="2">2024-06-25 19:17:29</td>
                 </tr>
                 <tr>
-                    <th>执行时长</th>
+                    <th>Duration</th>
                     <td id="duration" colspan="2">0:00:00</td>
                 </tr>
             </table>
@@ -169,9 +169,9 @@ example:
                     </tr>
                     
                     <tr class="WARNING">
-                        <td>2023-12-17 16:35:25,189</td>
+                        <td>2024-06-25 19:17:29,888</td>
                         <td>WARNING</td>
-                        <td style="word-wrap: break-word;">testcase.py:171</td>
+                        <td style="word-wrap: break-word;">testcase.py:228</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Skipped: self.TAGS=[], testset.tags.include=('tag1',), testset.tags.exclude=('tag2',)</pre>
                             
