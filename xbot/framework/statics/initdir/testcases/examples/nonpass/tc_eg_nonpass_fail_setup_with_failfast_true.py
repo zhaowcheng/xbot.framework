@@ -5,7 +5,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_fail_setup_with_failfast_true(TestCase):
     """
-    在 FAILFAST 为 True 的情况下预置步骤失败。
+    Testcase failed in setup with FAILFAST set to True.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -13,26 +13,26 @@ class tc_eg_nonpass_fail_setup_with_failfast_true(TestCase):
 
     def setup(self):
         """
-        断言 1 == 0。
+        Prepare test environment.
         """
-        # setup 出现失败，无论 FAILFAST 是何值，
-        # 都会跳过后续测试步骤并立即执行清理步骤。
+        # When the setup fails, regardless of the value of FAILFAST, 
+        # subsequent steps will be skipped and immediately execute teardown.
         assertx(1, '==', 0)
 
     def step1(self):
         """
-        断言 1 == 1。
+        Assert 1 == 1.
         """
         assertx(1, '==', 1)
 
     def step2(self):
         """
-        断言 2 == 2。
+        Assert 2 == 2.
         """
         assertx(2, '==', 2)
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤。
+        Clean up test environment.
         """
         self.sleep(1)

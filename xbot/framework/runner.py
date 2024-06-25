@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-执行器。
+Testcase runner.
 """
 
 import os
@@ -25,22 +25,22 @@ logger = getlogger(__name__)
 
 class Runner(object):
     """
-    执行器。
+    Testcase runner.
     """
     def __init__(self, testbed: TestBed, testset: TestSet):
         """
-        :param testbed: 测试床实例。
-        :param testset: 测试套实例。
+        :param testbed: TestBed instance.
+        :param testset: TestSet instance.
         """
         self.testbed = testbed
         self.testset = testset
 
     def run(self, outfmt: str = 'brief') -> str:
         """
-        执行所有用例。
+        Run testcases parsed from testset.
 
-        :param outfmt: 输出模式（verbose/brief）。
-        :return: 本次执行的日志根目录。
+        :param outfmt: output format(verbose/brief)
+        :return: testcase logdir of this execution.
         """
         fmts = ['verbose', 'brief']
         if outfmt not in fmts:
@@ -72,7 +72,7 @@ class Runner(object):
     
     def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> Thread:
         """
-        打印执行时长。
+        Flush testcase execution time.
         """
         def _timer():
             order = f'({seq}/{casecnt})'
@@ -93,9 +93,9 @@ class Runner(object):
         
     def _make_logroot(self) -> str:
         """
-        创建本次执行的日志根目录。
+        Make testcase logdir of this execution.
 
-        :return: 目录路径。
+        :return: logdir path.
         """
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         logroot = os.path.join(os.getcwd(), 'logs', self.testbed.name, timestamp)
@@ -104,10 +104,10 @@ class Runner(object):
 
     def _import_case(self, casepath: str) -> type:
         """
-        导入用例。
+        Import testcase class.
 
-        :param casepath: 用例相对路径。
-        :return: 用例类。
+        :param casepath: testcase filepath(relative).
+        :return: testcase class.
         """
         caseid = casepath.split('/')[-1].replace('.py', '')
         modname = casepath.replace('/', '.').replace('.py', '')

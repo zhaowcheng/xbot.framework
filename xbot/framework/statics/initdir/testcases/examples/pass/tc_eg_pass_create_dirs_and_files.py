@@ -3,13 +3,12 @@ import tempfile
 import shutil
 
 from xbot.framework.utils import assertx
-
 from lib.testcase import TestCase
 
 
 class tc_eg_pass_create_dirs_and_files(TestCase):
     """
-    测试创建目录和文件。
+    Test creating directories and files.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -17,14 +16,14 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def setup(self):
         """
-        创建一个临时工作目录。
+        Prepare test environment.
         """
         self.workdir = tempfile.mkdtemp()
         self.info('Created workdir: %s', self.workdir)
 
     def step1(self):
         """
-        在临时工作目录下下创建子目录 `dir`，并检查是否创建成功。
+        Create a subdirectory 'dir' under the temporary working directory and check if it is created successfully.
         """
         self.dir1 = os.path.join(self.workdir, 'dir1')
         os.mkdir(self.dir1)
@@ -32,7 +31,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def step2(self):
         """
-        在 `dir1` 下创建空文件 `file1`，并检查是否创建成功。
+        Create an empty file 'file1' under 'dir1' and check if it is created successfully.
         """
         self.file1 = os.path.join(self.dir1, 'file1')
         open(self.file1, 'w').close()
@@ -40,7 +39,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def step3(self):
         """
-        写入 `hello world` 到 `file1` 中，并检查是否写入成功。
+        Write 'hello world' to 'file1' and check if it is written successfully.
         """
         with open(self.file1, 'w') as f:
             f.write('hello world')
@@ -49,7 +48,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def teardown(self):
         """
-        删除临时工作目录。
+        Clean up test environment.
         """
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)

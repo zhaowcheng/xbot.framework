@@ -80,12 +80,12 @@
         <div>
             <table style="border-collapse: separate; height: 240px;">
                 <tr>
-                    <th colspan="3">执行概况</th>
-                    <th colspan="3">用例源码</th>
-                    <th colspan="3">测试床</th>
+                    <th colspan="3">Summary</th>
+                    <th colspan="3">TestCase</th>
+                    <th colspan="3">TestBed</th>
                 </tr>
                 <tr>
-                    <th>用例编号</th>
+                    <th>CaseID</th>
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_true</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
@@ -95,7 +95,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_fail_step_with_failfast_true(TestCase):
     """
-    在 FAILFAST 为 True 的情况下测试步骤失败。
+    Testcase failed in any step with FAILFAST set to True.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -103,33 +103,34 @@ class tc_eg_nonpass_fail_step_with_failfast_true(TestCase):
 
     def setup(self):
         """
-        无
+        Prepare test environment.
         """
         pass
 
     def step1(self):
         """
-        断言 1 == 2。
+        Assert 1 == 2
         """
-        # 此处失败，由于 FAILFAST=True，将会跳过后续测试步骤并立即执行 teardown。
+        # This will fail, and due to FAILFAST=True, it will skip the 
+        # subsequent test steps and immediately execute teardown.
         assertx(1, '==', 2)
 
     def step2(self):
         """
-        断言 1 == 1。
+        Assert 1 == 1
         """
         assertx(1, '==', 1)
 
     def teardown(self):
         """
-        睡 1 秒模拟清理步骤。
+        Clean up test environment.
         """
         self.sleep(1)
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
-# 测试用例中可通过 self.testbed.get() 获取信息。
+                        <pre id="testbed" style="overflow-y: scroll;"># Testbeds are used to store the information about the test environment.
+# The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
   key2: 
@@ -143,19 +144,19 @@ example:
                     </td>
                 </tr>
                 <tr>
-                    <th>执行结果</th>
+                    <th>Result</th>
                     <td id="result" colspan="2">FAIL</td>
                 </tr>
                 <tr>
-                    <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-17 16:35:24</td>
+                    <th>StartTime</th>
+                    <td id="starttime" colspan="2">2024-06-25 19:17:26</td>
                 </tr>
                 <tr>
-                    <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-17 16:35:25</td>
+                    <th>EndTime</th>
+                    <td id="endtime" colspan="2">2024-06-25 19:17:27</td>
                 </tr>
                 <tr>
-                    <th>执行时长</th>
+                    <th>Duration</th>
                     <td id="duration" colspan="2">0:00:01</td>
                 </tr>
             </table>
@@ -193,16 +194,16 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2023-12-17 16:35:24,144</td>
+                        <td>2024-06-25 19:17:26,861</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:260</td>
+                        <td style="word-wrap: break-word;">testcase.py:262</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot/xbot/testcase.py", line 250, in __run_stage
+  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/testcase.py", line 252, in __run_stage
     func()
-  File "./testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py", line 25, in step1
+  File "/Users/wan/CodeProjects/xbot.framework/testproj/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py", line 26, in step1
     assertx(1, '==', 2)
-  File "/Users/wan/CodeProjects/xbot/xbot/utils.py", line 355, in assertx
+  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/utils.py", line 355, in assertx
     raise AssertionError(errmsg)
 AssertionError: 1 == 2</pre>
                             
@@ -227,9 +228,9 @@ AssertionError: 1 == 2</pre>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:24,144</td>
+                        <td>2024-06-25 19:17:26,861</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_true.py:37</td>
+                        <td style="word-wrap: break-word;">tc_eg_nonpass_fail_step_with_failfast_true.py:38</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

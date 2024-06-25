@@ -5,7 +5,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_timeout(TestCase):
     """
-    超时的测试用例。
+    Testcase execution timeout.
     """
     TIMEOUT = 2
     FAILFAST = True
@@ -13,25 +13,26 @@ class tc_eg_nonpass_timeout(TestCase):
 
     def setup(self):
         """
-        预置步骤。
+        Prepare test environment.
         """
-        self.info('开始执行预置步骤')
+        self.info('Starting setup')
 
     def step1(self):
         """
-        睡眠 3 秒。
+        Test step 1.
         """
-        # 此处因超时而 error，会被强行终止，然后立即执行清理步骤。
+        # This will be forced to end due to timeout, subsequent 
+        # steps will be skipped and immediately execute teardown.
         self.sleep(3)
 
     def step2(self):
         """
-        测试步骤 2。
+        Test step 2.
         """
-        self.info('开始执行测试步骤 2')
+        self.info('Starting test step 2')
 
     def teardown(self):
         """
-        清理步骤。
+        Clean up test environment.
         """
-        self.info('开始执行清理步骤')
+        self.info('Starting teardown')

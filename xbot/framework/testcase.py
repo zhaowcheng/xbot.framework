@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-用例基类。
+Testcase base.
 """
 
 import os
@@ -25,19 +25,19 @@ from xbot.framework.errors import TestCaseTimeout, TestCaseError
 
 class TestCase(object):
     """
-    用例基类。
+    Testcase base.
     """
-    # 最大执行时长（单位：秒），超过该时长将会被强制结束。
+    # Maximum execution time(seconds), exceeding will be forced to end.
     TIMEOUT = 60
-    # 如果为 True，当第一个断言失败发生时则跳过所有未执行的 step，直接执行 teardown。
+    # If True, skip all unexecuted steps when a failure occurs.
     FAILFAST = True
-    # 用例标签。
+    # For testcase filtering.
     TAGS = []
 
     def __init__(self, testbed: TestBed, testset: TestSet, logroot: str):
         """
-        :param testbed: 测试床实例。
-        :param logroot: 日志根目录。
+        :param testbed: TestBed instance.
+        :param logroot: testcase logdir.
         """
         self.__testbed = testbed
         self.__testset = testset
@@ -55,28 +55,28 @@ class TestCase(object):
     @property
     def testbed(self) -> TestBed:
         """
-        测试床实例。
+        TestBed instance.
         """
         return self.__testbed
 
     @property
     def caseid(self) -> str:
         """
-        用例 id（不带后缀的文件名）。
+        Testcase filename(without suffix).
         """
         return os.path.basename(self.abspath.replace('.py', ''))
     
     @property
     def abspath(self) -> str:
         """
-        用例文件绝对路径。
+        Absolute path of testcase file.
         """
         return sys.modules[self.__module__].__file__
     
     @property
     def relpath(self) -> str:
         """
-        用例文件相对路径。（`testcases`开头，路径分隔符为 `/`）
+        Relative path of testcase file(startswith `testcases`, split by `/`).
         """
         paths = self.abspath.split(os.path.sep)
         return '/'.join(paths[paths.index('testcases'):])
@@ -84,7 +84,7 @@ class TestCase(object):
     @property
     def logfile(self) -> str:
         """
-        日志文件路径。
+        Logfile path(absolute).
         """
         return os.path.normpath(
             os.path.join(self.__logroot, self.relpath.replace('.py', '.html'))
@@ -93,14 +93,14 @@ class TestCase(object):
     @property
     def sourcecode(self) -> str:
         """
-        用例源码。
+        Source code of testcase.
         """
         return inspect.getsource(import_module(self.__module__))
     
     @property
     def skipped(self) -> bool:
         """
-        是否被跳过。
+        Whether it is exclued by testset.
         """
         etags = self.__testset.exclude_tags
         itags = self.__testset.include_tags
@@ -110,35 +110,35 @@ class TestCase(object):
     @property
     def steps(self) -> List[str]:
         """
-        测试步骤列表。
+        Testcase steps.
         """
         return sorted([n for n in dir(self.__class__) if re.match(r'step\d+', n)])
     
     @property
     def starttime(self) -> datetime:
         """
-        开始执行时间。
+        Start execution time.
         """
         return self.__starttime
 
     @property
     def endtime(self) -> datetime:
         """
-        结束执行时间。
+        End execution time.
         """
         return self.__endtime
 
     @property
     def duration(self) -> timedelta:
         """
-        执行时长。
+        Execution duration.
         """
         return self.__duration
 
     @property
     def timestamp(self) -> str:
         """
-        时间戳：<caseid>_<starttime>
+        <caseid>_<starttime>
         """
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
@@ -146,67 +146,67 @@ class TestCase(object):
     @property
     def result(self) -> str:
         """
-        执行结果。
+        Testcase result.
         """
         return self.__result
     
     def debug(self, msg, *args, **kwargs):
         """
-        DEBUG 级别日志。
+        debug level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         """
-        INFO 级别日志。
+        info level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.info(msg, *args, **kwargs)
 
     def warn(self, msg, *args, **kwargs):
         """
-        WARN 级别日志。
+        warn level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.warning(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
-        ERROR 级别日志。
+        error level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.error(msg, *args, **kwargs)
 
     def sleep(self, seconds: float) -> None:
         """
-        打印一条日志，然后睡眠指定时长的秒数。
+        Sleep for a specified number of seconds.
         """
         self.info('Sleep %s second(s)...' % seconds, stacklevel=3)
         time.sleep(seconds)
 
     def setup(self) -> None:
         """
-        用例预置步骤。
+        Testcase preset step.
         """
         raise NotImplementedError
 
     def step1(self) -> None:
         """
-        用例测试步骤 1，根据需要可继续添加 step2, step3, ...
-        一个用例至少需要一个测试步骤，即 step1。
+        Test step 1(add more in order, e.g. step2, step3, ...).
+        At least one step is required.
         """
         raise NotImplementedError
 
     def teardown(self) -> None:
         """
-        清理步骤。
+        Testcase cleanup step.
         """
         raise NotImplementedError
     
     def run(self) -> None:
         """
-        以线程方式执行当前用例。
+        Run the current testcase.
         """
         t = Thread(target=self.__run, name=self.caseid)
         t.start()
@@ -217,7 +217,7 @@ class TestCase(object):
 
     def __run(self) -> None:
         """
-        执行当前用例。
+        Run the current testcase.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
         if self.skipped:
@@ -230,7 +230,8 @@ class TestCase(object):
             self.__run_stage('setup')
             if not self.__result:
                 for step in self.steps:
-                    if not self.__result or not self.FAILFAST:
+                    if not self.__result or (self.__result == 'FAIL' and 
+                                             not self.FAILFAST):
                         self.__run_stage(step)
             self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
@@ -241,7 +242,7 @@ class TestCase(object):
 
     def __run_stage(self, stage: str) -> None:
         """
-        执行用例指定阶段（setup, step1, step2, ..., teardown）。
+        Run the specified stage(setup, step1, ..., stepn, teardown).
         """
         func = getattr(self, stage)
         try:
@@ -262,7 +263,7 @@ class TestCase(object):
 
     def __dump_log(self) -> None:
         """
-        将用例日志转储到 html 文件。
+        Save logs to html file.
         """
         os.makedirs(os.path.dirname(self.logfile), exist_ok=True)
         utils.render_write(
@@ -281,7 +282,7 @@ class TestCase(object):
 
 class ErrorTestCase(TestCase):
     """
-    错误的测试用例。
+    Error TestCase.
     """
     def __init__(
         self, 
@@ -293,12 +294,12 @@ class ErrorTestCase(TestCase):
         exc: Exception
     ) -> None:
         """
-        :param caseid: 用例 id。
-        :param filepath: 用例文件路径。
-        :param testbed: 测试床实例。
-        :param testset: 测试集实例。
-        :param logroot: 日志根目录。
-        :param exc: 抛出的异常类型。
+        :param caseid: testcase id.
+        :param filepath: testcase filepath.
+        :param testbed: TestBed instance.
+        :param testset: TestSet instance.
+        :param logroot: testcase logdir.
+        :param exc: Exception to be raised.
         """
         self.__caseid = caseid
         self.__filepath = filepath
@@ -324,18 +325,18 @@ class ErrorTestCase(TestCase):
     
     def setup(self) -> None:
         """
-        预置步骤。
+        Preset step.
         """
         raise TestCaseError(str(self.__exc)) from None
 
     def step1(self) -> None:
         """
-        测试步骤 1。
+        Test step 1.
         """
         pass
 
     def teardown(self) -> None:
         """
-        清理步骤。
+        Cleanup step.
         """
         pass

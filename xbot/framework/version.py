@@ -1,4 +1,4 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'

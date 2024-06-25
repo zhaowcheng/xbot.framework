@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-测试床模块。
+Test environment information management.
 """
 
 import os
@@ -14,11 +14,11 @@ from xbot.framework.utils import deepget
 
 class TestBed(object):
     """
-    测试床类。
+    Test environment information manager.
     """
     def __init__(self, filepath: str):
         """
-        :param filepath: 测试床文件路径。
+        :param filepath: testbed filepath.
         """
         self.__data = self.__parse(filepath)
         self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
@@ -27,7 +27,7 @@ class TestBed(object):
 
     def __parse(self, filepath: str) -> dict:
         """
-        解析测试床。
+        Parse testbed.
         """
         with open(filepath, encoding='utf8') as f:
             return yaml.YAML(typ='safe').load(f)
@@ -35,20 +35,20 @@ class TestBed(object):
     @property
     def name(self) -> str:
         """
-        测试床名称（不带后缀的文件名）。
+        testbed filename(without suffix).
         """
         return self.__name
     
     @property
     def content(self) -> str:
         """
-        测试床文件内容。
+        testbed file content.
         """
         return self.__content
 
     def get(self, deepkey: str, default: Any = None) -> Any:
         """
-        获取指定路径的值。
+        Get value from testbed.
 
         ----------yamlfile--------
         a:
@@ -65,9 +65,9 @@ class TestBed(object):
         >>> get('a.b3', default='x')
         'x'
 
-        :param deepkey: 用 `.` 连接的路径。
-        :param default: 如果路径不存在返回的默认值。
-        :return: 获取到的值或默认值。
+        :param deepkey: multiple keys combined with `.`
+        :param default: return value when deepkey not exists.
+        :return: Got value.
         """
         try:
             return deepget(self.__data, deepkey)

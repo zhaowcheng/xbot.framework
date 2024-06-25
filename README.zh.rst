@@ -1,20 +1,20 @@
-English | `中文 <README.zh.rst>`_
+中文 | `English <README.rst>`_
 
 -------------------------------------------------------------------------------
 
-Introduction
----------------
+简介
+-----
 
-xbot is a ``lightweight``, ``easy-to-use``, and ``extensible`` test automation framework.
+xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架。
 
-Installation
---------------
+安装
+-----
 
-Install xbot via pip::
+使用 pip 进行安装::
 
     pip install xbot.framework
 
-Type ``xbot --help`` to check:
+安装成功后即可调用 xbot 命令:
 
 .. code:: console
 
@@ -37,28 +37,28 @@ Type ``xbot --help`` to check:
     -v, --version         show program's version number and exit
 
 
-Quick Start
---------------
+快速上手
+---------
 
-Initialize a test project:
+初始化工程目录:
 
 .. code:: console
 
     $ xbot init -d ./testproj
     Initialized ./testproj
 
-The test project directory structure::
+工程目录结构如下::
 
     ./testproj
     ├── README.md
-    ├── lib  # test libraries
+    ├── lib  # 测试库目录
     │   ├── __init__.py
-    │   ├── testbed.py  # testbed base
-    │   └── testcase.py  # testcase base
+    │   ├── testbed.py  # 测试床基类
+    │   └── testcase.py  # 测试用例基类
     ├── requirements.txt
-    ├── testbeds  # directory storing testbeds
+    ├── testbeds  # 测试床目录
     │   └── testbed_example.yml 
-    ├── testcases  # directory storing testcases
+    ├── testcases  # 测试用例目录
     │   ├── __init__.py
     │   └── examples
     │       ├── __init__.py
@@ -77,10 +77,10 @@ The test project directory structure::
     │           ├── __init__.py
     │           ├── tc_eg_pass_create_dirs_and_files.py
     │           └── tc_eg_pass_get_values_from_testbed.py
-    └── testsets  # directory storing testsets
+    └── testsets  # 测试套目录
         └── testset_example.yml
 
-Testbed example(``testbeds/testbed_example.yml``):
+测试床示例(``testbeds/testbed_example.yml``):
 
 .. code:: yaml
 
@@ -98,7 +98,7 @@ Testbed example(``testbeds/testbed_example.yml``):
 
 
 
-Testset example(``testsets/testset_example.yml``):
+测试套示例(``testsets/testset_example.yml``):
 
 .. code:: yaml
 
@@ -119,7 +119,7 @@ Testset example(``testsets/testset_example.yml``):
 
 
 
-Run the testcases(must execute under the test project directory):
+执行测试(测试工程目录下执行命令):
 
 .. code:: console
 
@@ -139,21 +139,21 @@ Run the testcases(must execute under the test project directory):
     report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-06-25_19-17-14/report.html 
 
 
-Test report and logs will be generated in the ``logs`` subdirectory.
+执行完成后会在测试工程下根据测试床名称和时间戳生成日志目录保存 html 格式的用例日志和测试报告。
 
-Example report:
+测试报告:
 
 .. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/report_example.png?raw=True
 
-Example log:
+用例日志:
 
 .. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/log_example.png?raw=True
 
 
-Testcase Development
------------------------
+用例开发
+---------
 
-Testcases are stored in the ``testcases`` subdirectory, below is a example(``testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py``):
+测试用例存放在工程目录的 ``testcases`` 子目录下，以下为 ``testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py`` 用例内容:
 
 .. code:: python
 
@@ -214,16 +214,16 @@ Testcases are stored in the ``testcases`` subdirectory, below is a example(``tes
             self.sleep(1)
 
 
-- Testcase ``MUST`` inherit from the ``TestCase`` base class;
-- Testcase ``MUST`` implement the preset steps in the setup method, write pass if there are no specific steps;
-- Testcase ``MUST`` implement the cleanup steps in the teardown method, write pass if there are no specific steps;
-- Test steps are named in the form of ``step1, step2, ...``, the number at the end is the execution order;
-- The ``TIMEOUT`` attribute defines the maximum execution time of the testcase(unit: ``seconds``), the testcase will be forced to end and the result will be set to TIMEOUT if it exceeds the time limit;
-- When ``FAILFAST`` attribute is *True*, the subsequent test steps will be skipped and the teardown will be executed immediately if a test step fails;
-- The ``TAGS`` attribute defines the testcase *tags*, which can be used to filter testcases to be executed in the testset;
+- 用例 ``必须`` 继承自 TestCase 基类；
+- 用例 ``必须`` 在 setup 方法内实现预置步骤，如无具体步骤则写 pass；
+- 用例 ``必须`` 在 teardown 方法内实现清理步骤，如无具体步骤则写 pass；
+- 测试步骤以 ``step1, step2, ...`` 这样的方式命名，末尾数字为执行顺序；
+- ``TIMEOUT`` 属性定义测试用例最大执行时长(单位：``秒``)，超过该时长将被强制结束且置结果为 TIMEOUT；
+- ``FAILFAST`` 属性为 *True* 时，当某个测试步骤失败时，则会跳过后续测试步骤立即执行清理步骤；
+- ``TAGS`` 属性定义用例 *标签*，可用于测试套中对待执行测试用例列表进行筛选；
 
 
-Test libraries development
------------------------------
+测试库开发
+-----------
 
-Test libraries are stored in the ``lib`` subdirectory, write the test libraries according to the business requirements, import and use them in the testcases.
+测试库存放在工程目录的 ``lib`` 子目录下，根据业务开发所需测试库放入该目录下，然后在测试用例中导入使用即可。

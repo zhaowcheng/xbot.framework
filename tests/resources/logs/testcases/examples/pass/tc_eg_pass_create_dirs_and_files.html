@@ -80,26 +80,23 @@
         <div>
             <table style="border-collapse: separate; height: 240px;">
                 <tr>
-                    <th colspan="3">执行概况</th>
-                    <th colspan="3">用例源码</th>
-                    <th colspan="3">测试床</th>
+                    <th colspan="3">Summary</th>
+                    <th colspan="3">TestCase</th>
+                    <th colspan="3">TestBed</th>
                 </tr>
                 <tr>
-                    <th>用例编号</th>
+                    <th>CaseID</th>
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">import os
 import tempfile
 import shutil
-
 from xbot.framework.utils import assertx
-
 from lib.testcase import TestCase
-
 
 class tc_eg_pass_create_dirs_and_files(TestCase):
     """
-    测试创建目录和文件。
+    Test creating directories and files.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -107,14 +104,14 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def setup(self):
         """
-        创建一个临时工作目录。
+        Prepare test environment.
         """
         self.workdir = tempfile.mkdtemp()
         self.info('Created workdir: %s', self.workdir)
 
     def step1(self):
         """
-        在临时工作目录下下创建子目录 `dir`，并检查是否创建成功。
+        Create a subdirectory 'dir' under the temporary working directory and check if it is created successfully.
         """
         self.dir1 = os.path.join(self.workdir, 'dir1')
         os.mkdir(self.dir1)
@@ -122,7 +119,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def step2(self):
         """
-        在 `dir1` 下创建空文件 `file1`，并检查是否创建成功。
+        Create an empty file 'file1' under 'dir1' and check if it is created successfully.
         """
         self.file1 = os.path.join(self.dir1, 'file1')
         open(self.file1, 'w').close()
@@ -130,7 +127,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def step3(self):
         """
-        写入 `hello world` 到 `file1` 中，并检查是否写入成功。
+        Write 'hello world' to 'file1' and check if it is written successfully.
         """
         with open(self.file1, 'w') as f:
             f.write('hello world')
@@ -139,7 +136,7 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def teardown(self):
         """
-        删除临时工作目录。
+        Clean up test environment.
         """
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)
@@ -147,8 +144,8 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># 测试床文件必须是 YAML 格式，具体字段信息自定义。
-# 测试用例中可通过 self.testbed.get() 获取信息。
+                        <pre id="testbed" style="overflow-y: scroll;"># Testbeds are used to store the information about the test environment.
+# The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
   key2: 
@@ -162,19 +159,19 @@ example:
                     </td>
                 </tr>
                 <tr>
-                    <th>执行结果</th>
+                    <th>Result</th>
                     <td id="result" colspan="2">PASS</td>
                 </tr>
                 <tr>
-                    <th>开始时间</th>
-                    <td id="starttime" colspan="2">2023-12-17 16:35:19</td>
+                    <th>StartTime</th>
+                    <td id="starttime" colspan="2">2024-06-25 19:17:16</td>
                 </tr>
                 <tr>
-                    <th>结束时间</th>
-                    <td id="endtime" colspan="2">2023-12-17 16:35:20</td>
+                    <th>EndTime</th>
+                    <td id="endtime" colspan="2">2024-06-25 19:17:17</td>
                 </tr>
                 <tr>
-                    <th>执行时长</th>
+                    <th>Duration</th>
                     <td id="duration" colspan="2">0:00:01</td>
                 </tr>
             </table>
@@ -195,11 +192,11 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,991</td>
+                        <td>2024-06-25 19:17:16,800</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:23</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:20</td>
                         <td style="padding-left: 0.5%;">
-                            <pre>Created workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmp0y2ssy_z</pre>
+                            <pre>Created workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmphh_85i_1</pre>
                             
                         </td>
                     </tr>
@@ -222,9 +219,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,992</td>
+                        <td>2024-06-25 19:17:16,801</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:31</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:28</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: True == True</pre>
                             
@@ -249,9 +246,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,992</td>
+                        <td>2024-06-25 19:17:16,802</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:39</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:36</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: True == True</pre>
                             
@@ -276,9 +273,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,994</td>
+                        <td>2024-06-25 19:17:16,804</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:48</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:45</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: hello world == hello world</pre>
                             
@@ -303,19 +300,19 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,994</td>
+                        <td>2024-06-25 19:17:16,804</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:55</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:52</td>
                         <td style="padding-left: 0.5%;">
-                            <pre>Removed workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmp0y2ssy_z</pre>
+                            <pre>Removed workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmphh_85i_1</pre>
                             
                         </td>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2023-12-17 16:35:19,995</td>
+                        <td>2024-06-25 19:17:16,805</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:56</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:53</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

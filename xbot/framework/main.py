@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-命令行接口。
+Entry script.
 """
 
 import os
@@ -21,7 +21,7 @@ from xbot.framework.common import INIT_DIR
 
 def create_parser() -> argparse.ArgumentParser:
     """
-    创建命令行参数解析器。
+    Create cli parser.
     """
     parser = argparse.ArgumentParser(prog='xbot')
     parser.add_argument('command', choices=['init', 'run'])
@@ -39,9 +39,9 @@ def create_parser() -> argparse.ArgumentParser:
 
 def init(directory: str) -> None:
     """
-    初始化测试项目目录。
+    Initialize a workdir.
 
-    :param directory: 待初始化的目录。
+    :param directory: workdir path.
     """
     if os.path.exists(directory):
         printerr('%s already exists' % directory)
@@ -51,20 +51,20 @@ def init(directory: str) -> None:
 
 def is_projdir(directory: str) -> bool:
     """
-    检测当前目录是否为测试项目目录。
+    Check if the `directory` is a workdir.
 
-    :param directory: 待检测的目录。
+    :param directory: directory path.
     """
     return os.path.exists(os.path.join(directory, 'testcases'))
     
 
 def run(testbed: str, testset: str, outfmt: str = 'brief') -> None:
     """
-    执行测试。
+    Run testcases.
 
-    :param testbed: 测试床文件。
-    :param testset: 测试床文件。
-    :param outfmt: 输出模式。
+    :param testbed: testbed filepath.
+    :param testset: testset filepath.
+    :param outfmt: output format.
     """
     if not is_projdir(os.getcwd()):
         printerr("No `testcases` directory in current directory, "
@@ -81,7 +81,7 @@ def run(testbed: str, testset: str, outfmt: str = 'brief') -> None:
 
 def main() -> None:
     """
-    入口函数。
+    Entry function.
     """
     parser = create_parser()
     args = parser.parse_args()

@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-实用函数。
+Utilities.
 """
 
 import os
@@ -25,7 +25,7 @@ logger = getlogger(__name__)
 
 class ColorText(object):
     """
-    给终端字符添加 ascii 颜色码。
+    Colored text output.
     """
 
     COLORS = {
@@ -37,7 +37,7 @@ class ColorText(object):
     @staticmethod
     def wrap(s, color):
         """
-        给字符串 `s` 添加颜色。
+        Wrap string `s` with color.
         """
         code = ColorText.COLORS.get(color, None)
         if not code:
@@ -47,12 +47,12 @@ class ColorText(object):
 
 def xprint(*values, **kwargs) -> None:
     """
-    专用 print 函数。
+    Custom print function.
 
-    :param values: 待打印的值。
-    :param color: 字符颜色。
-    :param do_exit: 打印后是否退出程序，默认 False。
-    :param exit_code: 退出码，默认 0。
+    :param values: values to print.
+    :param color: color of the output.
+    :param do_exit: if True, exit after print, default False.
+    :param exit_code: exit code.
     """
     color = kwargs.pop('color', None)
     do_exit = kwargs.pop('do_exit', False)
@@ -69,10 +69,10 @@ printerr = partial(xprint, file=sys.stderr, color='red', do_exit=True, exit_code
 
 def render_write(template: str, outfile: str, **kwargs) -> None:
     """
-    渲染 HTML 模板 `template` 并输出到 `outfile`。
+    Render `template` and write to `outfile`.
     
-    :param template: HTML 模板文件。
-    :param outfile: 输出文件。
+    :param template: template file.
+    :param outfile: output file.
     """
     rendered_content = ''
     with open(template, encoding='utf8') as fp:
@@ -86,12 +86,12 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
 
 def stop_thread(thread, exc=SystemExit) -> None:
     """
-    通过让线程抛出异常来结束线程。
+    Stop a thread by raising an exception in the thread.
     
-    :param thread: 线程实例。
-    :param exc: 抛出的异常类。
-    :raises SystemError: 如果停止线程失败。
-            ValueError: 如果线程 ident 无效。
+    :param thread: thread to stop.
+    :param exc: exception to raise.
+    :raises SystemError: if stop thread failed.
+            ValueError: if invalid thread id.
     """
     r = ctypes.pythonapi.PyThreadState_SetAsyncExc(
             ctypes.c_long(thread.ident), ctypes.py_object(exc))
@@ -105,7 +105,7 @@ def stop_thread(thread, exc=SystemExit) -> None:
 
 def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     """
-    把路径 `deepkey` 按照 `sep` 分隔为列表，其中数字会转为 int 类型。
+    Split deepkey by `sep`.
 
     >>> parse_deepkey('a.b1')
     ['a', 'b1']
@@ -114,9 +114,9 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     >>> parse_deepkey('a.b2[0].c2')
     ['a', 'b2', 0, 'c2']
 
-    :param deepkey: 路径。
-    :param sep: 分隔符
-    :return: 分隔后的路径列表。
+    :param deepkey: multi-level key.
+    :param sep: separator.
+    :return: list of keys.
     """
     keys = []
     for k in re.split(r'%s|\[' % re.escape(sep), deepkey):
@@ -129,7 +129,7 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
 
 def deepget(obj, deepkey: str, sep: str = '.') -> Any:
     """
-    深度获取 `obj` 中的元素的值。
+    Get value from `obj` by deepkey.
 
     >>> d = {
     ...     'a': {
@@ -142,10 +142,10 @@ def deepget(obj, deepkey: str, sep: str = '.') -> Any:
     >>> deepget(d, 'a.b2[0]')
     1
 
-    :param obj: 被获取对象。
-    :param deepkey: 元素路径。
-    :param sep: 路径分隔符。
-    :return: 获取到的值。
+    :param obj: object.
+    :param deepkey: multi-level key.
+    :param sep: separator.
+    :return: value.
     """
     keys = parse_deepkey(deepkey, sep)
     return reduce(operator.getitem, keys, obj)
@@ -153,8 +153,8 @@ def deepget(obj, deepkey: str, sep: str = '.') -> Any:
 
 def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
     """
-    深度设置 `obj` 中的元素的值。
-    如果路径不存在会自动创建（路径中包含索引的情况除外，如 a.b[0]）。
+    Set value to `obj` by deepkey.
+    Automatically create missing keys.
 
     >>> d = {
     ...     'a': {
@@ -172,10 +172,10 @@ def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
     >>> d
     {'a': {'b1': 'd', 'b2': ['-1', 2, 3]}, 'i': {'j': 'x'}}
 
-    :param obj: 被设置对象。.
-    :param deepkey: 元素路径。
-    :param value: 被设置的值
-    :param sep: 路径分隔符。
+    :param obj: object.
+    :param deepkey: multi-level key.
+    :param value: value to set.
+    :param sep: separator.
     """
     keys = parse_deepkey(deepkey, sep)
     for k in keys[:-1]:
@@ -189,15 +189,15 @@ def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
 
 def ip_reachable(ip: str) -> bool:
     """
-    检查 IP 地址是否可达
+    Check if IP is reachable.
 
     >>> ip_reachable('127.0.0.1')
     True
     >>> ip_reachable('128.0.0.1')
     False
 
-    :param ip: IP 地址。
-    :return: 可达返回 True，否则 False。
+    :param ip: IP address.
+    :return: reachable return True, otherwise False.
     """
     try:
         conn = socket.create_connection((ip, 22), 0.1)
@@ -211,11 +211,11 @@ def ip_reachable(ip: str) -> bool:
 
 def port_opened(ip: str, port: int) -> bool:
     """
-    检查端口是否开放。
+    Check if port is opened.
 
-    :param ip: IP 地址
-    :param port: 端口号
-    :return: 开放返回 True，否则 False。
+    :param ip: IP address.
+    :param port: port number.
+    :return: opened return True, otherwise False.
     """
     try:
         conn = socket.create_connection((ip, port), 0.1)
@@ -227,7 +227,7 @@ def port_opened(ip: str, port: int) -> bool:
 
 def wrapstr(s: str, title: str = '') -> str:
     """
-    使用字符边框包裹字符串 `s`。
+    Wrap string `s` with border.
 
     >>> print(wrapstr('hello world'))
     +-------------+
@@ -243,8 +243,8 @@ def wrapstr(s: str, title: str = '') -> str:
     | hello world |
     +-------------+
 
-    :param s: 字符串。
-    :param title: 标题。
+    :param s: string to wrap.
+    :param title: title.
     """
     lines = s.splitlines()
     width = max(len(line) for line in lines + [title])
@@ -257,7 +257,7 @@ def wrapstr(s: str, title: str = '') -> str:
 
 def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     """
-    按名称顺序对目录进行遍历。
+    Walk through the directory in order(ascii).
 
     >>> import tempfile
     >>> tmpdir = tempfile.mkdtemp()
@@ -280,7 +280,7 @@ def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
     dirs: [], files: ['file1_1', 'file1_2']
     dirs: [], files: ['file2_1', 'file2_2']
 
-    :param path: 被遍历路径。
+    :param path: directory path.
     :yield: (top, dirs, files)
     """
     top, dirs, files = path, [], []
@@ -306,7 +306,7 @@ def assertx(
         verbose: bool = True
     ) -> None:
     """
-    断言函数。
+    Assert `a` and `b` with operator `op`.
 
     >>> assertx(1, '==', 1)
     >>> assertx(1, '!=', 2)
@@ -323,13 +323,13 @@ def assertx(
     >>> assertx('abc', 'search', r'[a-z]')
     >>> assertx('abc', 'not search', r'[0-9]')
 
-    :param a: 操作对象 a。
-    :param op: 操作符。
-    :param b: 操作对象 b。
-    :param errmsg: 断言失败时的错误消息，如果未制定则自动生成。
-    :param verbose: 如果为 True，断言成功时也打印打印一条日志。
-    :raises AssertionError: 如果断言失败。
-            ValueError: 不支持的操作符。
+    :param a: object a.
+    :param op: operator.
+    :param b: object b.
+    :param errmsg: error message.
+    :param verbose: if True, log assertion result even success.
+    :raises AssertionError: if assertion failed.
+            ValueError: if invalid operator.
     """
     funcs = {
         '==': operator.eq,
@@ -360,9 +360,9 @@ def assertx(
 @contextmanager
 def cd(path):
     """
-    切换当前工作目录。（支持 with 语句）
+    Change directory, support context manager(like `with`).
 
-    :param path: 目标目录。
+    :param path: directory path.
     """
     oldpwd = os.getcwd()
     os.chdir(path)
