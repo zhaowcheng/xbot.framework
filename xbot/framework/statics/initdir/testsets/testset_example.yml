@@ -1,11 +1,14 @@
-tags:
-  include:  # 0 个或多个
+# Testset is used to organize testcases to be executed.
+
+tags:  # `exclude` has higher priority than `include`.
+  include:  # Include testcases with these tags.
     - tag1
-  exclude:  # 0 个或多个
+  exclude:  # Exclude testcases with these tags.
     - tag2
 
 paths:
   - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
   - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
-  # 自动解析目录及子目录下的所有 .py 文件（__init__.py 除外）
+  # Recursively include all testcases in the directory, 
+  # only match files with the prefix 'tc_' and suffix '.py'.
   - testcases/examples/nonpass/

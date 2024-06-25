@@ -2,7 +2,7 @@
 
 import os
 
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_namespace_packages
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))

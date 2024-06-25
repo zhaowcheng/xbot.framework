@@ -1,5 +1,5 @@
-# 测试床文件必须是 YAML 格式，具体字段信息自定义。
-# 测试用例中可通过 self.testbed.get() 获取信息。
+# Testbed is used to store the information about the test environment.
+# The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
   key2: 

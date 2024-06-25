@@ -5,7 +5,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_skip_not_included(TestCase):
     """
-    因不被 testset.tags.include 包含而跳过的测试用例。
+    Testcase skipped due to not containing tag matching the `testset.tags.include`.
     """
     TIMEOUT = 60
     FAILFAST = True
@@ -13,18 +13,18 @@ class tc_eg_nonpass_skip_not_included(TestCase):
 
     def setup(self):
         """
-        预置步骤。
+        Prepare test environment.
         """
-        self.info('开始执行预置步骤')
+        self.info('Starting setup')
 
     def step1(self):
         """
-        测试步骤 1。
+        Test step 1.
         """
-        self.info('开始执行测试步骤 1')
+        self.info('Starting test step 1')
 
     def teardown(self):
         """
-        清理步骤。
+        Clean up test environment.
         """
-        self.info('开始执行清理步骤')
+        self.info('Starting teardown')

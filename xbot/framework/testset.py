@@ -1,13 +1,12 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-测试套模块。
+Testcase list management.
 """
 
 import os
 
 from ruamel import yaml
-from copy import deepcopy
 
 from xbot.framework.utils import ordered_walk
 from xbot.framework.errors import TestSetError
@@ -15,11 +14,11 @@ from xbot.framework.errors import TestSetError
 
 class TestSet(object):
     """
-    测试套类。
+    Testcase list manager.
     """
     def __init__(self, filepath: str):
         """
-        :param filepath: 测试套文件路径。
+        :param filepath: testset filepath.
         """
         self._data = self._parse(filepath)
         self._include_tags = None
@@ -28,7 +27,7 @@ class TestSet(object):
 
     def _parse(self, filepath: str) -> dict:
         """
-        解析测试套。
+        Parse testset.
         """
         with open(filepath, encoding='utf8') as f:
             data = yaml.YAML(typ='safe').load(f)
@@ -53,7 +52,7 @@ class TestSet(object):
     @property
     def include_tags(self) -> tuple:
         """
-        用来筛选用例的 tags。
+        tags used to include testcases.
         """
         if not self._include_tags:
             self._include_tags = self._data['tags'].get('include') or []
@@ -62,7 +61,7 @@ class TestSet(object):
     @property
     def exclude_tags(self) -> tuple:
         """
-        用来排除用例的 tags。
+        tags used to exclude testcases.
         """
         if not self._exclude_tags:
             self._exclude_tags = self._data['tags'].get('exclude') or []
@@ -71,7 +70,7 @@ class TestSet(object):
     @property
     def paths(self) -> tuple:
         """
-        待执行的测试用例或目录路径列表。
+        testcase filepath(relative) list.
         """
         if not self._paths:
             paths = []
@@ -83,7 +82,7 @@ class TestSet(object):
                 else:
                     for top, dirs, files in ordered_walk(p):
                         for f in sorted(files):
-                            if f.endswith('.py') and f != '__init__.py':
+                            if f.startswith('tc_') and f.endswith('.py'):
                                 relpath = os.path.relpath(os.path.join(top, f), 
                                                           os.getcwd())
                                 paths.append(relpath.replace(os.sep, '/'))

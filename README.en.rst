@@ -1,23 +1,23 @@
-中文 | `English <README.en.rst>`_
+English | `中文 <README.rst>`_
 
 --------------------------------------------
 
 xbot
 =====
 
-简介
------
+Introduction
+---------------
 
-xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架。
+xbot is a ``lightweight``, ``easy-to-use``, ``extensible`` test automation framework.
 
-安装
------
+Installation
+--------------
 
-使用 pip 进行安装::
+Install xbot via pip::
 
     pip install xbot.framework
 
-安装成功后即可调用 xbot 命令:
+Type ``xbot --help`` to check:
 
 .. code:: console
 
@@ -40,28 +40,28 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     -v, --version         show program's version number and exit
 
 
-快速上手
----------
+Quick Start
+--------------
 
-初始化工程目录:
+Initialize a test project:
 
 .. code:: console
 
     $ xbot init -d ./testproj
     Initialized ./testproj
 
-工程目录结构如下::
+The test project directory structure::
 
     ./testproj
     ├── README.md
-    ├── lib  # 测试库目录
+    ├── lib  # test libraries
     │   ├── __init__.py
-    │   ├── testbed.py  # 测试床基类
-    │   └── testcase.py  # 测试用例基类
+    │   ├── testbed.py  # testbed base
+    │   └── testcase.py  # testcase base
     ├── requirements.txt
-    ├── testbeds  # 测试床目录
+    ├── testbeds  # directory storing testbeds
     │   └── testbed_example.yml 
-    ├── testcases  # 测试用例目录
+    ├── testcases  # directory storing testcases
     │   ├── __init__.py
     │   └── examples
     │       ├── __init__.py
@@ -80,10 +80,10 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     │           ├── __init__.py
     │           ├── tc_eg_pass_create_dirs_and_files.py
     │           └── tc_eg_pass_get_values_from_testbed.py
-    └── testsets  # 测试套目录
+    └── testsets  # directory storing testsets
         └── testset_example.yml
 
-测试床示例(``testbeds/testbed_example.yml``):
+Testbed example(``testbeds/testbed_example.yml``):
 
 .. code:: yaml
 
@@ -101,7 +101,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 
 
-测试套示例(``testsets/testset_example.yml``):
+Testset example(``testsets/testset_example.yml``):
 
 .. code:: yaml
 
@@ -122,7 +122,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 
 
 
-执行测试(测试工程目录下执行命令):
+Run the testcases(must execute under the test project directory):
 
 .. code:: console
 
@@ -142,21 +142,21 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-06-25_19-17-14/report.html 
 
 
-执行完成后会在测试工程下根据测试床名称和时间戳生成日志目录保存 html 格式的用例日志和测试报告。
+Test report and logs will be generated in the ``logs`` subdirectory.
 
-测试报告:
+Example report:
 
 .. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/report_example.png?raw=True
 
-用例日志:
+Example log:
 
 .. image:: https://github.com/zhaowcheng/xbot.framework/blob/master/xbot/framework/statics/log_example.png?raw=True
 
 
-用例开发
----------
+Testcase Development
+-----------------------
 
-测试用例存放在工程目录的 ``testcases`` 子目录下，以下为 ``testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py`` 用例内容:
+Testcases are stored in the ``testcases`` subdirectory, below is a example(``testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py``):
 
 .. code:: python
 
@@ -217,16 +217,16 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
             self.sleep(1)
 
 
-- 用例 ``必须`` 继承自 TestCase 基类；
-- 用例 ``必须`` 在 setup 方法内实现预置步骤，如无具体步骤则写 pass；
-- 用例 ``必须`` 在 teardown 方法内实现清理步骤，如无具体步骤则写 pass；
-- 测试步骤以 ``step1, step2, ...`` 这样的方式命名，末尾数字为执行顺序；
-- ``TIMEOUT`` 属性定义测试用例最大执行时长(单位：``秒``)，超过该时长将被强制结束且置结果为 TIMEOUT；
-- ``FAILFAST`` 属性为 *True* 时，当某个测试步骤失败时，则会跳过后续测试步骤立即执行清理步骤；
-- ``TAGS`` 属性定义用例 *标签*，可用于测试套中对待执行测试用例列表进行筛选；
+- Testcase ``MUST`` inherit from the ``TestCase`` base class;
+- Testcase ``MUST`` implement the preset steps in the setup method, write pass if there are no specific steps;
+- Testcase ``MUST`` implement the cleanup steps in the teardown method, write pass if there are no specific steps;
+- Test steps are named in the form of ``step1, step2, ...``, the number at the end is the execution order;
+- The ``TIMEOUT`` attribute defines the maximum execution time of the testcase(unit: ``seconds``), the testcase will be forced to end and the result will be set to TIMEOUT if it exceeds the time limit;
+- When ``FAILFAST`` attribute is *True*, the subsequent test steps will be skipped and the teardown will be executed immediately if a test step fails;
+- The ``TAGS`` attribute defines the testcase *tags*, which can be used to filter testcases to be executed in the testset;
 
 
-测试库开发
------------
+Test libraries development
+-----------------------------
 
-测试库存放在工程目录的 ``lib`` 子目录下，根据业务开发所需测试库放入该目录下，然后在测试用例中导入使用即可。
+Test libraries are stored in the ``lib`` subdirectory, write the test libraries according to the business requirements, import and use them in the testcases.

@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-日志模块。
+logging.
 """
 
 import logging
@@ -11,11 +11,11 @@ import sys
 
 class XLogger(logging.Logger):
     """
-    自定义 Logger。
+    Custom Logger.
     """
     def findCaller(self, stacklevel= 1):
         """
-        拷贝自 Python3.8
+        Copy from Python3.8
         """
         f = logging.currentframe()
         #On some versions of IronPython, currentframe() returns None if
@@ -41,7 +41,7 @@ class XLogger(logging.Logger):
 
     def _log(self, level, msg, args, exc_info=None, extra=None, stacklevel=1):
         """
-        拷贝自 Python3.8
+        Copy from Python3.8
         """
         if logging._srcfile:
             #IronPython doesn't track Python frames, so findCaller raises an
@@ -65,7 +65,7 @@ class XLogger(logging.Logger):
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info,
                    func=None, extra=None, sinfo=None):
         """
-        extra 中包含 LogRecord 保留字段时不报错。
+        Copy from super class and remove `raise KeyError` line.
         """
         rv = logging._logRecordFactory(name, level, fn, lno, msg, args, 
                                        exc_info, func,sinfo)
@@ -87,7 +87,7 @@ class StdoutFilter(logging.Filter):
 
 class CaseLogFilter(logging.Filter):
     """
-    用例日志过滤器。
+    Testcase log filter.
     """
     def filter(self, record):
         return self.name == record.threadName
@@ -95,7 +95,7 @@ class CaseLogFilter(logging.Filter):
 
 class CaseLogHandler(logging.Handler):
     """
-    用例日志处理器。
+    Testcase log handler.
     """
     def __init__(self, level=logging.NOTSET):
         super(CaseLogHandler, self).__init__(level)
@@ -116,7 +116,7 @@ class CaseLogHandler(logging.Handler):
 
 class ExtraAdapter(logging.LoggerAdapter):
     """
-    日志消息包含额外信息（前缀）。
+    Extra content for log message.
     """
     def process(self, msg, kwargs):
         if 'prefix' in self.extra:
@@ -133,7 +133,7 @@ FORMATTER = logging.Formatter(
 
 def enable_console_logging() -> None:
     """
-    开启控制台日志输出。
+    Add stream handler(sys.stdout) to root logger.
     """
     if 'console_logging_enabled' in globals():
         return
@@ -151,6 +151,6 @@ def enable_console_logging() -> None:
 
 def getlogger(name) -> XLogger:
     """
-    返回 xbot 子 Logger。
+    Get child logger of root logger.
     """
     return ROOT_LOGGER.getChild(name)

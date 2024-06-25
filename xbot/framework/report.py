@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023, zhaowcheng <zhaowcheng@163.com>
 
 """
-报告模块。
+Execution report.
 """
 
 import os
@@ -16,20 +16,20 @@ from xbot.framework import common
 
 def find_value(html: str, id_: str) -> str:
     """
-    通过 id 获取 html 元素的文本。
+    Get text of a element by id from html.
 
-    :param html: html 内容。
-    :param id_: 元素 id。
-    :return: 元素的文本。
+    :param html: html content.
+    :param id_: element id.
+    :return: text of element.
     """
     return re.search(r'id="%s".*>(.*)<.*' % id_, html).group(1)
 
 
 def gen_report(logdir: str) -> Tuple[str, bool]:
     """
-    生成报告。
+    Generate report for all testcase logfiles in `logdir`.
 
-    :param logdir: 日志目录。
+    :param logdir: testcase logfile directory.
     :return: (report_filepath, is_allpassed)
     """
     cases = []
@@ -44,7 +44,7 @@ def gen_report(logdir: str) -> Tuple[str, bool]:
     allpassed = True
     for top, dirs, files in utils.ordered_walk(logdir):
         for f in files:
-            # report.ok.html 是单元测试时用于对比生成的报告是否正确的文件。
+            # report.ok.html is only for unittest.
             if f.endswith('.html') and f not in ['report.html', 'report.ok.html']:
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')

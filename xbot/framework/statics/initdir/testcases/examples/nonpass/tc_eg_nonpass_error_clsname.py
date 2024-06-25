@@ -5,7 +5,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_class_name_incorrect(TestCase):
     """
-    类名错误（与文件名不一致）的用例。
+    Testcase with incorrect class name (not consistent with the filename).
     """
     TIMEOUT = 60
     FAILFAST = False
@@ -13,18 +13,18 @@ class tc_eg_nonpass_class_name_incorrect(TestCase):
 
     def setup(self):
         """
-        预置步骤。
+        Prepare test environment.
         """
-        self.info('开始执行预置步骤')
+        self.info('Starting setup')
 
     def step1(self):
         """
-        测试步骤 1。
+        Test step 1.
         """
-        self.info('开始执行测试步骤 1')
+        self.info('Starting test step 1')
 
     def teardown(self):
         """
-        清理步骤。
+        Clean up test environment.
         """
-        self.info('开始执行清理步骤')
+        self.info('Starting teardown')

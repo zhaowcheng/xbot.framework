@@ -5,7 +5,7 @@ from lib.testcase import TestCase
 
 class tc_eg_nonpass_error_syntax(TestCase):
     """
-    存在语法错误的用例。
+    Testcase with syntax error.
     """
     TIMEOUT = 60
     FAILFAST = False
@@ -13,19 +13,19 @@ class tc_eg_nonpass_error_syntax(TestCase):
 
     def setup(self):
         """
-        预置步骤。
+        Prepare test environment.
         """
-        self.info('开始执行预置步骤')
+        self.info('Starting setup')
 
     def step1(self):
         """
-        测试步骤 1。
+        Test step 1.
         """
         # noinspection PyUnreachableCode
-        self.info('开始执行测试步骤 1'  # type: ignore
+        self.info('Starting test step 1'  # type: ignore
 
     def teardown(self):
         """
-        清理步骤。
+        Clean up test environment.
         """
-        self.info('开始执行清理步骤')
+        self.info('Starting teardown')
