@@ -95,7 +95,11 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
         - value3-1
         - value3-2
         - value3-3
-
+      key4:
+        - name: jack
+          age: 20
+        - name: tom
+          age: 30
 
 
 测试套示例(``testsets/testset_example.yml``):
@@ -103,20 +107,17 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
 .. code:: yaml
 
     # Testset is used to organize testcases to be executed.
-    
     tags:  # `exclude` has higher priority than `include`.
       include:  # Include testcases with these tags.
         - tag1
       exclude:  # Exclude testcases with these tags.
         - tag2
-    
     paths:
       - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
       - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
       # Recursively include all testcases in the directory, 
       # only match files with the prefix 'tc_' and suffix '.py'.
       - testcases/examples/nonpass/
-
 
 
 执行测试(测试工程目录下执行命令):
@@ -136,7 +137,7 @@ xbot 是一个 ``轻量``、``易用``、``可扩展`` 的自动化测试框架�
     (10/11)  SKIP     0:00:00  tc_eg_nonpass_skip_not_included
     (11/11)  TIMEOUT  0:00:03  tc_eg_nonpass_timeout
     
-    report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-06-25_19-17-14/report.html 
+    report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-07-02_12-19-43/report.html 
 
 
 执行完成后会在测试工程下根据测试床名称和时间戳生成日志目录保存 html 格式的用例日志和测试报告。

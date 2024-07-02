@@ -1,11 +1,9 @@
 # Testset is used to organize testcases to be executed.
-
 tags:  # `exclude` has higher priority than `include`.
   include:  # Include testcases with these tags.
     - tag1
   exclude:  # Exclude testcases with these tags.
     - tag2
-
 paths:
   - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
   - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py

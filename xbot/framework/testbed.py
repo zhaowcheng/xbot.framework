@@ -6,10 +6,11 @@ Test environment information management.
 
 import os
 
+import jmespath
+
 from typing import Any
 
 from ruamel import yaml
-from xbot.framework.utils import deepget
 
 
 class TestBed(object):
@@ -46,9 +47,14 @@ class TestBed(object):
         """
         return self.__content
 
-    def get(self, deepkey: str, default: Any = None) -> Any:
+    def get(self, expr: str) -> Any:
         """
         Get value from testbed.
+
+        https://jmespath.org/
+
+        :param expr: JMESPath expression.
+        :return: Got value.
 
         ----------yamlfile--------
         a:
@@ -57,19 +63,26 @@ class TestBed(object):
             - 1
             - 2
             - 3
+          b3:
+            - x: 1
+              y: 'h'
+            - x: 2
+              y: 'i'
         ---------------------------
-        >>> get('a.b1')
-        'c'
-        >>> get('a.b2[0]')
-        1
-        >>> get('a.b3', default='x')
-        'x'
 
-        :param deepkey: multiple keys combined with `.`
-        :param default: return value when deepkey not exists.
-        :return: Got value.
+        >>> get("a.b1")
+        'c'
+        >>> get("a.b2[0]")
+        1
+        >>> get("a.b3") == None
+        True
+        >>> get("a.b3[0].x")
+        [1]
+        >>> get('a.b3[?x==`1`]')
+        [{'x': 1, 'y': 'h'}]
+        >>> get("a.b3[?y=='i']|[0]")
+        {'x': 2, 'y': 'i'}
+        >>> get('a.b3[?x==`3`]') == None
+        True
         """
-        try:
-            return deepget(self.__data, deepkey)
-        except KeyError:
-            return default
+        return jmespath.search(expr, self.__data)

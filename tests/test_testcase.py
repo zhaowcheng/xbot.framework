@@ -87,7 +87,7 @@ class TestTestCase(unittest.TestCase):
         with open(caseinst.abspath, encoding='utf8') as f:
             self.assertEqual(caseinst.sourcecode, f.read())
         self.assertEqual(caseinst.skipped, False)
-        self.assertEqual(caseinst.steps, ['step1', 'step2', 'step3'])
+        self.assertEqual(caseinst.steps, ['step1', 'step2', 'step3', 'step4', 'step5'])
         self.assertIsInstance(caseinst.starttime, datetime)
         self.assertIsInstance(caseinst.endtime, datetime)
         self.assertIsInstance(caseinst.duration, timedelta)

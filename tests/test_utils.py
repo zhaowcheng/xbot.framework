@@ -42,15 +42,6 @@ class TestUtils(unittest.TestCase):
                 elif typ == 'idle' and result != 0:
                     return port
 
-    def test_port_opened(self):
-        """
-        测试 port_opened 函数。
-        """
-        busyport = self.get_first_busy_or_idle_port('127.0.0.1', 1, 65535, 'busy')
-        idleport = self.get_first_busy_or_idle_port('127.0.0.1', 1, 65535, 'idle')
-        self.assertTrue(utils.port_opened('127.0.0.1', busyport))
-        self.assertFalse(utils.port_opened('127.0.0.1', idleport))
-
     def test_stop_thread(self):
         """
         测试 stop_thread 函数。

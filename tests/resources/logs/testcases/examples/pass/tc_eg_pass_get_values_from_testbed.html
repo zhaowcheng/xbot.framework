@@ -91,6 +91,7 @@
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
 from lib.testcase import TestCase
 
+
 class tc_eg_pass_get_values_from_testbed(TestCase):
     """
     Get information from the testbed and perform checks.
@@ -114,9 +115,9 @@ class tc_eg_pass_get_values_from_testbed(TestCase):
 
     def step2(self):
         """
-        Expect the value of `example.key2.key2-1` to be `value2-1`.
+        Expect the value of `example.key2."key2-1"` to be `value2-1`.
         """
-        value2 = self.testbed.get('example.key2.key2-1')
+        value2 = self.testbed.get('example.key2."key2-1"')
         assertx(value2, '==', 'value2-1')
 
     def step3(self):
@@ -126,6 +127,20 @@ class tc_eg_pass_get_values_from_testbed(TestCase):
         value3 = self.testbed.get('example.key3[1]')
         assertx(value3, '==', 'value3-2')
 
+    def step4(self):
+        """
+        Expect the value of `example.key4[?name=='jack']` to be `[{'name': 'jack', 'age', '20'}]`.
+        """
+        value4 = self.testbed.get("example.key4[?name=='jack']")
+        assertx(value4, '==', [{'name': 'jack', 'age': 20}])
+
+    def step5(self):
+        """
+        Expect the value of `example.key4[?name=='lily']` to be `[]`.
+        """
+        value5 = self.testbed.get("example.key5[?name=='lily']")
+        assertx(value5, '==', None)
+
     def teardown(self):
         """
         Clean up test environment.
@@ -134,7 +149,7 @@ class tc_eg_pass_get_values_from_testbed(TestCase):
 </pre>
                     </td>
                     <td colspan="3" rowspan="5">
-                        <pre id="testbed" style="overflow-y: scroll;"># Testbeds are used to store the information about the test environment.
+                        <pre id="testbed" style="overflow-y: scroll;"># Testbed is used to store the information about the test environment.
 # The information can be accessed by self.testbed.get() in the testcases.
 example:
   key1: value1
@@ -145,6 +160,11 @@ example:
     - value3-1
     - value3-2
     - value3-3
+  key4:
+    - name: jack
+      age: 20
+    - name: tom
+      age: 30
 </pre>
                     </td>
                 </tr>
@@ -154,11 +174,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-06-25 19:17:14</td>
+                    <td id="starttime" colspan="2">2024-07-02 12:10:30</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-06-25 19:17:15</td>
+                    <td id="endtime" colspan="2">2024-07-02 12:10:31</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -199,9 +219,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-06-25 19:17:14,783</td>
+                        <td>2024-07-02 12:10:30,349</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:23</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:24</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value1 == value1</pre>
                             
@@ -226,9 +246,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-06-25 19:17:14,784</td>
+                        <td>2024-07-02 12:10:30,351</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:30</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:31</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value2-1 == value2-1</pre>
                             
@@ -253,11 +273,65 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-06-25 19:17:14,784</td>
+                        <td>2024-07-02 12:10:30,351</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:37</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:38</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value3-2 == value3-2</pre>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <br>
+            <br>
+            
+            <div>
+                <button>step4</button>
+            </div>
+            <div id="step4">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="INFO">
+                        <td>2024-07-02 12:10:30,351</td>
+                        <td>INFO</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:45</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>AssertionOK: [{'name': 'jack', 'age': 20}] == [{'name': 'jack', 'age': 20}]</pre>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <br>
+            <br>
+            
+            <div>
+                <button>step5</button>
+            </div>
+            <div id="step5">
+                <table>
+                    <tr style="height: 25px;">
+                        <th class="asctime">time</th>
+                        <th class="levelname">level</th>
+                        <th class="location">location</th>
+                        <th class="message">message</th>
+                    </tr>
+                    
+                    <tr class="INFO">
+                        <td>2024-07-02 12:10:30,352</td>
+                        <td>INFO</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:52</td>
+                        <td style="padding-left: 0.5%;">
+                            <pre>AssertionOK: None == None</pre>
                             
                         </td>
                     </tr>
@@ -280,9 +354,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-06-25 19:17:14,784</td>
+                        <td>2024-07-02 12:10:30,352</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:43</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:58</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

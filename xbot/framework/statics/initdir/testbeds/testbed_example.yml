@@ -9,3 +9,8 @@ example:
     - value3-1
     - value3-2
     - value3-3
+  key4:
+    - name: jack
+      age: 20
+    - name: tom
+      age: 30
