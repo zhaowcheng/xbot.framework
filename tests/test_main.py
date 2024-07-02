@@ -18,13 +18,13 @@ from xbot.framework.version import __version__
 
 class TestMain(unittest.TestCase):
     """
-    测试 main 模块。
+    Unit tests for main module.
     """
     @classmethod
     def setUpClass(cls) -> None:
         cls.workdir = tempfile.mktemp()
         shutil.copytree(INIT_DIR, cls.workdir)
-        # 将用例执行时的控制台日志重定向到 StringIO
+        # Hide console output.
         for hdlr in ROOT_LOGGER.handlers:
             if isinstance(hdlr, logging.StreamHandler) \
                     and hdlr.stream in [sys.stdout, sys.stderr]:
@@ -36,7 +36,7 @@ class TestMain(unittest.TestCase):
 
     def samedir(self, dir1: str, dir2: str) -> bool:
         """
-        比较两个目录是否相同。
+        Compare two directories recursively.
         """
         dcmp = filecmp.dircmp(dir1, dir2, ignore=None, hide=None)
         return (

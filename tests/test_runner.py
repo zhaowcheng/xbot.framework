@@ -19,7 +19,7 @@ from xbot.framework.logger import ROOT_LOGGER
 
 class TestRunner(unittest.TestCase):
     """
-    测试 runner 模块。
+    Unit tests for runner module.
     """
     @classmethod
     def setUpClass(cls) -> None:
@@ -29,7 +29,7 @@ class TestRunner(unittest.TestCase):
             TestBed(os.path.join(cls.workdir, 'testbeds', 'testbed_example.yml')),
             TestSet(os.path.join(cls.workdir, 'testsets', 'testset_example.yml'))
         )
-        # 将用例执行时的控制台日志重定向到 StringIO
+        # Hide console output.
         for hdlr in ROOT_LOGGER.handlers:
             if isinstance(hdlr, logging.StreamHandler) \
                     and hdlr.stream in [sys.stdout, sys.stderr]:
@@ -41,9 +41,9 @@ class TestRunner(unittest.TestCase):
 
     def get_case_result_from_logfile(self, logfile: str):
         """
-        从用例日志中获取测试用例的执行结果。
+        Get the result of a testcase from its log file.
 
-        :param logfile: 用例日志路径。
+        :param logfile: The path of the log file.
         """
         with open(logfile, 'r', encoding='utf8') as f:
             m = re.search(rf'<td id="result" colspan="2">(.+)</td>', f.read())
@@ -51,7 +51,7 @@ class TestRunner(unittest.TestCase):
 
     def test_run(self):
         """
-        测试 run 函数。
+        Test `Runner.run` method.
         """
         with utils.cd(self.workdir):
             with patch('sys.stdout', new_callable=StringIO):

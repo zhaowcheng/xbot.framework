@@ -12,11 +12,11 @@ from xbot.framework.logger import (XLogger, StdoutFilter, CaseLogFilter,
 
 class TestLogger(unittest.TestCase):
     """
-    logger 模块单元测试。
+    Unit tests for logger module.
     """
     def test_xlogger_stacklevel(self):
         """
-        测试 stacklevel 参数。
+        Test stacklevel parameter of XLogger.
         """
         logger = XLogger('test_xlogger')
         strio = StringIO()
@@ -41,13 +41,13 @@ class TestLogger(unittest.TestCase):
 
     def test_logging_logger_class(self):
         """
-        检查 logging 的 LoggerClass 是否为 XLogger。
+        Expect the return type of logging.getLoggerClass() to be XLogger.
         """
         self.assertEqual(logging.getLoggerClass(), XLogger)
         
     def test_stdout_filter(self):
         """
-        测试 StdoutFilter。
+        Test `StdoutFilter` class.
         """
         filter_ = StdoutFilter()
         self.assertTrue(filter_.filter(logging.makeLogRecord({'levelno': logging.DEBUG })))
@@ -58,7 +58,7 @@ class TestLogger(unittest.TestCase):
             
     def test_case_log_filter(self):
         """
-        测试 CaseLogFilter。
+        Test `CaseLogFilter`.
         """
         filter_ = CaseLogFilter()
         record = logging.makeLogRecord({ 'threadName': 'test_thread' })
@@ -69,7 +69,7 @@ class TestLogger(unittest.TestCase):
 
     def test_case_log_handler(self):
         """
-        测试 CaseLogHandler。
+        Test `CaseLogHandler` class.
         """
         handler = CaseLogHandler()
 
@@ -88,7 +88,7 @@ class TestLogger(unittest.TestCase):
 
     def test_getlogger(self):
         """
-        测试 getlogger。
+        Test `getlogger` function.
         """
         logger = getlogger('test_module')
         self.assertIsInstance(logger, XLogger)
