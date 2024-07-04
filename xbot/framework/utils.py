@@ -9,16 +9,16 @@ import re
 import sys
 import ctypes
 import operator
-import socket
 
 import jinja2
 
-from typing import Any, Iterator, Tuple, List
-from functools import reduce, partial
+from typing import Any, Iterator, Tuple, List, TypeVar
+from functools import partial
 from contextlib import contextmanager
 
 from xbot.framework.logger import getlogger
 
+T = TypeVar('T')
 
 logger = getlogger(__name__)
 
@@ -107,123 +107,36 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     """
     Split deepkey by `sep`.
 
+    :param deepkey: multi-level key.
+    :param sep: separator.
+    :return: list of keys.
+
     >>> parse_deepkey('a.b1')
     ['a', 'b1']
     >>> parse_deepkey('a.b2[0]')
     ['a', 'b2', 0]
     >>> parse_deepkey('a.b2[0].c2')
     ['a', 'b2', 0, 'c2']
-
-    :param deepkey: multi-level key.
-    :param sep: separator.
-    :return: list of keys.
+    >>> parse_deepkey('a.b2[x=1].c2')
+    ['a', 'b2', {'x': 1}, 'c2']
+    >>> parse_deepkey('a.b2[x=1, y="z"].c2')
+    ['a', 'b2', {'x': 1, 'y': 'z'}, 'c2']
     """
     keys = []
     for k in re.split(r'%s|\[' % re.escape(sep), deepkey):
-        if k.endswith(']') and k[:-1].isdigit():
-            keys.append(int(k[:-1]))
+        if k.endswith(']'):
+            k = k[:-1]
+            if k.isdigit():
+                keys.append(int(k))
+            else:
+                try:
+                    keys.append(eval(f'dict({k})'))
+                except SyntaxError as e:
+                    raise SyntaxError(f'Invalid expr `{k}` in deepkey `{deepkey}`: {str(e)}.')
         else:
             keys.append(k)
     return keys
 
-
-def deepget(obj, deepkey: str, sep: str = '.') -> Any:
-    """
-    Get value from `obj` by deepkey.
-
-    >>> d = {
-    ...     'a': {
-    ...         'b1': 'c',
-    ...         'b2': [1, 2, 3]
-    ...      }
-    ... }
-    >>> deepget(d, 'a.b1')
-    'c'
-    >>> deepget(d, 'a.b2[0]')
-    1
-
-    :param obj: object.
-    :param deepkey: multi-level key.
-    :param sep: separator.
-    :return: value.
-    """
-    keys = parse_deepkey(deepkey, sep)
-    return reduce(operator.getitem, keys, obj)
-
-
-def deepset(obj: Any, deepkey: str, value: Any, sep: str = '.') -> None:
-    """
-    Set value to `obj` by deepkey.
-    Automatically create missing keys.
-
-    >>> d = {
-    ...     'a': {
-    ...         'b1': 'c',
-    ...         'b2': [1, 2, 3]
-    ...      }
-    ... }
-    >>> deepset(d, 'a.b1', 'd')
-    >>> d
-    {'a': {'b1': 'd', 'b2': [1, 2, 3]}}
-    >>> deepset(d, 'a.b2[0]', '-1')
-    >>> d
-    {'a': {'b1': 'd', 'b2': ['-1', 2, 3]}}
-    >>> deepset(d, 'i.j', 'x')
-    >>> d
-    {'a': {'b1': 'd', 'b2': ['-1', 2, 3]}, 'i': {'j': 'x'}}
-
-    :param obj: object.
-    :param deepkey: multi-level key.
-    :param value: value to set.
-    :param sep: separator.
-    """
-    keys = parse_deepkey(deepkey, sep)
-    for k in keys[:-1]:
-        try:
-            obj = operator.getitem(obj, k)
-        except KeyError:
-            obj[k] = {}
-            obj = obj[k]
-    operator.setitem(obj, keys[-1], value)
-
-
-def ip_reachable(ip: str) -> bool:
-    """
-    Check if IP is reachable.
-
-    >>> ip_reachable('127.0.0.1')
-    True
-    >>> ip_reachable('128.0.0.1')
-    False
-
-    :param ip: IP address.
-    :return: reachable return True, otherwise False.
-    """
-    try:
-        conn = socket.create_connection((ip, 22), 0.1)
-        conn.close()
-        return True
-    except ConnectionRefusedError:
-        return True
-    except:
-        return False
-
-
-def port_opened(ip: str, port: int) -> bool:
-    """
-    Check if port is opened.
-
-    :param ip: IP address.
-    :param port: port number.
-    :return: opened return True, otherwise False.
-    """
-    try:
-        conn = socket.create_connection((ip, port), 0.1)
-        conn.close()
-        return True
-    except:
-        return False
-    
 
 def wrapstr(s: str, title: str = '') -> str:
     """

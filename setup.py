@@ -24,13 +24,13 @@ def find_requires():
 
 def find_long_description():
     desc = ''
-    for readme in ('README.rst', 'README.zh.rst'):
+    for readme in ('README.md', 'README.zh.md'):
         if desc:
-            desc += '\n' + '-' * 80 + '\n\n'
+            desc += '\n***\n\n'
         with open(readme, encoding='utf8') as f:
-            desc += ''.join(f.readlines()[4:])
-    desc = desc.replace('github.com/zhaowcheng/xbot.framework/blob/master',
-                        f'github.com/zhaowcheng/xbot.framework/blob/v{find_version()}')
+            desc += ''.join(f.readlines()[6:])
+    desc = desc.replace('/blob/master/',
+                        f'/blob/v{find_version()}/')
     return desc
 
 
@@ -39,7 +39,7 @@ setup(
     version=find_version(),
     description='A lightweight, easy-to-use, and extensible automation testing framework.',
     long_description=find_long_description(),
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     author='zhaowcheng',
     author_email='zhaowcheng@163.com',
     install_requires=find_requires(),

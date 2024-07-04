@@ -10,11 +10,11 @@ OKREPORT = os.path.join(LOGDIR, 'report.ok.html')
 
 class TestReport(unittest.TestCase):
     """
-    report 模块单元测试。
+    Unit tests for report module.
     """
     def test_gen_report(self):
         """
-        测试 gen_report 函数。
+        Test `gen_report` function.
         """
         report, _ = gen_report(LOGDIR)
         with open(report, encoding='utf8') as f1:

@@ -2,7 +2,6 @@ import unittest
 import doctest
 import socket
 import threading
-import tempfile
 import time
 import sys
 import os
@@ -21,39 +20,11 @@ def load_tests(loader, tests, ignore):
 
 class TestUtils(unittest.TestCase):
     """
-    utils 模块单元测试。
+    Unit tests for utils module.
     """
-    def get_first_busy_or_idle_port(
-            self, 
-            ip: str,
-            start: int, 
-            end: int,
-            typ: str
-        ) -> int:
-        """
-        获取主机第一个占用或空闲的端口。
-        """
-        for port in range(start, end):
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.settimeout(0.1)
-                result = sock.connect_ex((ip, port))
-                if typ == 'busy' and result == 0:
-                    return port
-                elif typ == 'idle' and result != 0:
-                    return port
-
-    def test_port_opened(self):
-        """
-        测试 port_opened 函数。
-        """
-        busyport = self.get_first_busy_or_idle_port('127.0.0.1', 1, 65535, 'busy')
-        idleport = self.get_first_busy_or_idle_port('127.0.0.1', 1, 65535, 'idle')
-        self.assertTrue(utils.port_opened('127.0.0.1', busyport))
-        self.assertFalse(utils.port_opened('127.0.0.1', idleport))
-
     def test_stop_thread(self):
         """
-        测试 stop_thread 函数。
+        Test `stop_thread` function.
         """
         def func():
             while True:
@@ -66,7 +37,7 @@ class TestUtils(unittest.TestCase):
 
     def test_xprint_without_color(self):
         """
-        测试 xprint 不带颜色。
+        Test `xprint` without color.
         """
         with patch('sys.stdout', new_callable=StringIO) as mockout:
             s = 'Hello World!'
@@ -75,7 +46,7 @@ class TestUtils(unittest.TestCase):
 
     def test_xprint_with_color(self):
         """
-        测试 xprint 带颜色。
+        Test `xprint` with color.
         """
         with patch('sys.stdout', new_callable=StringIO) as mockout:
             s = 'Hello World!'
@@ -85,7 +56,7 @@ class TestUtils(unittest.TestCase):
             
     def test_xprint_with_exit(self):
         """
-        测试 xprint 后退出。
+        Test `xprint` with exit.
         """
         with patch('sys.stdout', new_callable=StringIO) as mockout:
             with self.assertRaises(SystemExit) as cm:
@@ -95,7 +66,7 @@ class TestUtils(unittest.TestCase):
 
     def test_printerr(self):
         """
-        测试 printerr 函数。
+        Test `printerr` function.
         """
         with patch('sys.stderr', new_callable=StringIO) as mockerr:
             with self.assertRaises(SystemExit) as cm:
@@ -107,7 +78,7 @@ class TestUtils(unittest.TestCase):
                 
     def test_cd(self):
         """
-        测试 cd 函数。
+        Test `cd` context manager.
         """
         cwd = os.getcwd()
         parent = os.path.dirname(cwd)

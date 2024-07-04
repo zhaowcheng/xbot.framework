@@ -19,7 +19,7 @@ from xbot.framework.logger import ROOT_LOGGER
 
 class TestTestCase(unittest.TestCase):
     """
-    测试 “测试用例基类”。
+    Unit tests for testcase module.
     """
     @classmethod
     def setUpClass(cls) -> None:
@@ -31,7 +31,7 @@ class TestTestCase(unittest.TestCase):
                                            'testbed_example.yml'))
         cls.testset = TestSet(os.path.join(cls.workdir, 'testsets', 
                                            'testset_example.yml'))
-        # 将用例执行时的控制台日志重定向到 StringIO
+        # Hide console output.
         for hdlr in ROOT_LOGGER.handlers:
             if isinstance(hdlr, logging.StreamHandler) \
                     and hdlr.stream in [sys.stdout, sys.stderr]:
@@ -44,13 +44,14 @@ class TestTestCase(unittest.TestCase):
 
     def instcase(self, parent: str, caseid: str) -> TestCase:
         """
-        实例化测试用例。
+        Instantiate a testcase class.
 
-        通过 importlib.util 来导入，避免批量执行所有单元测试的情况下导入
-        了别的测试模块中已导入的用例（import 导入同名模块时会用已导入的缓存）
+        Use importlib.util to import, to avoid importing the cases that have
+        been imported in other test modules (importing the same module will
+        use the cached one).
 
-        :param parent: 测试用例所在父目录：pass/nonpass。
-        :param caseid: 测试用例 id。
+        :param parent: The parent directory of the testcase: `pass`/`nonpass`.
+        :param caseid: Testcase id.
         """
         name = f'testcases.examples.{parent}.{caseid}'
         path = os.path.join(self.workdir, 'testcases', 'examples',
@@ -87,7 +88,7 @@ class TestTestCase(unittest.TestCase):
         with open(caseinst.abspath, encoding='utf8') as f:
             self.assertEqual(caseinst.sourcecode, f.read())
         self.assertEqual(caseinst.skipped, False)
-        self.assertEqual(caseinst.steps, ['step1', 'step2', 'step3'])
+        self.assertEqual(caseinst.steps, ['step1', 'step2', 'step3', 'step4', 'step5'])
         self.assertIsInstance(caseinst.starttime, datetime)
         self.assertIsInstance(caseinst.endtime, datetime)
         self.assertIsInstance(caseinst.duration, timedelta)

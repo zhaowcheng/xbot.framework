@@ -1,5 +1,5 @@
 """
-单元测试执行脚本。
+Entry point for running all tests in the tests directory.
 """
 
 import unittest
