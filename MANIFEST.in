@@ -1,3 +1,2 @@
-recursive-include xbot/framework/statics *
-include requirements.txt
-include README*
+include README.md
+include README.zh.md

@@ -12,9 +12,10 @@ import operator
 
 import jinja2
 
-from typing import Any, Iterator, Tuple, List, TypeVar
+from typing import Any, Callable, Iterator, TypeVar
 from functools import partial
 from contextlib import contextmanager
+from threading import Thread
 
 from xbot.framework.logger import getlogger
 
@@ -28,14 +29,14 @@ class ColorText(object):
     Colored text output.
     """
 
-    COLORS = {
+    COLORS: dict[str, str] = {
         'red': '31m',
         'green': '32m',
         'yellow': '33m'
     }
 
     @staticmethod
-    def wrap(s, color):
+    def wrap(s: object, color: str) -> str:
         """
         Wrap string `s` with color.
         """
@@ -45,7 +46,7 @@ class ColorText(object):
         return '\033[%s%s\033[39m' % (code, s)
 
 
-def xprint(*values, **kwargs) -> None:
+def xprint(*values: object, **kwargs: Any) -> None:
     """
     Custom print function.
 
@@ -58,7 +59,7 @@ def xprint(*values, **kwargs) -> None:
     do_exit = kwargs.pop('do_exit', False)
     exit_code = kwargs.pop('exit_code', 0)
     if color:
-        values = [ColorText.wrap(v, color) for v in values]
+        values = tuple(ColorText.wrap(v, color) for v in values)
     print(*values, **kwargs)
     if do_exit:
         exit(exit_code)
@@ -67,7 +68,7 @@ def xprint(*values, **kwargs) -> None:
 printerr = partial(xprint, file=sys.stderr, color='red', do_exit=True, exit_code=1)
 
 
-def render_write(template: str, outfile: str, **kwargs) -> None:
+def render_write(template: str, outfile: str, **kwargs: Any) -> None:
     """
     Render `template` and write to `outfile`.
     
@@ -84,7 +85,10 @@ def render_write(template: str, outfile: str, **kwargs) -> None:
         fp.write(rendered_content)
 
 
-def stop_thread(thread, exc=SystemExit) -> None:
+def stop_thread(
+    thread: Thread,
+    exc: type[BaseException] = SystemExit
+) -> None:
     """
     Stop a thread by raising an exception in the thread.
     
@@ -93,17 +97,23 @@ def stop_thread(thread, exc=SystemExit) -> None:
     :raises SystemError: if stop thread failed.
             ValueError: if invalid thread id.
     """
+    if thread.ident is None:
+        raise ValueError("Invalid thread id 'None'")
+    thread_id = thread.ident
     r = ctypes.pythonapi.PyThreadState_SetAsyncExc(
-            ctypes.c_long(thread.ident), ctypes.py_object(exc))
+            ctypes.c_long(thread_id), ctypes.py_object(exc))
     if r == 0:
         raise ValueError("Invalid thread id '%s'" % thread.ident)
     if r != 1:
         ctypes.pythonapi.PyThreadState_SetAsyncExc(
-            ctypes.c_long(thread.ident), None)
+            ctypes.c_long(thread_id), None)
         raise SystemError("Stop thread '%s' failed" % thread.name)
 
 
-def parse_deepkey(deepkey: str, sep: str = '.') -> list:
+def parse_deepkey(
+    deepkey: str,
+    sep: str = '.'
+) -> list[str | int | dict[str, Any]]:
     """
     Split deepkey by `sep`.
 
@@ -122,7 +132,7 @@ def parse_deepkey(deepkey: str, sep: str = '.') -> list:
     >>> parse_deepkey('a.b2[x=1, y="z"].c2')
     ['a', 'b2', {'x': 1, 'y': 'z'}, 'c2']
     """
-    keys = []
+    keys: list[str | int | dict[str, Any]] = []
     for k in re.split(r'%s|\[' % re.escape(sep), deepkey):
         if k.endswith(']'):
             k = k[:-1]
@@ -168,7 +178,7 @@ def wrapstr(s: str, title: str = '') -> str:
     ])
 
 
-def ordered_walk(path: str) -> Iterator[Tuple[str, List[str], List[str]]]:
+def ordered_walk(path: str) -> Iterator[tuple[str, list[str], list[str]]]:
     """
     Walk through the directory in order(ascii).
 
@@ -215,7 +225,7 @@ def assertx(
         a: Any, 
         op: str, 
         b: Any, 
-        errmsg: str = None, 
+        errmsg: str | None = None,
         verbose: bool = True
     ) -> None:
     """
@@ -244,7 +254,7 @@ def assertx(
     :raises AssertionError: if assertion failed.
             ValueError: if invalid operator.
     """
-    funcs = {
+    funcs: dict[str, Callable[[Any, Any], Any]] = {
         '==': operator.eq,
         '!=': operator.ne,
         '>': operator.gt,
@@ -271,7 +281,7 @@ def assertx(
 
 
 @contextmanager
-def cd(path):
+def cd(path: str) -> Iterator[None]:
     """
     Change directory, support context manager(like `with`).
 

@@ -10,8 +10,10 @@ import shutil
 import argparse
 
 from importlib import import_module
+from typing import cast
 
 from xbot.framework.version import __version__
+from xbot.framework.testbed import TestBed
 from xbot.framework.testset import TestSet
 from xbot.framework.runner import Runner
 from xbot.framework.report import gen_report
@@ -70,7 +72,7 @@ def run(testbed: str, testset: str, outfmt: str = 'brief') -> None:
         printerr("No `testcases` directory in current directory, "
                  "maybe current is not a project directory.")
     sys.path.insert(0, os.getcwd())
-    tb = import_module('lib.testbed').TestBed(testbed)
+    tb = cast(TestBed, import_module('lib.testbed').TestBed(testbed))
     ts = TestSet(testset)
     runner = Runner(tb, ts)
     logdir = runner.run(outfmt)

@@ -1,3 +1,53 @@
 [build-system]
-requires = ["setuptools>=40.6"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "xbot.framework"
+dynamic = ["version", "readme"]
+description = "A lightweight, easy-to-use, and extensible automation testing framework."
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [
+    { name = "zhaowcheng", email = "zhaowcheng@163.com" },
+]
+dependencies = [
+    "jinja2",
+    "ruamel.yaml",
+    "jmespath",
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+xbot = "xbot.framework.main:main"
+
+[project.urls]
+Homepage = "https://github.com/zhaowcheng/xbot.framework"
+Issues = "https://github.com/zhaowcheng/xbot.framework/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["xbot.framework*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"xbot.framework" = [
+    "py.typed",
+    "statics/*.html",
+    "statics/*.png",
+    "statics/initdir/.gitignore",
+    "statics/initdir/*.md",
+    "statics/initdir/*.txt",
+    "statics/initdir/**/*.py",
+    "statics/initdir/**/*.yml",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "xbot.framework.version.__version__" }

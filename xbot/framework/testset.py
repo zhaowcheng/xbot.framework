@@ -6,6 +6,8 @@ Testcase list management.
 
 import os
 
+from typing import Any
+
 from ruamel import yaml
 
 from xbot.framework.utils import ordered_walk
@@ -16,16 +18,16 @@ class TestSet(object):
     """
     Testcase list manager.
     """
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str) -> None:
         """
         :param filepath: testset filepath.
         """
-        self._data = self._parse(filepath)
-        self._include_tags = None
-        self._exclude_tags = None
-        self._paths = None
+        self._data: dict[str, Any] = self._parse(filepath)
+        self._include_tags: list[str] | None = None
+        self._exclude_tags: list[str] | None = None
+        self._paths: list[str] | None = None
 
-    def _parse(self, filepath: str) -> dict:
+    def _parse(self, filepath: str) -> dict[str, Any]:
         """
         Parse testset.
         """
@@ -50,7 +52,7 @@ class TestSet(object):
             return data
 
     @property
-    def include_tags(self) -> tuple:
+    def include_tags(self) -> tuple[str, ...]:
         """
         tags used to include testcases.
         """
@@ -59,7 +61,7 @@ class TestSet(object):
         return tuple(self._include_tags)
 
     @property
-    def exclude_tags(self) -> tuple:
+    def exclude_tags(self) -> tuple[str, ...]:
         """
         tags used to exclude testcases.
         """
@@ -68,7 +70,7 @@ class TestSet(object):
         return tuple(self._exclude_tags)
 
     @property
-    def paths(self) -> tuple:
+    def paths(self) -> tuple[str, ...]:
         """
         testcase filepath(relative) list.
         """

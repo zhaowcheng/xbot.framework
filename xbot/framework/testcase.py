@@ -12,7 +12,7 @@ import re
 import time
 import inspect
 
-from typing import List
+from typing import Any, ClassVar
 from datetime import datetime, timedelta
 from importlib import import_module
 from threading import Thread
@@ -28,26 +28,33 @@ class TestCase(object):
     Testcase base.
     """
     # Maximum execution time(seconds), exceeding will be forced to end.
-    TIMEOUT = 60
+    TIMEOUT: ClassVar[int] = 60
     # If True, skip all unexecuted steps when a failure occurs.
-    FAILFAST = True
+    FAILFAST: ClassVar[bool] = True
     # For testcase filtering.
-    TAGS = []
+    TAGS: ClassVar[list[str]] = []
 
-    def __init__(self, testbed: TestBed, testset: TestSet, logroot: str):
+    def __init__(
+        self,
+        testbed: TestBed,
+        testset: TestSet,
+        logroot: str
+    ) -> None:
         """
         :param testbed: TestBed instance.
         :param logroot: testcase logdir.
         """
-        self.__testbed = testbed
-        self.__testset = testset
-        self.__logroot = logroot
-        self.__starttime = None
-        self.__endtime = None
-        self.__duration = None
-        self.__result = None
-        self.__logger = logger.getlogger(self.caseid)
-        self.__loghdlr = logger.CaseLogHandler(logging.DEBUG)
+        self.__testbed: TestBed = testbed
+        self.__testset: TestSet = testset
+        self.__logroot: str = logroot
+        self.__starttime: datetime | None = None
+        self.__endtime: datetime | None = None
+        self.__duration: timedelta | None = None
+        self.__result: str | None = None
+        self.__logger: logger.XLogger = logger.getlogger(self.caseid)
+        self.__loghdlr: logger.CaseLogHandler = logger.CaseLogHandler(
+            logging.DEBUG
+        )
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
         self.__loghdlr.setFormatter(logger.FORMATTER)
         logger.ROOT_LOGGER.addHandler(self.__loghdlr)
@@ -71,7 +78,10 @@ class TestCase(object):
         """
         Absolute path of testcase file.
         """
-        return sys.modules[self.__module__].__file__
+        filepath = sys.modules[self.__module__].__file__
+        if filepath is None:
+            raise RuntimeError(f'No source file found for {self.__module__}')
+        return filepath
     
     @property
     def relpath(self) -> str:
@@ -104,32 +114,34 @@ class TestCase(object):
         """
         etags = self.__testset.exclude_tags
         itags = self.__testset.include_tags
-        return (etags and not set(etags).isdisjoint(self.TAGS)) or \
-               (itags and set(itags).isdisjoint(self.TAGS))
+        return bool(
+            (etags and not set(etags).isdisjoint(self.TAGS))
+            or (itags and set(itags).isdisjoint(self.TAGS))
+        )
     
     @property
-    def steps(self) -> List[str]:
+    def steps(self) -> list[str]:
         """
         Testcase steps.
         """
         return sorted([n for n in dir(self.__class__) if re.match(r'step\d+', n)])
     
     @property
-    def starttime(self) -> datetime:
+    def starttime(self) -> datetime | None:
         """
         Start execution time.
         """
         return self.__starttime
 
     @property
-    def endtime(self) -> datetime:
+    def endtime(self) -> datetime | None:
         """
         End execution time.
         """
         return self.__endtime
 
     @property
-    def duration(self) -> timedelta:
+    def duration(self) -> timedelta | None:
         """
         Execution duration.
         """
@@ -140,38 +152,40 @@ class TestCase(object):
         """
         <caseid>_<starttime>
         """
+        if self.starttime is None:
+            raise RuntimeError('Testcase has not started')
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
 
     @property
-    def result(self) -> str:
+    def result(self) -> str | None:
         """
         Testcase result.
         """
         return self.__result
     
-    def debug(self, msg, *args, **kwargs):
+    def debug(self, msg: object, *args: Any, **kwargs: Any) -> None:
         """
         debug level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.debug(msg, *args, **kwargs)
 
-    def info(self, msg, *args, **kwargs):
+    def info(self, msg: object, *args: Any, **kwargs: Any) -> None:
         """
         info level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.info(msg, *args, **kwargs)
 
-    def warn(self, msg, *args, **kwargs):
+    def warn(self, msg: object, *args: Any, **kwargs: Any) -> None:
         """
         warn level log.
         """
         kwargs['stacklevel'] = kwargs.get('stacklevel', 2)
         self.__logger.warning(msg, *args, **kwargs)
 
-    def error(self, msg, *args, **kwargs):
+    def error(self, msg: object, *args: Any, **kwargs: Any) -> None:
         """
         error level log.
         """
@@ -235,7 +249,7 @@ class TestCase(object):
                         self.__run_stage(step)
             self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
-        self.__duration = self.endtime - self.starttime
+        self.__duration = self.__endtime - self.__starttime
         self.__result = self.__result or 'PASS'
         self.__dump_log()
         logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
@@ -265,6 +279,8 @@ class TestCase(object):
         """
         Save logs to html file.
         """
+        if self.starttime is None or self.endtime is None:
+            raise RuntimeError('Testcase execution time is incomplete')
         os.makedirs(os.path.dirname(self.logfile), exist_ok=True)
         utils.render_write(
             common.LOG_TEMPLATE,

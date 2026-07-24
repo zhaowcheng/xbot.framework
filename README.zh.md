@@ -226,10 +226,8 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
 ## 插件
 
-| Name                                                               | Description                           |
-|--------------------------------------------------------------------|---------------------------------------|
-| [xbot.plugins.ssh](https://github.com/zhaowcheng/xbot.plugins.ssh) | SSH library for xbot.framework        |
-| xbot.plugins.http(`planning`)                                      | HTTP library for xbot.framework       |
-| xbot.plugins.wui(`planning`)                                       | WebUI library for xbot.framework      |
-| xbot.plugins.gui(`planning`)                                       | GUI library for xbot.framework        |
-| xbot.plugins.pgsql(`planning`)                                     | PostgreSQL library for xbot.framework |
+| Name | Description |
+|------|-------------|
+| [xbot.plugins.ssh](https://github.com/zhaowcheng/xbot.plugins.ssh) | SSH library for xbot.framework |
+| [xbot.plugins.pgsql](https://github.com/zhaowcheng/xbot.plugins.pgsql) | PostgreSQL library for xbot.framework |
+| [xbot.plugins.docker](https://github.com/zhaowcheng/xbot.plugins.docker) | Docker library for xbot.framework |

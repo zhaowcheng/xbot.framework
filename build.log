@@ -1,0 +1,286 @@
+* Getting build dependencies for sdist...
+running egg_info
+creating xbot.framework.egg-info
+writing xbot.framework.egg-info/PKG-INFO
+writing dependency_links to xbot.framework.egg-info/dependency_links.txt
+writing entry points to xbot.framework.egg-info/entry_points.txt
+writing requirements to xbot.framework.egg-info/requires.txt
+writing top-level names to xbot.framework.egg-info/top_level.txt
+writing manifest file 'xbot.framework.egg-info/SOURCES.txt'
+reading manifest file 'xbot.framework.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'xbot.framework.egg-info/SOURCES.txt'
+* Building sdist...
+running sdist
+running egg_info
+writing xbot.framework.egg-info/PKG-INFO
+writing dependency_links to xbot.framework.egg-info/dependency_links.txt
+writing entry points to xbot.framework.egg-info/entry_points.txt
+writing requirements to xbot.framework.egg-info/requires.txt
+writing top-level names to xbot.framework.egg-info/top_level.txt
+reading manifest file 'xbot.framework.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'xbot.framework.egg-info/SOURCES.txt'
+running check
+creating xbot_framework-0.5.0rc1
+creating xbot_framework-0.5.0rc1/tests
+creating xbot_framework-0.5.0rc1/xbot.framework.egg-info
+creating xbot_framework-0.5.0rc1/xbot/framework
+creating xbot_framework-0.5.0rc1/xbot/framework/statics
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/lib
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testbeds
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/pass
+creating xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testsets
+copying files to xbot_framework-0.5.0rc1...
+copying LICENSE -> xbot_framework-0.5.0rc1
+copying MANIFEST.in -> xbot_framework-0.5.0rc1
+copying README.md -> xbot_framework-0.5.0rc1
+copying README.zh.md -> xbot_framework-0.5.0rc1
+copying pyproject.toml -> xbot_framework-0.5.0rc1
+copying setup.py -> xbot_framework-0.5.0rc1
+copying tests/test_logger.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_main.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_report.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_runner.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_testbed.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_testcase.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_testset.py -> xbot_framework-0.5.0rc1/tests
+copying tests/test_utils.py -> xbot_framework-0.5.0rc1/tests
+copying xbot.framework.egg-info/PKG-INFO -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot.framework.egg-info/SOURCES.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot.framework.egg-info/dependency_links.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot.framework.egg-info/entry_points.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot.framework.egg-info/requires.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot.framework.egg-info/top_level.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+copying xbot/framework/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/common.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/errors.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/logger.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/main.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/py.typed -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/report.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/runner.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/testbed.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/testcase.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/testset.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/utils.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/version.py -> xbot_framework-0.5.0rc1/xbot/framework
+copying xbot/framework/statics/log_example.png -> xbot_framework-0.5.0rc1/xbot/framework/statics
+copying xbot/framework/statics/log_template.html -> xbot_framework-0.5.0rc1/xbot/framework/statics
+copying xbot/framework/statics/report_example.png -> xbot_framework-0.5.0rc1/xbot/framework/statics
+copying xbot/framework/statics/report_template.html -> xbot_framework-0.5.0rc1/xbot/framework/statics
+copying xbot/framework/statics/initdir/.gitignore -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir
+copying xbot/framework/statics/initdir/README.md -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir
+copying xbot/framework/statics/initdir/requirements.txt -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir
+copying xbot/framework/statics/initdir/lib/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/lib/testbed.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/lib/testcase.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/testbeds/testbed_example.yml -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testbeds
+copying xbot/framework/statics/initdir/testcases/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases
+copying xbot/framework/statics/initdir/testcases/examples/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_clsname.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_true.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_false.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_timeout.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/pass/__init__.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testsets/testset_example.yml -> xbot_framework-0.5.0rc1/xbot/framework/statics/initdir/testsets
+copying xbot.framework.egg-info/SOURCES.txt -> xbot_framework-0.5.0rc1/xbot.framework.egg-info
+Writing xbot_framework-0.5.0rc1/setup.cfg
+Creating tar archive
+removing 'xbot_framework-0.5.0rc1' (and everything under it)
+* Building wheel from sdist
+* Getting build dependencies for wheel...
+running egg_info
+writing xbot.framework.egg-info/PKG-INFO
+writing dependency_links to xbot.framework.egg-info/dependency_links.txt
+writing entry points to xbot.framework.egg-info/entry_points.txt
+writing requirements to xbot.framework.egg-info/requires.txt
+writing top-level names to xbot.framework.egg-info/top_level.txt
+reading manifest file 'xbot.framework.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'xbot.framework.egg-info/SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/xbot/framework
+copying xbot/framework/runner.py -> build/lib/xbot/framework
+copying xbot/framework/version.py -> build/lib/xbot/framework
+copying xbot/framework/testcase.py -> build/lib/xbot/framework
+copying xbot/framework/__init__.py -> build/lib/xbot/framework
+copying xbot/framework/logger.py -> build/lib/xbot/framework
+copying xbot/framework/testset.py -> build/lib/xbot/framework
+copying xbot/framework/testbed.py -> build/lib/xbot/framework
+copying xbot/framework/common.py -> build/lib/xbot/framework
+copying xbot/framework/utils.py -> build/lib/xbot/framework
+copying xbot/framework/errors.py -> build/lib/xbot/framework
+copying xbot/framework/main.py -> build/lib/xbot/framework
+copying xbot/framework/report.py -> build/lib/xbot/framework
+creating build/lib/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/lib/testcase.py -> build/lib/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/lib/__init__.py -> build/lib/xbot/framework/statics/initdir/lib
+copying xbot/framework/statics/initdir/lib/testbed.py -> build/lib/xbot/framework/statics/initdir/lib
+creating build/lib/xbot/framework/statics/initdir/testcases
+copying xbot/framework/statics/initdir/testcases/__init__.py -> build/lib/xbot/framework/statics/initdir/testcases
+creating build/lib/xbot/framework/statics/initdir/testcases/examples
+copying xbot/framework/statics/initdir/testcases/examples/__init__.py -> build/lib/xbot/framework/statics/initdir/testcases/examples
+creating build/lib/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testcases/examples/pass/__init__.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/pass
+copying xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/pass
+creating build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/__init__.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_false.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_timeout.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_clsname.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_true.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.py -> build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass
+running egg_info
+writing xbot.framework.egg-info/PKG-INFO
+writing dependency_links to xbot.framework.egg-info/dependency_links.txt
+writing entry points to xbot.framework.egg-info/entry_points.txt
+writing requirements to xbot.framework.egg-info/requires.txt
+writing top-level names to xbot.framework.egg-info/top_level.txt
+reading manifest file 'xbot.framework.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'xbot.framework.egg-info/SOURCES.txt'
+copying xbot/framework/py.typed -> build/lib/xbot/framework
+copying xbot/framework/statics/log_template.html -> build/lib/xbot/framework/statics
+copying xbot/framework/statics/report_template.html -> build/lib/xbot/framework/statics
+copying xbot/framework/statics/report_example.png -> build/lib/xbot/framework/statics
+copying xbot/framework/statics/log_example.png -> build/lib/xbot/framework/statics
+copying xbot/framework/statics/initdir/.gitignore -> build/lib/xbot/framework/statics/initdir
+copying xbot/framework/statics/initdir/README.md -> build/lib/xbot/framework/statics/initdir
+copying xbot/framework/statics/initdir/requirements.txt -> build/lib/xbot/framework/statics/initdir
+creating build/lib/xbot/framework/statics/initdir/testbeds
+copying xbot/framework/statics/initdir/testbeds/testbed_example.yml -> build/lib/xbot/framework/statics/initdir/testbeds
+creating build/lib/xbot/framework/statics/initdir/testsets
+copying xbot/framework/statics/initdir/testsets/testset_example.yml -> build/lib/xbot/framework/statics/initdir/testsets
+installing to build/bdist.macosx-26.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-26.0-arm64/wheel
+creating build/bdist.macosx-26.0-arm64/wheel/xbot
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework
+copying build/lib/xbot/framework/runner.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testbeds
+copying build/lib/xbot/framework/statics/initdir/testbeds/testbed_example.yml -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testbeds
+copying build/lib/xbot/framework/statics/initdir/requirements.txt -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testsets
+copying build/lib/xbot/framework/statics/initdir/testsets/testset_example.yml -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testsets
+copying build/lib/xbot/framework/statics/initdir/README.md -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir
+copying build/lib/xbot/framework/statics/initdir/.gitignore -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/lib
+copying build/lib/xbot/framework/statics/initdir/lib/testcase.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/lib
+copying build/lib/xbot/framework/statics/initdir/lib/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/lib
+copying build/lib/xbot/framework/statics/initdir/lib/testbed.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/lib
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testcases
+copying build/lib/xbot/framework/statics/initdir/testcases/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testcases/examples
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testcases/examples/pass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/pass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/pass/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/pass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/pass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples
+creating build/bdist.macosx-26.0-arm64/wheel/xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_false.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_timeout.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_clsname.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_true.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics/initdir/testcases/examples/nonpass
+copying build/lib/xbot/framework/statics/report_example.png -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics
+copying build/lib/xbot/framework/statics/log_template.html -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics
+copying build/lib/xbot/framework/statics/log_example.png -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics
+copying build/lib/xbot/framework/statics/report_template.html -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework/statics
+copying build/lib/xbot/framework/version.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/testcase.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/__init__.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/logger.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/testset.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/testbed.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/common.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/utils.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/py.typed -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/errors.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/main.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+copying build/lib/xbot/framework/report.py -> build/bdist.macosx-26.0-arm64/wheel/./xbot/framework
+running install_egg_info
+Copying xbot.framework.egg-info to build/bdist.macosx-26.0-arm64/wheel/./xbot.framework-0.5.0rc1-py3.12.egg-info
+running install_scripts
+creating build/bdist.macosx-26.0-arm64/wheel/xbot_framework-0.5.0rc1.dist-info/WHEEL
+creating '/Users/zhaowcheng/Code/xbot.framework/dist/.tmp-et_zma33/xbot_framework-0.5.0rc1-py3-none-any.whl' and adding 'build/bdist.macosx-26.0-arm64/wheel' to it
+adding 'xbot/framework/__init__.py'
+adding 'xbot/framework/common.py'
+adding 'xbot/framework/errors.py'
+adding 'xbot/framework/logger.py'
+adding 'xbot/framework/main.py'
+adding 'xbot/framework/py.typed'
+adding 'xbot/framework/report.py'
+adding 'xbot/framework/runner.py'
+adding 'xbot/framework/testbed.py'
+adding 'xbot/framework/testcase.py'
+adding 'xbot/framework/testset.py'
+adding 'xbot/framework/utils.py'
+adding 'xbot/framework/version.py'
+adding 'xbot/framework/statics/log_example.png'
+adding 'xbot/framework/statics/log_template.html'
+adding 'xbot/framework/statics/report_example.png'
+adding 'xbot/framework/statics/report_template.html'
+adding 'xbot/framework/statics/initdir/.gitignore'
+adding 'xbot/framework/statics/initdir/README.md'
+adding 'xbot/framework/statics/initdir/requirements.txt'
+adding 'xbot/framework/statics/initdir/lib/__init__.py'
+adding 'xbot/framework/statics/initdir/lib/testbed.py'
+adding 'xbot/framework/statics/initdir/lib/testcase.py'
+adding 'xbot/framework/statics/initdir/testbeds/testbed_example.yml'
+adding 'xbot/framework/statics/initdir/testcases/__init__.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/__init__.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/__init__.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_clsname.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_error_syntax.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_true.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_false.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_fail_step_with_failfast_true.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_excluded.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_skip_not_included.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/nonpass/tc_eg_nonpass_timeout.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/pass/__init__.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py'
+adding 'xbot/framework/statics/initdir/testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py'
+adding 'xbot/framework/statics/initdir/testsets/testset_example.yml'
+adding 'xbot_framework-0.5.0rc1.dist-info/licenses/LICENSE'
+adding 'xbot_framework-0.5.0rc1.dist-info/METADATA'
+adding 'xbot_framework-0.5.0rc1.dist-info/WHEEL'
+adding 'xbot_framework-0.5.0rc1.dist-info/entry_points.txt'
+adding 'xbot_framework-0.5.0rc1.dist-info/top_level.txt'
+adding 'xbot_framework-0.5.0rc1.dist-info/RECORD'
+removing build/bdist.macosx-26.0-arm64/wheel
+Successfully built xbot_framework-0.5.0rc1.tar.gz and xbot_framework-0.5.0rc1-py3-none-any.whl

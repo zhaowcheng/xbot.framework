@@ -27,13 +27,13 @@ class Runner(object):
     """
     Testcase runner.
     """
-    def __init__(self, testbed: TestBed, testset: TestSet):
+    def __init__(self, testbed: TestBed, testset: TestSet) -> None:
         """
         :param testbed: TestBed instance.
         :param testset: TestSet instance.
         """
-        self.testbed = testbed
-        self.testset = testset
+        self.testbed: TestBed = testbed
+        self.testset: TestSet = testset
 
     def run(self, outfmt: str = 'brief') -> str:
         """
@@ -74,18 +74,22 @@ class Runner(object):
         """
         Flush testcase execution time.
         """
-        def _timer():
+        def _timer() -> None:
             order = f'({seq}/{casecnt})'
             order_width = len(f'{casecnt}') * 2 + 3
             fmtstr = f'\r{order:{order_width}}  %-7s  %s  {caseinst.caseid}'
             while not caseinst.endtime or not caseinst.result:
                 if not caseinst.starttime:
-                    duration = '0:00:00'
+                    duration: str | object = '0:00:00'
                 else:
                     duration = datetime.now().replace(microsecond=0) - caseinst.starttime
                 xprint(fmtstr % ('RUNNING', duration), end='')
                 sleep(1)
-            duration = caseinst.endtime - caseinst.starttime
+            starttime = caseinst.starttime
+            endtime = caseinst.endtime
+            if starttime is None or endtime is None:
+                raise RuntimeError('Testcase execution time is incomplete')
+            duration = endtime - starttime
             xprint(fmtstr % (caseinst.result, duration))
         t = Thread(target=_timer)
         t.start()
@@ -102,7 +106,7 @@ class Runner(object):
         os.makedirs(logroot)
         return logroot
 
-    def _import_case(self, casepath: str) -> type:
+    def _import_case(self, casepath: str) -> type[TestCase]:
         """
         Import testcase class.
 

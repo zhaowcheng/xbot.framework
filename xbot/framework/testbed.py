@@ -17,16 +17,16 @@ class TestBed(object):
     """
     Test environment information manager.
     """
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str) -> None:
         """
         :param filepath: testbed filepath.
         """
-        self.__data = self.__parse(filepath)
-        self.__name = os.path.basename(filepath).rsplit('.', 1)[0]
+        self.__data: dict[str, Any] = self.__parse(filepath)
+        self.__name: str = os.path.basename(filepath).rsplit('.', 1)[0]
         with open(filepath, encoding='utf8') as f:
-            self.__content = f.read()
+            self.__content: str = f.read()
 
-    def __parse(self, filepath: str) -> dict:
+    def __parse(self, filepath: str) -> dict[str, Any]:
         """
         Parse testbed.
         """

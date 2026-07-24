@@ -1,5 +1,7 @@
 from xbot.framework import testcase
 
+from typing import cast
+
 from .testbed import TestBed
 
 
@@ -12,4 +14,4 @@ class TestCase(testcase.TestCase):
         """
         TestBed instance.
         """
-        return self.__testbed
+        return cast(TestBed, super().testbed)

@@ -7,7 +7,6 @@ Execution report.
 import os
 import re
 
-from typing import Tuple
 from datetime import datetime
 
 from xbot.framework import utils
@@ -22,18 +21,21 @@ def find_value(html: str, id_: str) -> str:
     :param id_: element id.
     :return: text of element.
     """
-    return re.search(r'id="%s".*>(.*)<.*' % id_, html).group(1)
+    match = re.search(r'id="%s".*>(.*)<.*' % id_, html)
+    if match is None:
+        raise ValueError(f'No element found with id: {id_}')
+    return match.group(1)
 
 
-def gen_report(logdir: str) -> Tuple[str, bool]:
+def gen_report(logdir: str) -> tuple[str, bool]:
     """
     Generate report for all testcase logfiles in `logdir`.
 
     :param logdir: testcase logfile directory.
     :return: (report_filepath, is_allpassed)
     """
-    cases = []
-    counter = {
+    cases: list[dict[str, str]] = []
+    counter: dict[str, int] = {
         'PASS': 0,
         'FAIL': 0,
         'ERROR': 0,
