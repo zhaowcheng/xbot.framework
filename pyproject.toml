@@ -34,7 +34,7 @@ Issues = "https://github.com/zhaowcheng/xbot.framework/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["xbot.framework*"]
+include = ["xbot.framework*", "tests*"]
 namespaces = true
 
 [tool.setuptools.package-data]
