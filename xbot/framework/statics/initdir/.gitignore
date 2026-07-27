@@ -17,3 +17,7 @@ testbeds/*
 # testsets
 testsets/*
 !testsets/testset_example.yml
+
+# venv
+venv/
+.venv/
