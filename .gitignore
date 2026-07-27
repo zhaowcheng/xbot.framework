@@ -19,3 +19,6 @@ venv/
 
 # testproj
 testproj/
+
+# MacOS
+.DS_Store
