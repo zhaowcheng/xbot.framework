@@ -109,7 +109,10 @@ class Runner(object):
                     skip_reason = (
                         f'Suite {failed_suite.__name__} setup failed.'
                     )
-                caseinst.run(skip_reason)
+                if skip_reason:
+                    caseinst.run(skip_reason)
+                else:
+                    caseinst.run()
                 if outfmt == 'brief':
                     timer.join()
                 if outfmt == 'verbose':
@@ -217,7 +220,7 @@ class Runner(object):
         """
         mro = casecls.__mro__
         parents = mro[1:mro.index(TestCase)]
-        return tuple(
+        suites = tuple(
             cls
             for cls in reversed(parents)
             if any(
@@ -225,6 +228,19 @@ class Runner(object):
                 for stage in ('setup', 'teardown')
             )
         )
+        for index, suite in enumerate(suites):
+            for other in suites[index + 1:]:
+                if not (
+                    issubclass(suite, other)
+                    or issubclass(other, suite)
+                ):
+                    raise ValueError(
+                        f'Ambiguous suite inheritance for '
+                        f'{casecls.__name__}: {suite.__name__} and '
+                        f'{other.__name__} must form a single '
+                        f'inheritance chain'
+                    )
+        return suites
 
     def _import_case(self, casepath: str) -> type[TestCase]:
         """

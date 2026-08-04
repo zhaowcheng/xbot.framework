@@ -8,7 +8,7 @@ import logging
 from importlib import util
 from io import StringIO
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from xbot.framework.testcase import TestCase
 from xbot.framework.testbed import TestBed
@@ -202,6 +202,113 @@ class TestTestCase(unittest.TestCase):
         caseinst.teardown.assert_not_called()
         with open(caseinst.logfile, encoding='utf8') as f:
             self.assertIn(reason, f.read())
+
+    def test_handler_lifecycle_when_log_dump_fails(self) -> None:
+        """
+        Test handler attachment and cleanup when log dumping fails.
+
+        :return: None.
+        """
+        caseinst = self.instcase(
+            'pass',
+            'tc_eg_pass_get_values_from_testbed'
+        )
+        handler = caseinst._TestCase__loghdlr
+        attached_before_run = handler in ROOT_LOGGER.handlers
+
+        with patch('threading.excepthook'):
+            with patch(
+                'xbot.framework.testcase.utils.render_write',
+                side_effect=RuntimeError('dump failed')
+            ):
+                caseinst.run()
+
+        self.assertFalse(attached_before_run)
+        self.assertNotIn(handler, ROOT_LOGGER.handlers)
+
+    def test_same_caseid_log_isolation(self) -> None:
+        """
+        Test preloaded same-id testcases keep separate stage records.
+
+        :return: None.
+        """
+        class SameIdCase(TestCase):
+            DIRECTORY = ''
+            MESSAGE = ''
+            TAGS = ['tag1']
+
+            @property
+            def caseid(self) -> str:
+                """
+                Return a shared testcase id.
+
+                :return: Testcase id.
+                """
+                return 'duplicate'
+
+            @property
+            def relpath(self) -> str:
+                """
+                Return the testcase path.
+
+                :return: Relative testcase path.
+                """
+                return f'testcases/{self.DIRECTORY}/{self.caseid}.py'
+
+            @property
+            def sourcecode(self) -> str:
+                """
+                Return fake testcase source.
+
+                :return: Testcase source.
+                """
+                return 'pass'
+
+            def setup(self) -> None:
+                """
+                Set up the testcase.
+
+                :return: None.
+                """
+                pass
+
+            def step1(self) -> None:
+                """
+                Log the testcase marker.
+
+                :return: None.
+                """
+                self.info(self.MESSAGE)
+
+            def teardown(self) -> None:
+                """
+                Tear down the testcase.
+
+                :return: None.
+                """
+                pass
+
+        class LeftCase(SameIdCase):
+            DIRECTORY = 'left'
+            MESSAGE = 'left-only-message'
+
+        class RightCase(SameIdCase):
+            DIRECTORY = 'right'
+            MESSAGE = 'right-only-message'
+
+        left = LeftCase(self.testbed, self.testset, self.logroot)
+        right = RightCase(self.testbed, self.testset, self.logroot)
+        left.run()
+        right.run()
+
+        with open(left.logfile, encoding='utf8') as f:
+            left_log = f.read()
+        with open(right.logfile, encoding='utf8') as f:
+            right_log = f.read()
+        self.assertIn(LeftCase.MESSAGE, left_log)
+        self.assertNotIn(RightCase.MESSAGE, left_log)
+        self.assertIn(RightCase.MESSAGE, right_log)
+        self.assertNotIn(LeftCase.MESSAGE, right_log)
 
     def test_tc_eg_nonpass_timeout(self):
         caseid = 'tc_eg_nonpass_timeout'

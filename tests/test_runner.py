@@ -183,6 +183,152 @@ class TestRunner(unittest.TestCase):
             (TC, TC_HGDB_ACCESS)
         )
 
+    def test_ambiguous_suite_inheritance(self) -> None:
+        """
+        Test that unrelated suite parents are rejected before setup.
+
+        :return: None.
+        """
+        class TC_LEFT(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_LEFT.setup')
+
+        class TC_RIGHT(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_RIGHT.setup')
+
+        class TC_BOTH_001(TC_LEFT, TC_RIGHT):
+            pass
+
+        with self.assertRaisesRegex(
+            ValueError,
+            'Ambiguous suite inheritance'
+        ) as context:
+            self.run_suite_cases(TC_BOTH_001)
+        self.assertIn('TC_LEFT', str(context.exception))
+        self.assertIn('TC_RIGHT', str(context.exception))
+        self.assertEqual(SuiteTestCase.EVENTS, [])
+
+    def test_brief_suite_traceback_on_stderr(self) -> None:
+        """
+        Test suite tracebacks use the real logging chain in brief mode.
+
+        :return: None.
+        """
+        events = []
+
+        class BaseCase(TestCase):
+            TAGS = ['tag1']
+
+            @property
+            def caseid(self) -> str:
+                """
+                Return the fake testcase id.
+
+                :return: Testcase id.
+                """
+                return self.__class__.__name__
+
+            @property
+            def relpath(self) -> str:
+                """
+                Return a fake testcase path.
+
+                :return: Relative testcase path.
+                """
+                return f'testcases/{self.caseid}.py'
+
+            @property
+            def sourcecode(self) -> str:
+                """
+                Return fake testcase source.
+
+                :return: Testcase source.
+                """
+                return 'pass'
+
+        class TC(BaseCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Fail suite setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                events.append('TC.setup')
+                raise RuntimeError('brief setup failed')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Fail suite teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                events.append('TC.teardown')
+                raise RuntimeError('brief teardown failed')
+
+        class TC_001(TC):
+            pass
+
+        testset = MagicMock()
+        testset.paths = ('case.py',)
+        testset.include_tags = ()
+        testset.exclude_tags = ()
+        runner = Runner(self.runner.testbed, testset)
+        stderr = StringIO()
+        with patch.object(runner, '_import_case', return_value=TC_001):
+            with patch.object(
+                runner,
+                '_make_logroot',
+                return_value=self.logroot
+            ):
+                with patch('xbot.framework.runner.xprint'):
+                    with patch(
+                        'xbot.framework.runner.enable_console_logging'
+                    ) as enable_console:
+                        with patch('sys.stderr', stderr):
+                            runner.run()
+
+        enable_console.assert_not_called()
+        self.assertEqual(events, ['TC.setup', 'TC.teardown'])
+        self.assertIn('Traceback (most recent call last):', stderr.getvalue())
+        self.assertIn('RuntimeError: brief setup failed', stderr.getvalue())
+        self.assertIn('RuntimeError: brief teardown failed', stderr.getvalue())
+
+    def test_legacy_run_override(self) -> None:
+        """
+        Test a legacy run override with no optional argument.
+
+        :return: None.
+        """
+        class LegacyCase(SuiteTestCase):
+            def run(self) -> None:
+                """
+                Record testcase execution.
+
+                :return: None.
+                """
+                self.EVENTS.append(self.caseid)
+
+        self.assertEqual(self.run_suite_cases(LegacyCase), ['LegacyCase'])
+
     def test_suite_lifecycle_order(self) -> None:
         """
         Test nested and sibling suite lifecycle order.

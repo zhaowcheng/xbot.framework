@@ -261,6 +261,8 @@ class TC_ACCESS(TestCase):
 Runner calls suite setup from outermost to innermost and suite teardown
 from innermost to outermost. Regular instance methods and class attributes
 defined by a parent remain available to every child testcase.
+Suite-bearing parent classes must form one nested inheritance chain;
+multiple inheritance from unrelated suite-bearing parents is rejected.
 
 ## Test libraries development
 

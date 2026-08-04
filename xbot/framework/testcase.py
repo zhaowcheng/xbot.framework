@@ -57,7 +57,6 @@ class TestCase(object):
         )
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
         self.__loghdlr.setFormatter(logger.FORMATTER)
-        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
     def testbed(self) -> TestBed:
@@ -225,16 +224,20 @@ class TestCase(object):
         :param skip_reason: External reason for skipping this testcase.
         :return: None.
         """
-        t = Thread(
-            target=self.__run,
-            args=(skip_reason,),
-            name=self.caseid
-        )
-        t.start()
-        t.join(self.TIMEOUT)
-        if t.is_alive():
-            utils.stop_thread(t, TestCaseTimeout)
-            t.join(60)  # 等待 teardown 完成。
+        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
+        try:
+            t = Thread(
+                target=self.__run,
+                args=(skip_reason,),
+                name=self.caseid
+            )
+            t.start()
+            t.join(self.TIMEOUT)
+            if t.is_alive():
+                utils.stop_thread(t, TestCaseTimeout)
+                t.join(60)  # 等待 teardown 完成。
+        finally:
+            logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
 
     def __run(self, skip_reason: str | None = None) -> None:
         """
@@ -267,7 +270,6 @@ class TestCase(object):
         self.__duration = self.__endtime - self.__starttime
         self.__result = self.__result or 'PASS'
         self.__dump_log()
-        logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
 
     def __run_stage(self, stage: str) -> None:
         """

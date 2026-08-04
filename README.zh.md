@@ -258,6 +258,8 @@ class TC_ACCESS(TestCase):
 
 Runner 按继承关系从外到内执行 suite setup，从内到外执行 suite
 teardown。父类中的普通实例方法和类属性仍由所有子用例继承。
+包含 suite 钩子的父类必须构成一条嵌套继承链；不支持同时多继承自互不相关
+的 suite 父类。
 
 
 ## 测试库开发
