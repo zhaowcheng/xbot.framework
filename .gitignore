@@ -21,6 +21,7 @@ venv/
 
 # testproj
 testproj/
+.worktrees/
 
 # MacOS
 .DS_Store
