@@ -49,26 +49,79 @@ class Runner(object):
             enable_console_logging()
         logroot = self._make_logroot()
         casecnt = len(self.testset.paths)
-        for i, casepath in enumerate(self.testset.paths):
+        cases = []
+        enabled_suites = set()
+        for casepath in self.testset.paths:
             caseid = casepath.split('/')[-1].replace('.py', '')
             abspath = os.path.abspath(casepath)
-            order = f'({i+1}/{casecnt})'
+            suites: tuple[type[TestCase], ...] = ()
             try:
                 casecls = self._import_case(casepath)
                 caseinst = casecls(self.testbed, self.testset, logroot)
-            except (ImportError, AttributeError, SyntaxError) as e:
-                caseinst = ErrorTestCase(caseid, abspath, self.testbed, 
-                                         self.testset, logroot, e)
-            if outfmt == 'verbose':
-                xprint(f'Start: {caseid} {order}'.center(100, '='))
-            if outfmt == 'brief':
-                timer = self._timer(caseinst, i+1, casecnt)
-            caseinst.run()
-            if outfmt == 'brief':
-                timer.join()
-            if outfmt == 'verbose':
-                xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
+                suites = self._suite_chain(casecls)
+            except (ImportError, AttributeError, SyntaxError) as exc:
+                caseinst = ErrorTestCase(
+                    caseid,
+                    abspath,
+                    self.testbed,
+                    self.testset,
+                    logroot,
+                    exc
+                )
+            cases.append((caseid, caseinst, suites))
+            if not caseinst.skipped:
+                enabled_suites.update(suites)
+
+        active_suites: list[type[TestCase]] = []
+        try:
+            for i, (caseid, caseinst, suites) in enumerate(cases):
+                target_suites = [
+                    suite for suite in suites if suite in enabled_suites
+                ]
+                common = 0
+                for active, target in zip(active_suites, target_suites):
+                    if active is not target:
+                        break
+                    common += 1
+
+                for suite in reversed(active_suites[common:]):
+                    self._run_suite_hook(suite, 'teardown')
+                del active_suites[common:]
+
+                for suite in target_suites[common:]:
+                    active_suites.append(suite)
+                    self._run_suite_hook(suite, 'setup')
+
+                order = f'({i+1}/{casecnt})'
+                if outfmt == 'verbose':
+                    xprint(f'Start: {caseid} {order}'.center(100, '='))
+                if outfmt == 'brief':
+                    timer = self._timer(caseinst, i+1, casecnt)
+                caseinst.run()
+                if outfmt == 'brief':
+                    timer.join()
+                if outfmt == 'verbose':
+                    xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
+        finally:
+            for suite in reversed(active_suites):
+                self._run_suite_hook(suite, 'teardown')
         return logroot
+
+    def _run_suite_hook(
+        self,
+        suitecls: type[TestCase],
+        stage: str
+    ) -> None:
+        """
+        Run a hook declared by a suite class.
+
+        :param suitecls: Suite class.
+        :param stage: Hook name, setup or teardown.
+        :return: None.
+        """
+        hook = vars(suitecls).get(stage)
+        if isinstance(hook, classmethod):
+            getattr(suitecls, stage)(self.testbed)
     
     def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> Thread:
         """
