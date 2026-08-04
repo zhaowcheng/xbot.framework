@@ -221,6 +221,47 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 - When `FAILFAST` attribute is *True*, the subsequent test steps will be skipped and the teardown will be executed immediately if a test step fails;
 - The `TAGS` attribute defines the testcase *tags*, which can be used to filter testcases to be executed in the testset;
 
+### Suite setup and teardown
+
+An intermediate parent class in a testcase inheritance chain can declare
+class methods that run once when Runner enters and leaves that group:
+
+```python
+from typing import ClassVar
+
+from lib.testcase import TestCase
+from lib.testbed import TestBed
+
+
+class TC_ACCESS(TestCase):
+
+    database: ClassVar[str | None] = None
+
+    @classmethod
+    def setup(cls, testbed: TestBed) -> None:
+        """
+        Initialize suite resources.
+
+        :param testbed: TestBed instance.
+        :return: None.
+        """
+        cls.database = testbed.get('database')
+
+    @classmethod
+    def teardown(cls, testbed: TestBed) -> None:
+        """
+        Release suite resources.
+
+        :param testbed: TestBed instance.
+        :return: None.
+        """
+        cls.database = None
+```
+
+Runner calls suite setup from outermost to innermost and suite teardown
+from innermost to outermost. Regular instance methods and class attributes
+defined by a parent remain available to every child testcase.
+
 ## Test libraries development
 
 Test libraries are stored in the `lib` subdirectory, write the test libraries according to the business requirements, import and use them in the testcases.
