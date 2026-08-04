@@ -7,6 +7,7 @@ import shutil
 import logging
 
 from io import StringIO
+from typing import ClassVar
 from unittest.mock import MagicMock, patch
 
 from xbot.framework import utils
@@ -16,6 +17,62 @@ from xbot.framework.testcase import TestCase
 from xbot.framework.runner import Runner
 from xbot.framework.common import INIT_DIR
 from xbot.framework.logger import ROOT_LOGGER
+
+
+class SuiteTestCase(TestCase):
+    """
+    Minimal testcase used by suite runner tests.
+    """
+
+    EVENTS: ClassVar[list[str]] = []
+    SKIPPED: ClassVar[bool] = False
+
+    def __init__(
+        self,
+        testbed: TestBed,
+        testset: TestSet,
+        logroot: str
+    ) -> None:
+        """
+        Initialize a fake testcase.
+
+        :param testbed: TestBed instance.
+        :param testset: TestSet instance.
+        :param logroot: Testcase log root.
+        :return: None.
+        """
+        self._caseid = self.__class__.__name__
+
+    @property
+    def caseid(self) -> str:
+        """
+        Return the fake testcase id.
+
+        :return: Testcase id.
+        """
+        return self._caseid
+
+    @property
+    def skipped(self) -> bool:
+        """
+        Return whether the testcase is skipped.
+
+        :return: Skip state.
+        """
+        return self.SKIPPED
+
+    def run(self, skip_reason: str | None = None) -> None:
+        """
+        Record testcase execution.
+
+        :param skip_reason: External skip reason.
+        :return: None.
+        """
+        self.EVENTS.append(
+            f'{self.caseid}.skip:{skip_reason}'
+            if skip_reason
+            else self.caseid
+        )
 
 
 class TestRunner(unittest.TestCase):
@@ -41,6 +98,38 @@ class TestRunner(unittest.TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(cls.workdir)
         shutil.rmtree(cls.logroot)
+
+    def run_suite_cases(
+        self,
+        *caseclasses: type[SuiteTestCase]
+    ) -> list[str]:
+        """
+        Run fake testcase classes through Runner.
+
+        :param caseclasses: Fake testcase classes in execution order.
+        :return: Recorded lifecycle events.
+        """
+        SuiteTestCase.EVENTS.clear()
+        testset = MagicMock()
+        testset.paths = tuple(
+            f'case{index}.py'
+            for index in range(len(caseclasses))
+        )
+        runner = Runner(self.runner.testbed, testset)
+        with patch.object(
+            runner,
+            '_import_case',
+            side_effect=caseclasses
+        ):
+            with patch.object(
+                runner,
+                '_make_logroot',
+                return_value=self.logroot
+            ):
+                with patch('xbot.framework.runner.enable_console_logging'):
+                    with patch('xbot.framework.runner.xprint'):
+                        runner.run('verbose')
+        return SuiteTestCase.EVENTS.copy()
 
     def get_case_result_from_logfile(self, logfile: str):
         """
@@ -252,6 +341,175 @@ class TestRunner(unittest.TestCase):
             'TC_RIGHT.teardown',
             'TC.teardown'
         ])
+
+    def test_suite_setup_failure(self) -> None:
+        """
+        Test setup failure isolation and sibling execution.
+
+        :return: None.
+        """
+        class TC(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC.teardown')
+
+        class TC_LEFT(TC):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Fail suite setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_LEFT.setup')
+                raise RuntimeError('setup failed')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_LEFT.teardown')
+
+        class TC_LEFT_001(TC_LEFT):
+            pass
+
+        class TC_RIGHT(TC):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_RIGHT.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_RIGHT.teardown')
+
+        class TC_RIGHT_001(TC_RIGHT):
+            pass
+
+        events = self.run_suite_cases(TC_LEFT_001, TC_RIGHT_001)
+        self.assertEqual(events, [
+            'TC.setup',
+            'TC_LEFT.setup',
+            'TC_LEFT_001.skip:Suite TC_LEFT setup failed.',
+            'TC_LEFT.teardown',
+            'TC_RIGHT.setup',
+            'TC_RIGHT_001',
+            'TC_RIGHT.teardown',
+            'TC.teardown'
+        ])
+
+    def test_suite_teardown_failure(self) -> None:
+        """
+        Test that teardown failure does not block parent cleanup.
+
+        :return: None.
+        """
+        class TC(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC.teardown')
+
+        class TC_CHILD(TC):
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Fail suite teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_CHILD.teardown')
+                raise RuntimeError('teardown failed')
+
+        class TC_CHILD_001(TC_CHILD):
+            pass
+
+        events = self.run_suite_cases(TC_CHILD_001)
+        self.assertEqual(events[-2:], [
+            'TC_CHILD.teardown',
+            'TC.teardown'
+        ])
+
+    def test_all_suite_cases_filtered(self) -> None:
+        """
+        Test that a fully filtered suite runs no hooks.
+
+        :return: None.
+        """
+        class TC_FILTERED(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_FILTERED.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_FILTERED.teardown')
+
+        class TC_FILTERED_001(TC_FILTERED):
+            SKIPPED = True
+
+        events = self.run_suite_cases(TC_FILTERED_001)
+        self.assertEqual(events, ['TC_FILTERED_001'])
 
     def test_run(self):
         """

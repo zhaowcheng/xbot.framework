@@ -6,6 +6,7 @@ Testcase runner.
 
 import os
 import sys
+import traceback
 
 from importlib import import_module
 from datetime import datetime
@@ -73,6 +74,7 @@ class Runner(object):
                 enabled_suites.update(suites)
 
         active_suites: list[type[TestCase]] = []
+        failed_suite: type[TestCase] | None = None
         try:
             for i, (caseid, caseinst, suites) in enumerate(cases):
                 target_suites = [
@@ -85,27 +87,71 @@ class Runner(object):
                     common += 1
 
                 for suite in reversed(active_suites[common:]):
-                    self._run_suite_hook(suite, 'teardown')
+                    self._teardown_suite(suite)
                 del active_suites[common:]
+                if failed_suite not in active_suites:
+                    failed_suite = None
 
-                for suite in target_suites[common:]:
-                    active_suites.append(suite)
-                    self._run_suite_hook(suite, 'setup')
+                if failed_suite is None:
+                    for suite in target_suites[common:]:
+                        active_suites.append(suite)
+                        if not self._setup_suite(suite):
+                            failed_suite = suite
+                            break
 
                 order = f'({i+1}/{casecnt})'
                 if outfmt == 'verbose':
                     xprint(f'Start: {caseid} {order}'.center(100, '='))
                 if outfmt == 'brief':
                     timer = self._timer(caseinst, i+1, casecnt)
-                caseinst.run()
+                skip_reason = None
+                if failed_suite is not None:
+                    skip_reason = (
+                        f'Suite {failed_suite.__name__} setup failed.'
+                    )
+                caseinst.run(skip_reason)
                 if outfmt == 'brief':
                     timer.join()
                 if outfmt == 'verbose':
                     xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
         finally:
             for suite in reversed(active_suites):
-                self._run_suite_hook(suite, 'teardown')
+                self._teardown_suite(suite)
         return logroot
+
+    def _setup_suite(self, suitecls: type[TestCase]) -> bool:
+        """
+        Set up a suite and report failure.
+
+        :param suitecls: Suite class.
+        :return: True when setup succeeds.
+        """
+        try:
+            self._run_suite_hook(suitecls, 'setup')
+            return True
+        except Exception:
+            logger.error(
+                'Suite %s setup failed:\n%s',
+                suitecls.__name__,
+                traceback.format_exc().strip()
+            )
+            return False
+
+    def _teardown_suite(self, suitecls: type[TestCase]) -> None:
+        """
+        Tear down a suite and report failure.
+
+        :param suitecls: Suite class.
+        :return: None.
+        """
+        try:
+            self._run_suite_hook(suitecls, 'teardown')
+        except Exception:
+            logger.error(
+                'Suite %s teardown failed:\n%s',
+                suitecls.__name__,
+                traceback.format_exc().strip()
+            )
 
     def _run_suite_hook(
         self,
