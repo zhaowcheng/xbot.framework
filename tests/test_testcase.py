@@ -181,6 +181,28 @@ class TestTestCase(unittest.TestCase):
         caseinst.teardown.assert_not_called()
         self.assertTrue(os.path.exists(caseinst.logfile))
 
+    def test_external_skip_reason(self) -> None:
+        """
+        Test an external skip reason.
+
+        :return: None.
+        """
+        caseid = 'tc_eg_pass_get_values_from_testbed'
+        caseinst = self.instcase('pass', caseid)
+        caseinst.setup = MagicMock()
+        caseinst.step1 = MagicMock()
+        caseinst.teardown = MagicMock()
+        reason = 'Suite TC_HGDB setup failed.'
+
+        caseinst.run(reason)
+
+        self.assertEqual(caseinst.result, 'SKIP')
+        caseinst.setup.assert_not_called()
+        caseinst.step1.assert_not_called()
+        caseinst.teardown.assert_not_called()
+        with open(caseinst.logfile, encoding='utf8') as f:
+            self.assertIn(reason, f.read())
+
     def test_tc_eg_nonpass_timeout(self):
         caseid = 'tc_eg_nonpass_timeout'
         caseinst = self.instcase('nonpass', caseid)

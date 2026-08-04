@@ -218,28 +218,43 @@ class TestCase(object):
         """
         raise NotImplementedError
     
-    def run(self) -> None:
+    def run(self, skip_reason: str | None = None) -> None:
         """
         Run the current testcase.
+
+        :param skip_reason: External reason for skipping this testcase.
+        :return: None.
         """
-        t = Thread(target=self.__run, name=self.caseid)
+        t = Thread(
+            target=self.__run,
+            args=(skip_reason,),
+            name=self.caseid
+        )
         t.start()
         t.join(self.TIMEOUT)
         if t.is_alive():
             utils.stop_thread(t, TestCaseTimeout)
             t.join(60)  # 等待 teardown 完成。
 
-    def __run(self) -> None:
+    def __run(self, skip_reason: str | None = None) -> None:
         """
         Run the current testcase.
+
+        :param skip_reason: External reason for skipping this testcase.
+        :return: None.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
-        if self.skipped:
+        if skip_reason or self.skipped:
             self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
-            self.warn(f'Skipped: self.TAGS={self.TAGS}, ' + 
-                      f'testset.tags.include={self.__testset.include_tags}, ' + 
-                      f'testset.tags.exclude={self.__testset.exclude_tags}')
+            if skip_reason:
+                self.warn(f'Skipped: {skip_reason}')
+            else:
+                self.warn(
+                    f'Skipped: self.TAGS={self.TAGS}, '
+                    f'testset.tags.include={self.__testset.include_tags}, '
+                    f'testset.tags.exclude={self.__testset.exclude_tags}'
+                )
         else:
             self.__run_stage('setup')
             if not self.__result:
