@@ -106,6 +106,27 @@ class Runner(object):
         os.makedirs(logroot)
         return logroot
 
+    def _suite_chain(
+        self,
+        casecls: type[TestCase]
+    ) -> tuple[type[TestCase], ...]:
+        """
+        Get suite classes declared in a testcase MRO.
+
+        :param casecls: Testcase class.
+        :return: Suite classes ordered from outermost to innermost.
+        """
+        mro = casecls.__mro__
+        parents = mro[1:mro.index(TestCase)]
+        return tuple(
+            cls
+            for cls in reversed(parents)
+            if any(
+                isinstance(vars(cls).get(stage), classmethod)
+                for stage in ('setup', 'teardown')
+            )
+        )
+
     def _import_case(self, casepath: str) -> type[TestCase]:
         """
         Import testcase class.

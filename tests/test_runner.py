@@ -12,6 +12,7 @@ from unittest.mock import patch
 from xbot.framework import utils
 from xbot.framework.testbed import TestBed
 from xbot.framework.testset import TestSet
+from xbot.framework.testcase import TestCase
 from xbot.framework.runner import Runner
 from xbot.framework.common import INIT_DIR
 from xbot.framework.logger import ROOT_LOGGER
@@ -48,6 +49,48 @@ class TestRunner(unittest.TestCase):
         with open(logfile, 'r', encoding='utf8') as f:
             m = re.search(rf'<td id="result" colspan="2">(.+)</td>', f.read())
             return m.group(1)
+
+    def test_suite_chain(self) -> None:
+        """
+        Test suite extraction from a testcase MRO.
+
+        :return: None.
+        """
+        class BaseCase(TestCase):
+            pass
+
+        class TC(BaseCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Set up the suite.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                pass
+
+        class TC_HGDB(TC):
+            pass
+
+        class TC_HGDB_ACCESS(TC_HGDB):
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Tear down the suite.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                pass
+
+        class TC_HGDB_ACCESS_001(TC_HGDB_ACCESS):
+            pass
+
+        self.assertEqual(
+            self.runner._suite_chain(TC_HGDB_ACCESS_001),
+            (TC, TC_HGDB_ACCESS)
+        )
 
     def test_run(self):
         """
