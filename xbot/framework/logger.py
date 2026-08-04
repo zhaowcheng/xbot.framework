@@ -5,7 +5,6 @@ logging.
 """
 
 import logging
-import sys
 
 from types import TracebackType
 from typing import Any, Mapping, MutableMapping, TypeAlias, cast
@@ -21,55 +20,6 @@ class XLogger(logging.Logger):
     """
     Custom Logger.
     """
-    def _log(
-        self,
-        level: int,
-        msg: object,
-        args: tuple[Any, ...] | Mapping[str, Any],
-        exc_info: (
-            ExcInfo
-            | BaseException
-            | bool
-            | None
-        ) = None,
-        extra: Mapping[str, object] | None = None,
-        stack_info: bool = False,
-        stacklevel: int = 1
-    ) -> None:
-        """
-        Create and handle a log record.
-        """
-        if logging._srcfile:
-            try:
-                fn, lno, func, sinfo = super().findCaller(
-                    stack_info,
-                    stacklevel + 1
-                )
-            except ValueError:  # pragma: no cover
-                fn, lno, func, sinfo = (
-                    "(unknown file)", 0, "(unknown function)", None
-                )
-        else:  # pragma: no cover
-            fn, lno, func, sinfo = (
-                "(unknown file)", 0, "(unknown function)", None
-            )
-        normalized_exc_info: ExcInfo | None
-        if isinstance(exc_info, BaseException):
-            normalized_exc_info = (
-                type(exc_info),
-                exc_info,
-                exc_info.__traceback__
-            )
-        elif isinstance(exc_info, tuple):
-            normalized_exc_info = exc_info
-        elif exc_info:
-            normalized_exc_info = sys.exc_info()
-        else:
-            normalized_exc_info = None
-        record = self.makeRecord(self.name, level, fn, lno, msg, args,
-                                 normalized_exc_info, func, extra, sinfo)
-        self.handle(record)
-
     def makeRecord(
         self,
         name: str,
