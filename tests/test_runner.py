@@ -391,7 +391,31 @@ class TestRunner(unittest.TestCase):
                 """
                 cls.EVENTS.append('TC_LEFT.teardown')
 
-        class TC_LEFT_001(TC_LEFT):
+        class TC_LEFT_CHILD(TC_LEFT):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_LEFT_CHILD.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_LEFT_CHILD.teardown')
+
+        class TC_LEFT_CHILD_001(TC_LEFT_CHILD):
+            pass
+
+        class TC_LEFT_CHILD_002(TC_LEFT_CHILD):
             pass
 
         class TC_RIGHT(TC):
@@ -418,11 +442,16 @@ class TestRunner(unittest.TestCase):
         class TC_RIGHT_001(TC_RIGHT):
             pass
 
-        events = self.run_suite_cases(TC_LEFT_001, TC_RIGHT_001)
+        events = self.run_suite_cases(
+            TC_LEFT_CHILD_001,
+            TC_LEFT_CHILD_002,
+            TC_RIGHT_001
+        )
         self.assertEqual(events, [
             'TC.setup',
             'TC_LEFT.setup',
-            'TC_LEFT_001.skip:Suite TC_LEFT setup failed.',
+            'TC_LEFT_CHILD_001.skip:Suite TC_LEFT setup failed.',
+            'TC_LEFT_CHILD_002.skip:Suite TC_LEFT setup failed.',
             'TC_LEFT.teardown',
             'TC_RIGHT.setup',
             'TC_RIGHT_001',
@@ -510,6 +539,55 @@ class TestRunner(unittest.TestCase):
 
         events = self.run_suite_cases(TC_FILTERED_001)
         self.assertEqual(events, ['TC_FILTERED_001'])
+
+    def test_some_suite_cases_filtered(self) -> None:
+        """
+        Test that filtering one case keeps its suite active.
+
+        :return: None.
+        """
+        class TC_PARTIAL(SuiteTestCase):
+            @classmethod
+            def setup(cls, testbed: TestBed) -> None:
+                """
+                Record setup.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_PARTIAL.setup')
+
+            @classmethod
+            def teardown(cls, testbed: TestBed) -> None:
+                """
+                Record teardown.
+
+                :param testbed: TestBed instance.
+                :return: None.
+                """
+                cls.EVENTS.append('TC_PARTIAL.teardown')
+
+        class TC_PARTIAL_001(TC_PARTIAL):
+            pass
+
+        class TC_PARTIAL_002(TC_PARTIAL):
+            SKIPPED = True
+
+        class TC_PARTIAL_003(TC_PARTIAL):
+            pass
+
+        events = self.run_suite_cases(
+            TC_PARTIAL_001,
+            TC_PARTIAL_002,
+            TC_PARTIAL_003
+        )
+        self.assertEqual(events, [
+            'TC_PARTIAL.setup',
+            'TC_PARTIAL_001',
+            'TC_PARTIAL_002',
+            'TC_PARTIAL_003',
+            'TC_PARTIAL.teardown'
+        ])
 
     def test_run(self):
         """
