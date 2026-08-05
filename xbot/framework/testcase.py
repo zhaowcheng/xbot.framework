@@ -57,6 +57,7 @@ class TestCase(object):
         )
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
         self.__loghdlr.setFormatter(logger.FORMATTER)
+        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
     def testbed(self) -> TestBed:
@@ -217,47 +218,28 @@ class TestCase(object):
         """
         raise NotImplementedError
     
-    def run(self, skip_reason: str | None = None) -> None:
+    def run(self) -> None:
         """
         Run the current testcase.
-
-        :param skip_reason: External reason for skipping this testcase.
-        :return: None.
         """
-        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
-        try:
-            t = Thread(
-                target=self.__run,
-                args=(skip_reason,),
-                name=self.caseid
-            )
-            t.start()
-            t.join(self.TIMEOUT)
-            if t.is_alive():
-                utils.stop_thread(t, TestCaseTimeout)
-                t.join(60)  # 等待 teardown 完成。
-        finally:
-            logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
+        t = Thread(target=self.__run, name=self.caseid)
+        t.start()
+        t.join(self.TIMEOUT)
+        if t.is_alive():
+            utils.stop_thread(t, TestCaseTimeout)
+            t.join(60)  # 等待 teardown 完成。
 
-    def __run(self, skip_reason: str | None = None) -> None:
+    def __run(self) -> None:
         """
         Run the current testcase.
-
-        :param skip_reason: External reason for skipping this testcase.
-        :return: None.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
-        if skip_reason or self.skipped:
+        if self.skipped:
             self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
-            if skip_reason:
-                self.warn(f'Skipped: {skip_reason}')
-            else:
-                self.warn(
-                    f'Skipped: self.TAGS={self.TAGS}, '
-                    f'testset.tags.include={self.__testset.include_tags}, '
-                    f'testset.tags.exclude={self.__testset.exclude_tags}'
-                )
+            self.warn(f'Skipped: self.TAGS={self.TAGS}, ' + 
+                      f'testset.tags.include={self.__testset.include_tags}, ' + 
+                      f'testset.tags.exclude={self.__testset.exclude_tags}')
         else:
             self.__run_stage('setup')
             if not self.__result:
@@ -270,6 +252,7 @@ class TestCase(object):
         self.__duration = self.__endtime - self.__starttime
         self.__result = self.__result or 'PASS'
         self.__dump_log()
+        logger.ROOT_LOGGER.removeHandler(self.__loghdlr)
 
     def __run_stage(self, stage: str) -> None:
         """

@@ -219,48 +219,6 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 - `FAILFAST` 属性为 *True* 时，当某个测试步骤失败时，则会跳过后续测试步骤立即执行清理步骤；
 - `TAGS` 属性定义用例 *标签*，可用于测试套中对待执行测试用例列表进行筛选；
 
-### Suite 级 setup 和 teardown
-
-用例继承链中的中间父类可以声明类方法，在进入和离开该组用例时各执行
-一次：
-
-```python
-from typing import ClassVar
-
-from lib.testcase import TestCase
-from lib.testbed import TestBed
-
-
-class TC_ACCESS(TestCase):
-
-    database: ClassVar[str | None] = None
-
-    @classmethod
-    def setup(cls, testbed: TestBed) -> None:
-        """
-        Initialize suite resources.
-
-        :param testbed: TestBed instance.
-        :return: None.
-        """
-        cls.database = testbed.get('database')
-
-    @classmethod
-    def teardown(cls, testbed: TestBed) -> None:
-        """
-        Release suite resources.
-
-        :param testbed: TestBed instance.
-        :return: None.
-        """
-        cls.database = None
-```
-
-Runner 按继承关系从外到内执行 suite setup，从内到外执行 suite
-teardown。父类中的普通实例方法和类属性仍由所有子用例继承。
-包含 suite 钩子的父类必须构成一条嵌套继承链；不支持同时多继承自互不相关
-的 suite 父类。
-
 
 ## 测试库开发
 
