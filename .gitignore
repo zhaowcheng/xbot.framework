@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-.mypy_cache/
 
 # IDE config files
 .vscode/*
@@ -14,7 +13,6 @@ build/
 
 # build
 dist/
-build.log
 
 # venv
 venv/
