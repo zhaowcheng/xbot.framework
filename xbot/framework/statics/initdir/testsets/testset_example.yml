@@ -1,12 +1,31 @@
 # Testset is used to organize testcases to be executed.
-tags:  # `exclude` has higher priority than `include`.
-  include:  # Include testcases with these tags.
+
+# Tags are used to filter testcases by matching them against the `TAGS`
+# attribute of the testcases. Results of testcases that are not included
+# or excluded will be marked as SKIP.
+tags:
+  # Include testcases with these tags.
+  include:
     - tag1
-  exclude:  # Exclude testcases with these tags.
+  # Exclude testcases with these tags, higher priority than `include`.
+  exclude:
     - tag2
-paths:
-  - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
-  - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
-  # Recursively include all testcases in the directory, 
-  # only match files with the prefix 'tc_' and suffix '.py'.
-  - testcases/examples/nonpass/
+
+# Relative paths of testcases. These can be file paths (ending in `.py`)
+# or directory paths (not ending in `.py`). The execution order follows
+# the order in which they are written, and directories will be recursively
+# expanded into test case paths in alphabetical order.
+testcases:
+  # Testcases used to install the software to be tested. If any testcase
+  # in this section fails, the test section will not be executed.
+  # `tags` will not be used to filter testcases for this section.
+  # This section can be empty.
+  install:
+    - testcases/examples/inst/tc_eg_install_the_software_to_be_tested_successful.py
+  # Testcases used to test the installed software.
+  test:
+    - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
+    - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
+    # Recursively include all testcases in the directory,
+    # only match files with the prefix `tc_` and suffix `.py`.
+    - testcases/examples/nonpass/

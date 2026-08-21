@@ -5,7 +5,7 @@ import shutil
 
 from unittest.mock import patch, mock_open
 
-from xbot.framework.testset import TestSet, TestSetError
+from xbot.framework.testset import TestCases, TestSet, TestSetError
 
 class TestTestSet(unittest.TestCase):
     """
@@ -62,6 +62,19 @@ class TestTestSet(unittest.TestCase):
         """
         with patch("builtins.open", mock_open(read_data=content)):
             return TestSet('testset.yml')
+
+    def test_document_not_dict(self):
+        """
+        Expect TestSetError when the document is not a dict.
+        """
+        contents = ('', '- testset')
+        for content in contents:
+            with self.subTest(content=content):
+                with self.assertRaisesRegex(
+                    TestSetError,
+                    'Testset is not a dict',
+                ):
+                    self.mock_testset(content)
     
     def test_tags(self):
         """
@@ -75,7 +88,9 @@ class TestTestSet(unittest.TestCase):
           exclude:
             - tag3
             - tag4
-        paths:
+        testcases:
+          install:
+          test:
         """
         testset = self.mock_testset(content)
         self.assertEqual(testset.include_tags, ('tag1', 'tag2'))
@@ -89,7 +104,9 @@ class TestTestSet(unittest.TestCase):
         tags:
           include:
           exclude:
-        paths:
+        testcases:
+          install:
+          test:
         """
         testset = self.mock_testset(content)
         self.assertEqual(testset.include_tags, tuple())
@@ -103,7 +120,9 @@ class TestTestSet(unittest.TestCase):
         tags:
           - tag1
           - tag2
-        paths:
+        testcases:
+          install:
+          test:
         """
         with self.assertRaises(TestSetError):
             self.mock_testset(content)
@@ -118,7 +137,9 @@ class TestTestSet(unittest.TestCase):
           exclude:
             - tag3
             - tag4
-        paths:
+        testcases:
+          install:
+          test:
         """
         with self.assertRaises(TestSetError):
             self.mock_testset(content)
@@ -133,7 +154,9 @@ class TestTestSet(unittest.TestCase):
             - tag1
             - tag2
           exclude: tag3
-        paths:
+        testcases:
+          install:
+          test:
         """
         with self.assertRaises(TestSetError):
             self.mock_testset(content)
@@ -147,7 +170,9 @@ class TestTestSet(unittest.TestCase):
           exclude:
             - tag3
             - tag4
-        paths:
+        testcases:
+          install:
+          test:
         """
         with self.assertRaises(TestSetError):
             self.mock_testset(content)
@@ -161,45 +186,175 @@ class TestTestSet(unittest.TestCase):
           include:
             - tag1
             - tag2
-        paths:
+        testcases:
+          install:
+          test:
         """
         with self.assertRaises(TestSetError):
             self.mock_testset(content)
 
-    def test_paths(self):
+    def test_testcases(self):
         """
-        Test paths property.
+        Test testcase groups and directory expansion.
         """
         content = """
         tags:
           include:
           exclude:
-        paths:
-          - testcases/dir1/tc_01.py
-          - testcases/dir2
+        testcases:
+          install:
+            - testcases/dir1/tc_01.py
+          test:
+            - testcases/dir2
         """
         testset = self.mock_testset(content)
-        self.assertEqual(testset.paths, (
-            'testcases/dir1/tc_01.py',
-            'testcases/dir2/tc_03.py',
-            'testcases/dir2/tc_04.py',
-            'testcases/dir2/subdir2_1/tc_05.py',
-            'testcases/dir2/subdir2_1/tc_06.py'
-        ))
+        self.assertEqual(
+            testset.testcases,
+            TestCases(
+                install=('testcases/dir1/tc_01.py',),
+                test=(
+                    'testcases/dir2/tc_03.py',
+                    'testcases/dir2/tc_04.py',
+                    'testcases/dir2/subdir2_1/tc_05.py',
+                    'testcases/dir2/subdir2_1/tc_06.py',
+                ),
+            ),
+        )
 
-    def test_path_not_exist(self):
+    def test_testcases_empty(self):
         """
-        Expect TestSetError when a path does not exist.
+        Expect empty tuples when testcase groups are empty.
         """
         content = """
         tags:
           include:
           exclude:
-        paths:
-          - testcases/dir1/tc_00.py
+        testcases:
+          install:
+          test:
         """
-        with self.assertRaises(TestSetError):
-            self.mock_testset(content).paths
+        self.assertEqual(
+            self.mock_testset(content).testcases,
+            TestCases(install=(), test=()),
+        )
+
+    def test_testcases_not_found(self):
+        """
+        Expect TestSetError when testcases is not found.
+        """
+        content = """
+        tags:
+          include:
+          exclude:
+        """
+        with self.assertRaisesRegex(TestSetError, 'No `testcases`'):
+            self.mock_testset(content)
+
+    def test_testcases_not_dict(self):
+        """
+        Expect TestSetError when testcases is not a dict.
+        """
+        contents = (
+            """
+            tags:
+              include:
+              exclude:
+            testcases:
+            """,
+            """
+            tags:
+              include:
+              exclude:
+            testcases: []
+            """,
+        )
+        for content in contents:
+            with self.subTest(content=content):
+                with self.assertRaisesRegex(
+                    TestSetError,
+                    '`testcases` is not a dict',
+                ):
+                    self.mock_testset(content)
+
+    def test_testcase_group_not_found(self):
+        """
+        Expect TestSetError when a testcase group is not found.
+        """
+        contents = (
+            """
+            tags:
+              include:
+              exclude:
+            testcases:
+              test:
+            """,
+            """
+            tags:
+              include:
+              exclude:
+            testcases:
+              install:
+            """,
+        )
+        for content in contents:
+            with self.subTest(content=content):
+                with self.assertRaises(TestSetError):
+                    self.mock_testset(content)
+
+    def test_testcase_group_not_list(self):
+        """
+        Expect TestSetError when a non-empty testcase group is not a list.
+        """
+        content = """
+        tags:
+          include:
+          exclude:
+        testcases:
+          install: testcases/dir1/tc_01.py
+          test:
+        """
+        with self.assertRaisesRegex(
+            TestSetError,
+            '`testcases.install` is not a list',
+        ):
+            self.mock_testset(content)
+
+    def test_empty_testcase_group_not_list(self):
+        """
+        Expect TestSetError when an empty testcase group is not a list.
+        """
+        values = ('{}', '0')
+        for value in values:
+            content = f"""
+            tags:
+              include:
+              exclude:
+            testcases:
+              install: {value}
+              test:
+            """
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(
+                    TestSetError,
+                    '`testcases.install` is not a list',
+                ):
+                    self.mock_testset(content)
+
+    def test_testcase_path_not_exist(self):
+        """
+        Expect TestSetError when a testcase path does not exist.
+        """
+        content = """
+        tags:
+          include:
+          exclude:
+        testcases:
+          install:
+          test:
+            - testcases/dir1/tc_00.py
+        """
+        with self.assertRaisesRegex(TestSetError, 'does not exist'):
+            self.mock_testset(content)
 
 
 if __name__ == '__main__':

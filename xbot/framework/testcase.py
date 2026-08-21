@@ -110,7 +110,7 @@ class TestCase(object):
     @property
     def skipped(self) -> bool:
         """
-        Whether it is exclued by testset.
+        Whether it is excluded by testset.
         """
         etags = self.__testset.exclude_tags
         itags = self.__testset.include_tags
@@ -218,23 +218,31 @@ class TestCase(object):
         """
         raise NotImplementedError
     
-    def run(self) -> None:
+    def run(self, never_skip: bool = False) -> None:
         """
         Run the current testcase.
+
+        :param never_skip: Ignore tags matching.
         """
-        t = Thread(target=self.__run, name=self.caseid)
+        t = Thread(
+            target=self.__run,
+            args=(never_skip,),
+            name=self.caseid,
+        )
         t.start()
         t.join(self.TIMEOUT)
         if t.is_alive():
             utils.stop_thread(t, TestCaseTimeout)
             t.join(60)  # 等待 teardown 完成。
 
-    def __run(self) -> None:
+    def __run(self, never_skip: bool = False) -> None:
         """
         Run the current testcase.
+
+        :param never_skip: Ignore tags matching.
         """
         self.__starttime = datetime.now().replace(microsecond=0)
-        if self.skipped:
+        if not never_skip and self.skipped:
             self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
             self.warn(f'Skipped: self.TAGS={self.TAGS}, ' + 

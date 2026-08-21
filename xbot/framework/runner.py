@@ -48,11 +48,14 @@ class Runner(object):
         if outfmt == 'verbose':
             enable_console_logging()
         logroot = self._make_logroot()
-        casecnt = len(self.testset.paths)
-        for i, casepath in enumerate(self.testset.paths):
+        casepaths = self.testset.testcases.install + self.testset.testcases.test
+        casecnt = len(casepaths)
+        instend = len(self.testset.testcases.install) - 1
+        for i, casepath in enumerate(casepaths):
             caseid = casepath.split('/')[-1].replace('.py', '')
             abspath = os.path.abspath(casepath)
             order = f'({i+1}/{casecnt})'
+            insting = i <= instend
             try:
                 casecls = self._import_case(casepath)
                 caseinst = casecls(self.testbed, self.testset, logroot)
@@ -63,11 +66,14 @@ class Runner(object):
                 xprint(f'Start: {caseid} {order}'.center(100, '='))
             if outfmt == 'brief':
                 timer = self._timer(caseinst, i+1, casecnt)
-            caseinst.run()
+            caseinst.run(never_skip=(insting))
             if outfmt == 'brief':
                 timer.join()
             if outfmt == 'verbose':
                 xprint(f'End: {caseid} {order}'.center(100, '='), '\n')
+            if insting and caseinst.result != 'PASS':
+                xprint(f'Execution was interrupted because `{caseid}` failed.')
+                break
         return logroot
     
     def _timer(self, caseinst: TestCase, seq: int, casecnt: int) -> Thread:

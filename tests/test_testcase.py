@@ -10,6 +10,7 @@ from io import StringIO
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
+from xbot.framework import utils
 from xbot.framework.testcase import TestCase
 from xbot.framework.testbed import TestBed
 from xbot.framework.testset import TestSet
@@ -29,8 +30,14 @@ class TestTestCase(unittest.TestCase):
         cls.logroot = tempfile.mkdtemp()
         cls.testbed = TestBed(os.path.join(cls.workdir, 'testbeds', 
                                            'testbed_example.yml'))
-        cls.testset = TestSet(os.path.join(cls.workdir, 'testsets', 
-                                           'testset_example.yml'))
+        with utils.cd(cls.workdir):
+            cls.testset = TestSet(
+                os.path.join(
+                    cls.workdir,
+                    'testsets',
+                    'testset_example.yml',
+                ),
+            )
         # Hide console output.
         for hdlr in ROOT_LOGGER.handlers:
             if isinstance(hdlr, logging.StreamHandler) \
