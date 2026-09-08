@@ -24,3 +24,10 @@ class TestSetError(Exception):
     Testset syntax/format error.
     """
     pass
+
+
+class SuperClassError(Exception):
+    """
+    Super class syntax error.
+    """
+    pass

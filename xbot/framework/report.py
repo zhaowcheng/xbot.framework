@@ -40,6 +40,7 @@ def gen_report(logdir: str) -> tuple[str, bool]:
         'FAIL': 0,
         'ERROR': 0,
         'TIMEOUT': 0,
+        'BLOCK': 0,
         'SKIP': 0
     }
     report = os.path.join(logdir, 'report.html')
@@ -50,7 +51,12 @@ def gen_report(logdir: str) -> tuple[str, bool]:
             if f.endswith('.html') and f not in ['report.html', 'report.ok.html']:
                 reltop = os.path.relpath(top, logdir)
                 caselog = os.path.join(reltop, f).replace('\\', '/')
-                casepath = caselog.replace('.html', '.py')
+                caseid = f.replace('.html', '')
+                issuper = f.endswith('.setup.html') or f.endswith('.teardown.html')
+                if issuper:
+                    casepath = f'{reltop}/__init__.py:{caseid}'
+                else:
+                    casepath = caselog.replace('.html', '.py')
                 with open(os.path.join(top, f), encoding='utf8') as fp:
                     content = fp.read()
                     result = find_value(content, 'result')
@@ -58,7 +64,8 @@ def gen_report(logdir: str) -> tuple[str, bool]:
                         raise ValueError(f'Unknown result: {result}: {os.path.join(top, f)}')
                     if result not in ['PASS', 'SKIP']:
                         allpassed = False
-                    counter[result] += 1
+                    if not issuper:
+                        counter[result] += 1
                     caseinfo = {
                         'result': result,
                         'path': casepath,
@@ -80,6 +87,7 @@ def gen_report(logdir: str) -> tuple[str, bool]:
         failcnt=counter['FAIL'],
         errorcnt=counter['ERROR'],
         timeoutcnt=counter['TIMEOUT'],
+        blockcnt=counter['BLOCK'],
         skipcnt=counter['SKIP'],
         allcnt=sum(counter.values()),
         total_duration=total_duration,

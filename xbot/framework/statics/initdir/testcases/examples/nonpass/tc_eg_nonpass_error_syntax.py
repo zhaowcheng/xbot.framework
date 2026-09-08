@@ -1,14 +1,12 @@
 from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_error_syntax(TestCase):
+class tc_eg_nonpass_error_syntax(tc_eg_nonpass):
     """
     Testcase with syntax error.
     """
-    TIMEOUT = 60
-    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):

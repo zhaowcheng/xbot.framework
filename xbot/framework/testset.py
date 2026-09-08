@@ -8,18 +8,22 @@ import os
 
 from typing import Any, NamedTuple
 from functools import cached_property
+from pathlib import PurePosixPath
+from importlib import import_module
 
 from ruamel import yaml
 
+from xbot.framework.testcase import TestCase
 from xbot.framework.utils import ordered_walk
-from xbot.framework.errors import TestSetError
+from xbot.framework.errors import TestSetError, SuperClassError
 
 class TestCases(NamedTuple):
     """
-    测试套中 `TestSet.testcases` 解析后返回的类型。
+    The type returned after parsing `TestSet.testcases` in the testset.
     """
     install: tuple[str, ...]
     test: tuple[str, ...]
+
 
 class TestSet(object):
     """
@@ -30,9 +34,10 @@ class TestSet(object):
         :param filepath: testset filepath.
         :return: None.
         """
-        self._data: dict[str, Any] = self._parse(filepath)
+        self.__data: dict[str, Any] = self.__parse(filepath)
+        self.superclses  # Import and check in advance.
 
-    def _parse(self, filepath: str) -> dict[str, Any]:
+    def __parse(self, filepath: str) -> dict[str, Any]:
         """
         Parse testset.
 
@@ -76,7 +81,7 @@ class TestSet(object):
         """
         tags used to include testcases.
         """
-        include_tags = self._data['tags'].get('include') or []
+        include_tags = self.__data['tags'].get('include') or []
         return tuple(include_tags)
 
     @cached_property
@@ -84,7 +89,7 @@ class TestSet(object):
         """
         tags used to exclude testcases.
         """
-        exclude_tags = self._data['tags'].get('exclude') or []
+        exclude_tags = self.__data['tags'].get('exclude') or []
         return tuple(exclude_tags)
 
     @cached_property
@@ -94,7 +99,7 @@ class TestSet(object):
         """
         testcases = {'install': [], 'test': []}
         for section in ('install', 'test'):
-            paths = self._data['testcases'][section]
+            paths = self.__data['testcases'][section]
             if not paths:
                 continue
             for path in paths:
@@ -108,3 +113,43 @@ class TestSet(object):
                                 testcases[section].append(relpath.replace(os.sep, '/'))
         return TestCases(install=tuple(testcases['install']),
                          test=tuple(testcases['test']))
+
+    @cached_property
+    def superclses(self) -> dict[PurePosixPath, type[TestCase]]:
+        """
+        Super classes of all testcases.
+        """
+        superclses = {}
+        for tc in (self.testcases.install + self.testcases.test):
+            # Grandfather class.
+            grandfathercls = TestCase
+            # From top to bottom.
+            for parentpath in reversed(PurePosixPath(tc).parents[:-1]):
+                # Has been imported.
+                if parentpath in superclses:
+                    grandfathercls = superclses[parentpath]
+                    continue
+                # The current directory is definitely the project root, so 
+                # relative path imports can be used here. Refer to `main.py:run()`.
+                supermod = import_module(str(parentpath).replace('/', '.'))
+                for obj in vars(supermod).values():
+                    # The first subclass of `TestCase` defined in the 
+                    # current module will be treated as the superclass.
+                    if isinstance(obj, type) and \
+                            obj.__module__ == supermod.__name__ and \
+                            issubclass(obj, TestCase):
+                        parentcls = obj
+                        if not issubclass(parentcls, grandfathercls):
+                            parentclsloc = f'{parentpath}/__init__.py:{parentcls.__name__}'
+                            grandfatherpath = PurePosixPath(parentpath).parent
+                            grandfatherclsloc = f'{grandfatherpath}/__init__.py:{grandfathercls.__name__}'
+                            raise SuperClassError(f'{parentclsloc} must inherit from {grandfatherclsloc}')
+                        for method in ('setup', 'teardown'):
+                            if method not in parentcls.__dict__:
+                                raise SuperClassError(f'{parentclsloc} did not reimplement `{method}` method.')
+                        superclses[parentpath] = parentcls
+                        grandfathercls = parentcls
+                        break
+                else:
+                    raise SuperClassError(f'No superclass (subclass of {grandfathercls.__name__}) was found in {parentpath}/__init__.py')
+        return superclses

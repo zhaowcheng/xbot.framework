@@ -1,14 +1,13 @@
 from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_timeout(TestCase):
+class tc_eg_nonpass_timeout(tc_eg_nonpass):
     """
     Testcase execution timeout.
     """
     TIMEOUT = 2
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):

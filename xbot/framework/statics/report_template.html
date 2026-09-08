@@ -45,6 +45,10 @@
             background-color: orange;
         }
 
+        .filter_button.block {
+            background-color: orange;
+        }
+
         .filter_button.skip {
             background-color: gray;
         }
@@ -93,6 +97,10 @@
             background-color: rgba(252, 161, 48, .3) !important;
         }
 
+        .BLOCK {
+            background-color: rgba(252, 161, 48, .3) !important;
+        }
+
         .SKIP {
             background-color: rgba(87, 86, 85, 0.3) !important;
         }
@@ -105,13 +113,18 @@
 
 <body>
     <script language="javascript" type="text/javascript">
-        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: SKIP*/
+        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: BLOCK; 6: SKIP*/
         function filterCase(level) {
             trs = document.getElementsByTagName("tr");
             for (var i = 1; i < trs.length; i++) {
                 tr = trs[i];
+                testcase = tr.querySelector("td:nth-child(1)").textContent;
                 result = tr.querySelector("td:nth-child(5) > a").text;
-                if (level == 0) {
+                if (
+                    level == 0 ||
+                    testcase.endsWith('.setup') ||
+                    testcase.endsWith('.teardown')
+                ) {
                     tr.style.display = null;
                 } else if (level == 1) {
                     if (result == 'PASS') {
@@ -138,6 +151,12 @@
                         tr.style.display = 'none';
                     }
                 } else if (level == 5) {
+                    if (result == 'BLOCK') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 6) {
                     if (result == 'SKIP') {
                         tr.style.display = null;
                     } else {
@@ -155,7 +174,8 @@
         <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[{{failcnt}}]</a>
         <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[{{errorcnt}}]</a>
         <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[{{timeoutcnt}}]</a>
-        <a class="skip filter_button" href='javascript:filterCase(5)'>SKIP[{{skipcnt}}]</a>
+        <a class="block filter_button" href='javascript:filterCase(5)'>BLOCK[{{blockcnt}}]</a>
+        <a class="skip filter_button" href='javascript:filterCase(6)'>SKIP[{{skipcnt}}]</a>
     </div>
 
     <table id='result_table'>

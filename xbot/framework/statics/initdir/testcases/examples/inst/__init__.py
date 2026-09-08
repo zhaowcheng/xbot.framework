@@ -1,9 +1,9 @@
-from lib.testcase import TestCase
+from .. import tc_eg
 
 
-class tc(TestCase):
+class tc_eg_inst(tc_eg):
     """
-    Base of `testcases/` directory.
+    Base of `testcases/examples/inst` directory.
     """
     def setup(self):
         """

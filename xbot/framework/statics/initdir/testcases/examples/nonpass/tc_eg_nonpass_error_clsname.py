@@ -1,13 +1,12 @@
 from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_class_name_incorrect(TestCase):
+class tc_eg_nonpass_class_name_incorrect(tc_eg_nonpass):
     """
     Testcase with incorrect class name (not consistent with the filename).
     """
-    TIMEOUT = 60
     FAILFAST = False
     TAGS = ['tag1']
 

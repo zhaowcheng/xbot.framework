@@ -1,16 +1,12 @@
 from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_skip_not_included(TestCase):
+class tc_eg_nonpass_skip_not_included(tc_eg_nonpass):
     """
     Testcase skipped due to not containing tag matching the `testset.tags.include`.
     """
-    TIMEOUT = 60
-    FAILFAST = True
-    TAGS = []
-
     def setup(self):
         """
         Prepare test environment.

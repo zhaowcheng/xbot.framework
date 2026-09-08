@@ -71,6 +71,7 @@ def run(testbed: str, testset: str, outfmt: str = 'brief') -> None:
     if not is_projdir(os.getcwd()):
         printerr("No `testcases` directory in current directory, "
                  "maybe current is not a project directory.")
+    # Facilitates the use of relative paths for imports.
     sys.path.insert(0, os.getcwd())
     tb = cast(TestBed, import_module('lib.testbed').TestBed(testbed))
     ts = TestSet(testset)

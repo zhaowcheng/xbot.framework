@@ -3,15 +3,14 @@ import tempfile
 import shutil
 
 from xbot.framework.utils import assertx
-from lib.testcase import TestCase
+
+from . import tc_eg_pass
 
 
-class tc_eg_pass_create_dirs_and_files(TestCase):
+class tc_eg_pass_create_dirs_and_files(tc_eg_pass):
     """
     Test creating directories and files.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):

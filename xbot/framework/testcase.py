@@ -12,15 +12,18 @@ import re
 import time
 import inspect
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING
 from datetime import datetime, timedelta
 from importlib import import_module
 from threading import Thread
+from pathlib import Path
 
 from xbot.framework import logger, common, utils
 from xbot.framework.testbed import TestBed
-from xbot.framework.testset import TestSet
 from xbot.framework.errors import TestCaseTimeout, TestCaseError
+
+if TYPE_CHECKING:
+    from xbot.framework.testset import TestSet
 
 
 class TestCase(object):
@@ -37,27 +40,30 @@ class TestCase(object):
     def __init__(
         self,
         testbed: TestBed,
-        testset: TestSet,
-        logroot: str
+        testset: 'TestSet',
+        logroot: str,
+        role: Literal['testcase', 
+                      'setup', 
+                      'teardown'] = 'testcase'
     ) -> None:
         """
         :param testbed: TestBed instance.
+        :param testset: TestSet instance.
         :param logroot: testcase logdir.
+        :param role: role.
         """
         self.__testbed: TestBed = testbed
-        self.__testset: TestSet = testset
+        self.__testset: 'TestSet' = testset
         self.__logroot: str = logroot
+        self.__role = role
         self.__starttime: datetime | None = None
         self.__endtime: datetime | None = None
         self.__duration: timedelta | None = None
         self.__result: str | None = None
         self.__logger: logger.XLogger = logger.getlogger(self.caseid)
-        self.__loghdlr: logger.CaseLogHandler = logger.CaseLogHandler(
-            logging.DEBUG
-        )
+        self.__loghdlr: logger.CaseLogHandler = logger.CaseLogHandler(logging.DEBUG)
         self.__loghdlr.addFilter(logger.CaseLogFilter(self.caseid))
         self.__loghdlr.setFormatter(logger.FORMATTER)
-        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
 
     @property
     def testbed(self) -> TestBed:
@@ -69,9 +75,13 @@ class TestCase(object):
     @property
     def caseid(self) -> str:
         """
-        Testcase filename(without suffix).
+        Testcase id.
         """
-        return os.path.basename(self.abspath.replace('.py', ''))
+        clsname = self.__class__.__name__
+        if self.__role == 'testcase':
+            return clsname
+        else:
+            return f'{clsname}.{self.__role}'
     
     @property
     def abspath(self) -> str:
@@ -96,8 +106,9 @@ class TestCase(object):
         """
         Logfile path(absolute).
         """
+        parent = Path(self.relpath).parent
         return os.path.normpath(
-            os.path.join(self.__logroot, self.relpath.replace('.py', '.html'))
+            os.path.join(self.__logroot, parent, f'{self.caseid}.html')
         )
     
     @property
@@ -153,7 +164,7 @@ class TestCase(object):
         <caseid>_<starttime>
         """
         if self.starttime is None:
-            raise RuntimeError('Testcase has not started')
+            raise RuntimeError('Testcase has not started.')
         return '{}_{}'.format(
             self.caseid, self.starttime.strftime('%H%M%S'))
 
@@ -218,15 +229,20 @@ class TestCase(object):
         """
         raise NotImplementedError
     
-    def run(self, never_skip: bool = False) -> None:
+    def run(
+        self, 
+        never_skip: bool = False, 
+        block_reason: Optional[str] = None
+    ) -> None:
         """
         Run the current testcase.
 
         :param never_skip: Ignore tags matching.
+        :param block_reason: The reason for being blocked.
         """
         t = Thread(
             target=self.__run,
-            args=(never_skip,),
+            args=(never_skip, block_reason),
             name=self.caseid,
         )
         t.start()
@@ -235,27 +251,39 @@ class TestCase(object):
             utils.stop_thread(t, TestCaseTimeout)
             t.join(60)  # 等待 teardown 完成。
 
-    def __run(self, never_skip: bool = False) -> None:
+    def __run(
+        self, 
+        never_skip: bool = False, 
+        block_reason: Optional[str] = None
+    ) -> None:
         """
         Run the current testcase.
 
         :param never_skip: Ignore tags matching.
+        :param block_reason: The reason for being blocked.
         """
+        logger.ROOT_LOGGER.addHandler(self.__loghdlr)
         self.__starttime = datetime.now().replace(microsecond=0)
-        if not never_skip and self.skipped:
+        if self.__role == 'testcase' and not never_skip and self.skipped:
             self.__loghdlr.set_stage('setup')
             self.__result = 'SKIP'
             self.warn(f'Skipped: self.TAGS={self.TAGS}, ' + 
                       f'testset.tags.include={self.__testset.include_tags}, ' + 
                       f'testset.tags.exclude={self.__testset.exclude_tags}')
+        elif block_reason:
+            self.__loghdlr.set_stage('setup')
+            self.__result = 'BLOCK'
+            self.warn(f'Blocked: {block_reason}')
         else:
-            self.__run_stage('setup')
-            if not self.__result:
+            if self.__role != 'teardown':
+                self.__run_stage('setup')
+            if self.__role == 'testcase' and not self.__result:
                 for step in self.steps:
                     if not self.__result or (self.__result == 'FAIL' and 
                                              not self.FAILFAST):
                         self.__run_stage(step)
-            self.__run_stage('teardown')
+            if self.__role != 'setup':
+                self.__run_stage('teardown')
         self.__endtime = datetime.now().replace(microsecond=0)
         self.__duration = self.__endtime - self.__starttime
         self.__result = self.__result or 'PASS'
@@ -288,7 +316,7 @@ class TestCase(object):
         Save logs to html file.
         """
         if self.starttime is None or self.endtime is None:
-            raise RuntimeError('Testcase execution time is incomplete')
+            raise RuntimeError('Testcase execution time is incomplete.')
         os.makedirs(os.path.dirname(self.logfile), exist_ok=True)
         utils.render_write(
             common.LOG_TEMPLATE,
@@ -313,7 +341,7 @@ class ErrorTestCase(TestCase):
         caseid: str,
         filepath: str,
         testbed: TestBed, 
-        testset: TestSet, 
+        testset: 'TestSet', 
         logroot: str,
         exc: Exception
     ) -> None:
@@ -346,21 +374,23 @@ class ErrorTestCase(TestCase):
     def sourcecode(self) -> str:
         with open(self.__filepath, encoding='utf8') as f:
             return f.read()
-    
+
     def setup(self) -> None:
         """
-        Preset step.
+        Testcase preset step.
         """
         raise TestCaseError(str(self.__exc)) from None
-
+    
     def step1(self) -> None:
         """
-        Test step 1.
+        Test step 1(add more in order, e.g. step2, step3, ...).
+        At least one step is required.
         """
         pass
 
     def teardown(self) -> None:
         """
-        Cleanup step.
+        Testcase cleanup step.
         """
         pass
+    

@@ -1,13 +1,12 @@
 from xbot.framework.utils import assertx
-from lib.testcase import TestCase
+
+from . import tc_eg_pass
 
 
-class tc_eg_pass_get_values_from_testbed(TestCase):
+class tc_eg_pass_get_values_from_testbed(tc_eg_pass):
     """
     Get information from the testbed and perform checks.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):

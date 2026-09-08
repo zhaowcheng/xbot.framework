@@ -1,14 +1,12 @@
 from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_fail_setup_with_failfast_true(TestCase):
+class tc_eg_nonpass_fail_setup_with_failfast_true(tc_eg_nonpass):
     """
     Testcase failed in setup with FAILFAST set to True.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
