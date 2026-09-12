@@ -7,7 +7,7 @@ class tc_eg_install_the_software_to_be_tested_failed(tc_eg_inst):
     """
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         pass
 
@@ -19,6 +19,6 @@ class tc_eg_install_the_software_to_be_tested_failed(tc_eg_inst):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         pass

@@ -15,7 +15,7 @@ class tc_eg_pass_create_dirs_and_files(tc_eg_pass):
 
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         self.workdir = tempfile.mkdtemp()
         self.info('Created workdir: %s', self.workdir)
@@ -47,7 +47,7 @@ class tc_eg_pass_create_dirs_and_files(tc_eg_pass):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)

@@ -1,15 +1,15 @@
-from lib.testcase import TestCase
+from .. import tc_eg
 
 
-class tc(TestCase):
+class tc_eg_block(tc_eg):
     """
-    Base of `testcases/` directory.
+    Base of `testcases/examples/block` directory.
     """
     def setup(self):
         """
         Prepare.
         """
-        pass
+        raise Exception('Super class setup failed.')
 
     def teardown(self):
         """

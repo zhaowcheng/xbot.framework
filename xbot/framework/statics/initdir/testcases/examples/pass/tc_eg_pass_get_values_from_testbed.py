@@ -11,7 +11,7 @@ class tc_eg_pass_get_values_from_testbed(tc_eg_pass):
 
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         pass
 
@@ -52,6 +52,6 @@ class tc_eg_pass_get_values_from_testbed(tc_eg_pass):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         self.sleep(1)

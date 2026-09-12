@@ -29,3 +29,4 @@ testcases:
     # Recursively include all testcases in the directory,
     # only match files with the prefix `tc_` and suffix `.py`.
     - testcases/examples/nonpass/
+    - testcases/examples/block/

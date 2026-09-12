@@ -12,7 +12,7 @@ class tc_eg_nonpass_timeout(tc_eg_nonpass):
 
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         self.info('Starting setup')
 
@@ -32,6 +32,6 @@ class tc_eg_nonpass_timeout(tc_eg_nonpass):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         self.info('Starting teardown')

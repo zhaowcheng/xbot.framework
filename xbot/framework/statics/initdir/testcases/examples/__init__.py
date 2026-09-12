@@ -7,12 +7,12 @@ class tc_eg(tc):
     """
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         pass
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         pass

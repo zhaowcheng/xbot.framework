@@ -212,7 +212,7 @@ class TestCase(object):
 
     def setup(self) -> None:
         """
-        Testcase preset step.
+        Prepare.
         """
         raise NotImplementedError
 
@@ -225,7 +225,7 @@ class TestCase(object):
 
     def teardown(self) -> None:
         """
-        Testcase cleanup step.
+        Cleanup.
         """
         raise NotImplementedError
     
@@ -377,7 +377,7 @@ class ErrorTestCase(TestCase):
 
     def setup(self) -> None:
         """
-        Testcase preset step.
+        Prepare.
         """
         raise TestCaseError(str(self.__exc)) from None
     
@@ -390,7 +390,7 @@ class ErrorTestCase(TestCase):
 
     def teardown(self) -> None:
         """
-        Testcase cleanup step.
+        Cleanup.
         """
         pass
     

@@ -52,6 +52,7 @@ The test project directory structure:
 
 ```
 ./testproj
+├── .gitignore
 ├── README.md
 ├── lib  # test libraries
 │   ├── __init__.py
@@ -64,6 +65,13 @@ The test project directory structure:
 │   ├── __init__.py
 │   └── examples
 │       ├── __init__.py
+│       ├── block
+│       │   ├── __init__.py
+│       │   └── tc_eg_block_parent_setup_not_pass.py
+│       ├── inst
+│       │   ├── __init__.py
+│       │   ├── tc_eg_install_the_software_to_be_tested_failed.py
+│       │   └── tc_eg_install_the_software_to_be_tested_successful.py
 │       ├── nonpass
 │       │   ├── __init__.py
 │       │   ├── tc_eg_nonpass_error_clsname.py
@@ -108,36 +116,70 @@ Testset example(`testsets/testset_example.yml`):
 
 ```yaml
 # Testset is used to organize testcases to be executed.
-tags:  # `exclude` has higher priority than `include`.
-  include:  # Include testcases with these tags.
+
+# Tags are used to filter testcases by matching them against the `TAGS`
+# attribute of the testcases. Results of testcases that are not included
+# or excluded will be marked as SKIP.
+tags:
+  # Include testcases with these tags.
+  include:
     - tag1
-  exclude:  # Exclude testcases with these tags.
+  # Exclude testcases with these tags, higher priority than `include`.
+  exclude:
     - tag2
-paths:
-  - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
-  - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
-  # Recursively include all testcases in the directory, 
-  # only match files with the prefix 'tc_' and suffix '.py'.
-  - testcases/examples/nonpass/
+
+# Relative paths of testcases. These can be file paths (ending in `.py`)
+# or directory paths (not ending in `.py`). The execution order follows
+# the order in which they are written, and directories will be recursively
+# expanded into test case paths in alphabetical order.
+testcases:
+  # Testcases used to install the software to be tested. If any testcase
+  # in this section fails, the test section will not be executed.
+  # `tags` will not be used to filter testcases for this section.
+  # This section can be empty.
+  install:
+    - testcases/examples/inst/tc_eg_install_the_software_to_be_tested_successful.py
+  # Testcases used to test the installed software.
+  test:
+    - testcases/examples/pass/tc_eg_pass_get_values_from_testbed.py
+    - testcases/examples/pass/tc_eg_pass_create_dirs_and_files.py
+    # Recursively include all testcases in the directory,
+    # only match files with the prefix `tc_` and suffix `.py`.
+    - testcases/examples/nonpass/
+    - testcases/examples/block/
 ```
 
 Run the testcases(must execute under the test project directory):
 
 ```
 $ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml 
-(1/11)   PASS     0:00:01  tc_eg_pass_get_values_from_testbed
-(2/11)   PASS     0:00:01  tc_eg_pass_create_dirs_and_files
-(3/11)   ERROR    0:00:00  tc_eg_nonpass_error_clsname
-(4/11)   ERROR    0:00:00  tc_eg_nonpass_error_syntax
-(5/11)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_false
-(6/11)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_true
-(7/11)   FAIL     0:00:01  tc_eg_nonpass_fail_step_with_failfast_false
-(8/11)   FAIL     0:00:01  tc_eg_nonpass_fail_step_with_failfast_true
-(9/11)   SKIP     0:00:00  tc_eg_nonpass_skip_excluded
-(10/11)  SKIP     0:00:00  tc_eg_nonpass_skip_not_included
-(11/11)  TIMEOUT  0:00:03  tc_eg_nonpass_timeout
+(^_^)    PASS     0:00:00  tc.setup
+(^_^)    PASS     0:00:00  tc_eg.setup
+(^_^)    PASS     0:00:00  tc_eg_inst.setup
+(1/13)   PASS     0:00:00  tc_eg_install_the_software_to_be_tested_successful
+(^_^)    PASS     0:00:00  tc_eg_inst.teardown
+(^_^)    PASS     0:00:00  tc_eg_pass.setup
+(2/13)   PASS     0:00:01  tc_eg_pass_get_values_from_testbed
+(3/13)   PASS     0:00:01  tc_eg_pass_create_dirs_and_files
+(^_^)    PASS     0:00:00  tc_eg_pass.teardown
+(^_^)    PASS     0:00:00  tc_eg_nonpass.setup
+(4/13)   ERROR    0:00:00  tc_eg_nonpass_error_clsname
+(5/13)   ERROR    0:00:00  tc_eg_nonpass_error_syntax
+(6/13)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_false
+(7/13)   FAIL     0:00:01  tc_eg_nonpass_fail_setup_with_failfast_true
+(8/13)   FAIL     0:00:01  tc_eg_nonpass_fail_step_with_failfast_false
+(9/13)   FAIL     0:00:01  tc_eg_nonpass_fail_step_with_failfast_true
+(10/13)  SKIP     0:00:00  tc_eg_nonpass_skip_excluded
+(11/13)  SKIP     0:00:00  tc_eg_nonpass_skip_not_included
+(12/13)  TIMEOUT  0:00:03  tc_eg_nonpass_timeout
+(^_^)    PASS     0:00:00  tc_eg_nonpass.teardown
+(^_^)    FAIL     0:00:00  tc_eg_block.setup
+(13/13)  BLOCK    0:00:00  tc_eg_block_parent_setup_not_pass
+(^_^)    PASS     0:00:00  tc_eg_block.teardown
+(^_^)    PASS     0:00:00  tc_eg.teardown
+(^_^)    PASS     0:00:00  tc.teardown
 
-report: /Users/wan/CodeProjects/xbot.framework/testproj/logs/testbed_example/2024-07-02_12-19-43/report.html 
+report: /Users/zhaowcheng/Code/xbot/xbot.framework/testproj/logs/testbed_example/2026-09-09_16-19-33/report.html
 ```
 
 Test report and logs will be generated in the `logs` subdirectory.
@@ -161,20 +203,19 @@ import tempfile
 import shutil
 
 from xbot.framework.utils import assertx
-from lib.testcase import TestCase
+
+from . import tc_eg_pass
 
 
-class tc_eg_pass_create_dirs_and_files(TestCase):
+class tc_eg_pass_create_dirs_and_files(tc_eg_pass):
     """
     Test creating directories and files.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         self.workdir = tempfile.mkdtemp()
         self.info('Created workdir: %s', self.workdir)
@@ -206,14 +247,14 @@ class tc_eg_pass_create_dirs_and_files(TestCase):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         shutil.rmtree(self.workdir)
         self.info('Removed workdir: %s', self.workdir)
         self.sleep(1)
 ```
 
-- Testcase `MUST` inherit from the `TestCase` base class;
+- Testcase `MUST` directly inherit from the base class defined by its directory;
 - Testcase `MUST` implement the preset steps in the setup method, write pass if there are no specific steps;
 - Testcase `MUST` implement the cleanup steps in the teardown method, write pass if there are no specific steps;
 - Test steps are named in the form of `step1, step2, ...`, the number at the end is the execution order;

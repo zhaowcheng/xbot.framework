@@ -11,7 +11,7 @@ class tc_eg_nonpass_fail_step_with_failfast_true(tc_eg_nonpass):
 
     def setup(self):
         """
-        Prepare test environment.
+        Prepare.
         """
         pass
 
@@ -31,6 +31,6 @@ class tc_eg_nonpass_fail_step_with_failfast_true(tc_eg_nonpass):
 
     def teardown(self):
         """
-        Clean up test environment.
+        Cleanup.
         """
         self.sleep(1)
