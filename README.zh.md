@@ -59,7 +59,7 @@ Initialized ./testproj
 │   └── testcase.py  # 测试用例基类
 ├── requirements.txt
 ├── testbeds  # 测试床目录
-│   └── testbed_example.yml 
+│   └── testbed_example.yml
 ├── testcases  # 测试用例目录
 │   ├── __init__.py
 │   └── examples
@@ -151,7 +151,7 @@ testcases:
 执行测试(测试工程目录下执行命令):
 
 ```
-$ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml 
+$ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml
 (^_^)    PASS     0:00:00  tc.setup
 (^_^)    PASS     0:00:00  tc_eg.setup
 (^_^)    PASS     0:00:00  tc_eg_inst.setup
@@ -178,7 +178,7 @@ $ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml
 (^_^)    PASS     0:00:00  tc_eg.teardown
 (^_^)    PASS     0:00:00  tc.teardown
 
-report: /Users/zhaowcheng/Code/xbot/xbot.framework/testproj/logs/testbed_example/2026-09-09_16-19-33/report.html
+report: /Users/zhaowcheng/Code/xbot/xbot.framework/testproj/logs/testbed_example/2026-09-13_14-27-20/report.html
 ```
 
 执行完成后会在测试工程下根据测试床名称和时间戳生成日志目录保存 html 格式的用例日志和测试报告。

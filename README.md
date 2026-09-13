@@ -60,7 +60,7 @@ The test project directory structure:
 │   └── testcase.py  # testcase base
 ├── requirements.txt
 ├── testbeds  # directory storing testbeds
-│   └── testbed_example.yml 
+│   └── testbed_example.yml
 ├── testcases  # directory storing testcases
 │   ├── __init__.py
 │   └── examples
@@ -152,7 +152,7 @@ testcases:
 Run the testcases(must execute under the test project directory):
 
 ```
-$ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml 
+$ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml
 (^_^)    PASS     0:00:00  tc.setup
 (^_^)    PASS     0:00:00  tc_eg.setup
 (^_^)    PASS     0:00:00  tc_eg_inst.setup
@@ -179,7 +179,7 @@ $ xbot run -b testbeds/testbed_example.yml -s testsets/testset_example.yml
 (^_^)    PASS     0:00:00  tc_eg.teardown
 (^_^)    PASS     0:00:00  tc.teardown
 
-report: /Users/zhaowcheng/Code/xbot/xbot.framework/testproj/logs/testbed_example/2026-09-09_16-19-33/report.html
+report: /Users/zhaowcheng/Code/xbot/xbot.framework/testproj/logs/testbed_example/2026-09-13_14-27-20/report.html
 ```
 
 Test report and logs will be generated in the `logs` subdirectory.

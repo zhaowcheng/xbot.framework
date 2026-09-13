@@ -45,6 +45,10 @@
             background-color: orange;
         }
 
+        .filter_button.block {
+            background-color: orange;
+        }
+
         .filter_button.skip {
             background-color: gray;
         }
@@ -93,6 +97,10 @@
             background-color: rgba(252, 161, 48, .3) !important;
         }
 
+        .BLOCK {
+            background-color: rgba(252, 161, 48, .3) !important;
+        }
+
         .SKIP {
             background-color: rgba(87, 86, 85, 0.3) !important;
         }
@@ -105,12 +113,24 @@
 
 <body>
     <script language="javascript" type="text/javascript">
-        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: SKIP*/
+        /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: BLOCK; 6: SKIP*/
+        var superCasesVisible = true;
+        var currentFilterLevel = 0;
+
         function filterCase(level) {
-            trs = document.getElementsByTagName("tr");
+            currentFilterLevel = level;
+            var trs = document.getElementsByTagName("tr");
             for (var i = 1; i < trs.length; i++) {
-                tr = trs[i];
-                result = tr.querySelector("td:nth-child(5) > a").text;
+                var tr = trs[i];
+                var testcase = tr.querySelector("td:nth-child(1)").textContent;
+                if (
+                    testcase.endsWith('.setup') ||
+                    testcase.endsWith('.teardown')
+                ) {
+                    tr.style.display = superCasesVisible ? null : 'none';
+                    continue;
+                }
+                var result = tr.querySelector("td:nth-child(5) > a").text;
                 if (level == 0) {
                     tr.style.display = null;
                 } else if (level == 1) {
@@ -138,6 +158,12 @@
                         tr.style.display = 'none';
                     }
                 } else if (level == 5) {
+                    if (result == 'BLOCK') {
+                        tr.style.display = null;
+                    } else {
+                        tr.style.display = 'none';
+                    }
+                } else if (level == 6) {
                     if (result == 'SKIP') {
                         tr.style.display = null;
                     } else {
@@ -145,6 +171,15 @@
                     }
                 }
             }
+        }
+
+        function toggleSuperCases() {
+            superCasesVisible = !superCasesVisible;
+            document.getElementById('super_toggle').textContent =
+                superCasesVisible
+                    ? 'HIDE SUPER SETUPS/TEARDOWNS'
+                    : 'SHOW SUPER SETUPS/TEARDOWNS';
+            filterCase(currentFilterLevel);
         }
 
     </script>
@@ -155,7 +190,9 @@
         <a class="fail filter_button" href='javascript:filterCase(2)'>FAIL[4]</a>
         <a class="error filter_button" href='javascript:filterCase(3)'>ERROR[2]</a>
         <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[1]</a>
-        <a class="skip filter_button" href='javascript:filterCase(5)'>SKIP[2]</a>
+        <a class="block filter_button" href='javascript:filterCase(5)'>BLOCK[0]</a>
+        <a class="skip filter_button" href='javascript:filterCase(6)'>SKIP[2]</a>
+        <a id='super_toggle' class="all filter_button" href='javascript:toggleSuperCases()'>HIDE SUPER SETUPS/TEARDOWNS</a>
     </div>
 
     <table id='result_table'>

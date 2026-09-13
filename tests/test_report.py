@@ -19,8 +19,19 @@ class TestReport(unittest.TestCase):
         report, _ = gen_report(LOGDIR)
         with open(report, encoding='utf8') as f1:
             with open(OKREPORT, encoding='utf8') as f2:
-                self.assertEqual(f1.read(), f2.read(), 
+                content = f1.read()
+                self.assertEqual(content, f2.read(),
                                  f'{report} != {OKREPORT}')
+        self.assertIn('var superCasesVisible = true;', content)
+        self.assertIn('var currentFilterLevel = 0;', content)
+        self.assertIn("id='super_toggle'", content)
+        self.assertIn('HIDE SUPER SETUPS/TEARDOWNS', content)
+        self.assertIn('SHOW SUPER SETUPS/TEARDOWNS', content)
+        self.assertIn(
+            "tr.style.display = superCasesVisible ? null : 'none';",
+            content
+        )
+        self.assertIn('filterCase(currentFilterLevel);', content)
         os.remove(report)
 
 

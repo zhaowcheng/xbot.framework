@@ -114,17 +114,24 @@
 <body>
     <script language="javascript" type="text/javascript">
         /* level - 0:ALL; 1:PASS; 2:FAIL; 3:ERROR; 4:TIMEOUT; 5: BLOCK; 6: SKIP*/
+        var superCasesVisible = true;
+        var currentFilterLevel = 0;
+
         function filterCase(level) {
-            trs = document.getElementsByTagName("tr");
+            currentFilterLevel = level;
+            var trs = document.getElementsByTagName("tr");
             for (var i = 1; i < trs.length; i++) {
-                tr = trs[i];
-                testcase = tr.querySelector("td:nth-child(1)").textContent;
-                result = tr.querySelector("td:nth-child(5) > a").text;
+                var tr = trs[i];
+                var testcase = tr.querySelector("td:nth-child(1)").textContent;
                 if (
-                    level == 0 ||
                     testcase.endsWith('.setup') ||
                     testcase.endsWith('.teardown')
                 ) {
+                    tr.style.display = superCasesVisible ? null : 'none';
+                    continue;
+                }
+                var result = tr.querySelector("td:nth-child(5) > a").text;
+                if (level == 0) {
                     tr.style.display = null;
                 } else if (level == 1) {
                     if (result == 'PASS') {
@@ -166,6 +173,15 @@
             }
         }
 
+        function toggleSuperCases() {
+            superCasesVisible = !superCasesVisible;
+            document.getElementById('super_toggle').textContent =
+                superCasesVisible
+                    ? 'HIDE SUPER SETUPS/TEARDOWNS'
+                    : 'SHOW SUPER SETUPS/TEARDOWNS';
+            filterCase(currentFilterLevel);
+        }
+
     </script>
 
     <div id='filter_button_line' style=" float: left;  width: 100%;">
@@ -176,6 +192,7 @@
         <a class="timeout filter_button" href='javascript:filterCase(4)'>TIMEOUT[{{timeoutcnt}}]</a>
         <a class="block filter_button" href='javascript:filterCase(5)'>BLOCK[{{blockcnt}}]</a>
         <a class="skip filter_button" href='javascript:filterCase(6)'>SKIP[{{skipcnt}}]</a>
+        <a id='super_toggle' class="all filter_button" href='javascript:toggleSuperCases()'>HIDE SUPER SETUPS/TEARDOWNS</a>
     </div>
 
     <table id='result_table'>
