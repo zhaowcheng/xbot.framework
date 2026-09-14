@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -90,17 +95,13 @@
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_skip_not_included(TestCase):
+class tc_eg_nonpass_skip_not_included(tc_eg_nonpass):
     """
     Testcase skipped due to not containing tag matching the `testset.tags.include`.
     """
-    TIMEOUT = 60
-    FAILFAST = True
-    TAGS = []
-
     def setup(self):
         """
         Prepare.
@@ -146,11 +147,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:45</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:04:00</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:45</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:04:00</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -174,9 +175,9 @@ example:
                     </tr>
                     
                     <tr class="WARNING">
-                        <td>2024-07-02 12:10:45,536</td>
+                        <td>2026-09-13 23:04:00,289</td>
                         <td>WARNING</td>
-                        <td style="word-wrap: break-word;">testcase.py:228</td>
+                        <td style="word-wrap: break-word;">testcase.py:270</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Skipped: self.TAGS=[], testset.tags.include=('tag1',), testset.tags.exclude=('tag2',)</pre>
                             

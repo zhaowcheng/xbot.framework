@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -89,15 +94,14 @@
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
-from lib.testcase import TestCase
+
+from . import tc_eg_pass
 
 
-class tc_eg_pass_get_values_from_testbed(TestCase):
+class tc_eg_pass_get_values_from_testbed(tc_eg_pass):
     """
     Get information from the testbed and perform checks.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
@@ -174,11 +178,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:30</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:03:53</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:31</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:03:54</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -219,9 +223,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,349</td>
+                        <td>2026-09-13 23:03:53,496</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:24</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:23</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value1 == value1</pre>
                             
@@ -246,9 +250,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,351</td>
+                        <td>2026-09-13 23:03:53,497</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:31</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:30</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value2-1 == value2-1</pre>
                             
@@ -273,9 +277,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,351</td>
+                        <td>2026-09-13 23:03:53,497</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:38</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: value3-2 == value3-2</pre>
                             
@@ -300,9 +304,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,351</td>
+                        <td>2026-09-13 23:03:53,497</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:45</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:44</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: [{'name': 'jack', 'age': 20}] == [{'name': 'jack', 'age': 20}]</pre>
                             
@@ -327,9 +331,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,352</td>
+                        <td>2026-09-13 23:03:53,497</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:52</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:51</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: None == None</pre>
                             
@@ -354,9 +358,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:30,352</td>
+                        <td>2026-09-13 23:03:53,497</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:58</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_get_values_from_testbed.py:57</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

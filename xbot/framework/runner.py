@@ -223,7 +223,7 @@ class Runner(object):
                     else:
                         duration = datetime.now().replace(microsecond=0) - caseinst.starttime
                     xprint(fmtstr % ('RUNNING', duration), end='')
-                    sleep(1)
+                    sleep(0.1)
                 starttime = caseinst.starttime
                 endtime = caseinst.endtime
                 if starttime is None or endtime is None:

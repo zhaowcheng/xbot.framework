@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -89,14 +94,14 @@
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_skip_excluded</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
-from lib.testcase import TestCase
 
-class tc_eg_nonpass_skip_excluded(TestCase):
+from . import tc_eg_nonpass
+
+
+class tc_eg_nonpass_skip_excluded(tc_eg_nonpass):
     """
     Testcase skipped due to containing tag(s) matching the `testset.tags.exclude`.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1', 'tag2']
 
     def setup(self):
@@ -144,11 +149,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:44</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:04:00</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:44</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:04:00</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -172,9 +177,9 @@ example:
                     </tr>
                     
                     <tr class="WARNING">
-                        <td>2024-07-02 12:10:44,527</td>
+                        <td>2026-09-13 23:04:00,182</td>
                         <td>WARNING</td>
-                        <td style="word-wrap: break-word;">testcase.py:228</td>
+                        <td style="word-wrap: break-word;">testcase.py:270</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Skipped: self.TAGS=['tag1', 'tag2'], testset.tags.include=('tag1',), testset.tags.exclude=('tag2',)</pre>
                             

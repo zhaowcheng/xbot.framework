@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -93,15 +98,14 @@ import tempfile
 import shutil
 
 from xbot.framework.utils import assertx
-from lib.testcase import TestCase
+
+from . import tc_eg_pass
 
 
-class tc_eg_pass_create_dirs_and_files(TestCase):
+class tc_eg_pass_create_dirs_and_files(tc_eg_pass):
     """
     Test creating directories and files.
     """
-    TIMEOUT = 60
-    FAILFAST = True
     TAGS = ['tag1']
 
     def setup(self):
@@ -171,11 +175,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:32</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:03:54</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:33</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:03:55</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -199,11 +203,11 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,411</td>
+                        <td>2026-09-13 23:03:54,543</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:22</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:21</td>
                         <td style="padding-left: 0.5%;">
-                            <pre>Created workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmpq4037ehb</pre>
+                            <pre>Created workdir: /var/folders/40/grwlw6sn0tv1ctctzvrcmvh80000gn/T/tmp8ydim41z</pre>
                             
                         </td>
                     </tr>
@@ -226,9 +230,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,412</td>
+                        <td>2026-09-13 23:03:54,545</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:30</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:29</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: True == True</pre>
                             
@@ -253,9 +257,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,413</td>
+                        <td>2026-09-13 23:03:54,546</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:38</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:37</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: True == True</pre>
                             
@@ -280,9 +284,9 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,414</td>
+                        <td>2026-09-13 23:03:54,547</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:47</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:46</td>
                         <td style="padding-left: 0.5%;">
                             <pre>AssertionOK: hello world == hello world</pre>
                             
@@ -307,19 +311,19 @@ example:
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,414</td>
+                        <td>2026-09-13 23:03:54,550</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:54</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:53</td>
                         <td style="padding-left: 0.5%;">
-                            <pre>Removed workdir: /var/folders/49/ts39js3s1wz3tly6vjm8f8_m0000gn/T/tmpq4037ehb</pre>
+                            <pre>Removed workdir: /var/folders/40/grwlw6sn0tv1ctctzvrcmvh80000gn/T/tmp8ydim41z</pre>
                             
                         </td>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:32,415</td>
+                        <td>2026-09-13 23:03:54,550</td>
                         <td>INFO</td>
-                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:55</td>
+                        <td style="word-wrap: break-word;">tc_eg_pass_create_dirs_and_files.py:54</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Sleep 1 second(s)...</pre>
                             

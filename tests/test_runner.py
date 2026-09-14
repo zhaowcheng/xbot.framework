@@ -1,9 +1,9 @@
 import os
-import sys
 import re
-import unittest
-import tempfile
 import shutil
+import sys
+import tempfile
+import unittest
 import logging
 
 from io import StringIO
@@ -95,11 +95,26 @@ class TestRunner(unittest.TestCase):
             m = re.search(rf'<td id="result" colspan="2">(.+)</td>', f.read())
             return m.group(1)
 
+    def get_results_from_output(
+        self,
+        output: str,
+    ) -> list[tuple[str, str]]:
+        """
+        Get testcase results from runner output.
+
+        :param output: Captured runner output.
+        :return: Result and testcase id pairs.
+        """
+        return re.findall(
+            r'(PASS|FAIL|ERROR|TIMEOUT|BLOCK|SKIP) +\d+:\d+:\d+ +(\S+)',
+            output,
+        )
+
     def test_run(self):
         """
         Test `Runner.run` method.
         """
-        logroot, _ = self.run_testset('testset_example.yml')
+        logroot, output = self.run_testset('testset_example.yml')
         self.assertTrue(os.path.exists(logroot))
         self.assertEqual(
             self.get_case_result_from_logfile(
@@ -125,13 +140,125 @@ class TestRunner(unittest.TestCase):
         )
         self.assertEqual(
             self.get_case_result_from_logfile(
-                os.path.join(logroot, 
-                             'testcases', 
-                             'examples', 
-                             'nonpass', 
-                             'tc_eg_nonpass_error_syntax.html')
-            ), 
-            'ERROR'
+                os.path.join(
+                    logroot,
+                    'testcases',
+                    'examples',
+                    'nonpass',
+                    'tc_eg_nonpass_error_syntax.html',
+                ),
+            ),
+            'ERROR',
+        )
+        lifecycle = [
+            caseid for _, caseid in self.get_results_from_output(output)
+            if caseid.endswith('.setup') or caseid.endswith('.teardown')
+        ]
+        self.assertEqual(
+            lifecycle,
+            [
+                'tc.setup',
+                'tc_eg.setup',
+                'tc_eg_inst.setup',
+                'tc_eg_inst.teardown',
+                'tc_eg_pass.setup',
+                'tc_eg_pass.teardown',
+                'tc_eg_nonpass.setup',
+                'tc_eg_nonpass.teardown',
+                'tc_eg_block.setup',
+                'tc_eg_block.teardown',
+                'tc_eg.teardown',
+                'tc.teardown',
+            ],
+        )
+
+    def test_failed_superclass_setup_blocks_descendants(self):
+        """
+        Block a child superclass and testcase after a parent setup failure.
+        """
+        childdir = os.path.join(
+            self.workdir,
+            'testcases',
+            'examples',
+            'block',
+            'child',
+        )
+        os.makedirs(childdir)
+        self.addCleanup(shutil.rmtree, childdir)
+        self.addCleanup(self._clear_project_modules)
+        with open(
+            os.path.join(childdir, '__init__.py'),
+            'w',
+            encoding='utf8',
+        ) as initfile:
+            initfile.write(
+                """
+from testcases.examples.block import tc_eg_block
+
+
+class tc_eg_block_child(tc_eg_block):
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+""",
+            )
+        with open(
+            os.path.join(childdir, 'tc_blocked.py'),
+            'w',
+            encoding='utf8',
+        ) as casefile:
+            casefile.write(
+                """
+from . import tc_eg_block_child
+
+
+class tc_blocked(tc_eg_block_child):
+    def setup(self):
+        pass
+
+    def step1(self):
+        pass
+
+    def teardown(self):
+        pass
+""",
+            )
+        filename = 'testset_superclass_setup_failed.yml'
+        filepath = os.path.join(self.workdir, 'testsets', filename)
+        self.addCleanup(os.remove, filepath)
+        with open(
+            filepath,
+            'w',
+            encoding='utf8',
+        ) as testset_file:
+            testset_file.write(
+                """
+tags:
+  include:
+  exclude:
+testcases:
+  install:
+  test:
+    - testcases/examples/block/child/tc_blocked.py
+""",
+            )
+
+        _, output = self.run_testset(filename)
+        self.assertEqual(
+            self.get_results_from_output(output),
+            [
+                ('PASS', 'tc.setup'),
+                ('PASS', 'tc_eg.setup'),
+                ('FAIL', 'tc_eg_block.setup'),
+                ('BLOCK', 'tc_eg_block_child.setup'),
+                ('BLOCK', 'tc_blocked'),
+                ('BLOCK', 'tc_eg_block_child.teardown'),
+                ('PASS', 'tc_eg_block.teardown'),
+                ('PASS', 'tc_eg.teardown'),
+                ('PASS', 'tc.teardown'),
+            ],
         )
 
     def test_failed_install_interrupts_execution(self):
@@ -183,6 +310,21 @@ testcases:
         self.assertFalse(os.path.exists(successful))
         self.assertFalse(os.path.exists(tested))
         self.assertIn('Execution was interrupted', output)
+        self.assertEqual(
+            self.get_results_from_output(output),
+            [
+                ('PASS', 'tc.setup'),
+                ('PASS', 'tc_eg.setup'),
+                ('PASS', 'tc_eg_inst.setup'),
+                (
+                    'FAIL',
+                    'tc_eg_install_the_software_to_be_tested_failed',
+                ),
+                ('PASS', 'tc_eg_inst.teardown'),
+                ('PASS', 'tc_eg.teardown'),
+                ('PASS', 'tc.teardown'),
+            ],
+        )
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -89,14 +94,14 @@
                     <td id="caseid" colspan="2" style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_false</td>
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
-from lib.testcase import TestCase
 
-class tc_eg_nonpass_fail_setup_with_failfast_false(TestCase):
+from . import tc_eg_nonpass
+
+
+class tc_eg_nonpass_fail_setup_with_failfast_false(tc_eg_nonpass):
     """
     Testcase failed in setup with FAILFAST set to False.
     """
-    TIMEOUT = 60
-    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):
@@ -152,11 +157,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:36</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:03:56</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:37</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:03:57</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -180,16 +185,16 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2024-07-02 12:10:36,430</td>
+                        <td>2026-09-13 23:03:56,023</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:262</td>
+                        <td style="word-wrap: break-word;">testcase.py:312</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/testcase.py", line 252, in __run_stage
+  File "/Users/zhaowcheng/Code/xbot/xbot.framework/xbot/framework/testcase.py", line 302, in __run_stage
     func()
-  File "/Users/wan/CodeProjects/xbot.framework/testproj/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py", line 18, in setup
+  File "/Users/zhaowcheng/Code/xbot/xbot.framework/testproj/testcases/examples/nonpass/tc_eg_nonpass_fail_setup_with_failfast_false.py", line 18, in setup
     assertx(1, '==', 0)
-  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/utils.py", line 395, in assertx
+  File "/Users/zhaowcheng/Code/xbot/xbot.framework/xbot/framework/utils.py", line 278, in assertx
     raise AssertionError(errmsg)
 AssertionError: 1 == 0</pre>
                             
@@ -214,7 +219,7 @@ AssertionError: 1 == 0</pre>
                     </tr>
                     
                     <tr class="INFO">
-                        <td>2024-07-02 12:10:36,430</td>
+                        <td>2026-09-13 23:03:56,023</td>
                         <td>INFO</td>
                         <td style="word-wrap: break-word;">tc_eg_nonpass_fail_setup_with_failfast_false.py:36</td>
                         <td style="padding-left: 0.5%;">

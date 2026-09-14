@@ -139,8 +139,8 @@ class TestSet(object):
                             obj.__module__ == supermod.__name__ and \
                             issubclass(obj, TestCase):
                         parentcls = obj
+                        parentclsloc = (f'{parentpath}/__init__.py:{parentcls.__name__}')
                         if not issubclass(parentcls, grandfathercls):
-                            parentclsloc = f'{parentpath}/__init__.py:{parentcls.__name__}'
                             grandfatherpath = PurePosixPath(parentpath).parent
                             grandfatherclsloc = f'{grandfatherpath}/__init__.py:{grandfathercls.__name__}'
                             raise SuperClassError(f'{parentclsloc} must inherit from {grandfatherclsloc}')

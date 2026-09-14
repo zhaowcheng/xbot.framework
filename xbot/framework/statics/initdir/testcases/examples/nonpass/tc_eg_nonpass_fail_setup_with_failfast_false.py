@@ -7,6 +7,7 @@ class tc_eg_nonpass_fail_setup_with_failfast_false(tc_eg_nonpass):
     """
     Testcase failed in setup with FAILFAST set to False.
     """
+    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):

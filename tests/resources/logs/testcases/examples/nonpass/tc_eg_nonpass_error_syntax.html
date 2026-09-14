@@ -30,6 +30,11 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
+        #sourcecode,
+        #testbed {
+            margin: 0;
+        }
+
         a {
             text-decoration: none;
         }
@@ -90,15 +95,13 @@
                     <td colspan="3" rowspan="5">
                         <pre id="sourcecode" style="overflow-y: scroll;">from xbot.framework.utils import assertx
 
-from lib.testcase import TestCase
+from . import tc_eg_nonpass
 
 
-class tc_eg_nonpass_error_syntax(TestCase):
+class tc_eg_nonpass_error_syntax(tc_eg_nonpass):
     """
     Testcase with syntax error.
     """
-    TIMEOUT = 60
-    FAILFAST = False
     TAGS = ['tag1']
 
     def setup(self):
@@ -147,11 +150,11 @@ example:
                 </tr>
                 <tr>
                     <th>StartTime</th>
-                    <td id="starttime" colspan="2">2024-07-02 12:10:35</td>
+                    <td id="starttime" colspan="2">2026-09-13 23:03:55</td>
                 </tr>
                 <tr>
                     <th>EndTime</th>
-                    <td id="endtime" colspan="2">2024-07-02 12:10:35</td>
+                    <td id="endtime" colspan="2">2026-09-13 23:03:55</td>
                 </tr>
                 <tr>
                     <th>Duration</th>
@@ -175,16 +178,16 @@ example:
                     </tr>
                     
                     <tr class="ERROR">
-                        <td>2024-07-02 12:10:35,419</td>
+                        <td>2026-09-13 23:03:55,910</td>
                         <td>ERROR</td>
-                        <td style="word-wrap: break-word;">testcase.py:262</td>
+                        <td style="word-wrap: break-word;">testcase.py:312</td>
                         <td style="padding-left: 0.5%;">
                             <pre>Traceback (most recent call last):
-  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/testcase.py", line 252, in __run_stage
+  File "/Users/zhaowcheng/Code/xbot/xbot.framework/xbot/framework/testcase.py", line 302, in __run_stage
     func()
-  File "/Users/wan/CodeProjects/xbot.framework/xbot/framework/testcase.py", line 330, in setup
+  File "/Users/zhaowcheng/Code/xbot/xbot.framework/xbot/framework/testcase.py", line 382, in setup
     raise TestCaseError(str(self.__exc)) from None
-xbot.framework.errors.TestCaseError: invalid syntax (tc_eg_nonpass_error_syntax.py, line 27)</pre>
+xbot.framework.errors.TestCaseError: '(' was never closed (tc_eg_nonpass_error_syntax.py, line 23)</pre>
                             
                         </td>
                     </tr>
