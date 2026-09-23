@@ -4,8 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xbot.framework"
-dynamic = ["readme"]
-version = "1.0.0"
+dynamic = ["version", "readme"]
 description = "A lightweight, easy-to-use, and extensible automation testing framework."
 requires-python = ">=3.10"
 license = "BSD-3-Clause"
@@ -49,3 +48,6 @@ namespaces = true
     "statics/initdir/**/*.py",
     "statics/initdir/**/*.yml",
 ]
+
+[tool.setuptools.dynamic]
+version = { attr = "xbot.framework.version.__version__" }
