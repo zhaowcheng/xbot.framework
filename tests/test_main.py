@@ -34,18 +34,29 @@ class TestMain(unittest.TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(cls.workdir)
 
-    def samedir(self, dir1: str, dir2: str) -> bool:
+    def samedir(
+        self,
+        dir1: str,
+        dir2: str,
+        ignore: list[str] | None = None
+    ) -> bool:
         """
         Compare two directories recursively.
+
+        :param dir1: first directory path.
+        :param dir2: second directory path.
+        :param ignore: names to ignore in the comparison.
+        :return: True if the two directories are identical.
         """
-        dcmp = filecmp.dircmp(dir1, dir2, ignore=None, hide=None)
+        dcmp = filecmp.dircmp(dir1, dir2, ignore=ignore, hide=None)
         return (
             not dcmp.left_only and
             not dcmp.right_only and
             not dcmp.diff_files and
             all(self.samedir(
                 os.path.join(dcmp.left, subdir),
-                os.path.join(dcmp.right, subdir)
+                os.path.join(dcmp.right, subdir),
+                ignore
             ) for subdir in dcmp.common_dirs)
         )
 
@@ -54,8 +65,18 @@ class TestMain(unittest.TestCase):
             tmpdir1 = tempfile.mktemp()
             main.init(tmpdir1)
             self.assertIn(f'Initialized {tmpdir1}', mockout.getvalue())
-            self.assertTrue(self.samedir(tmpdir1, INIT_DIR), 
+            self.assertTrue(self.samedir(tmpdir1, INIT_DIR, ['requirements.txt']),
                             f'{tmpdir1} is not same as {INIT_DIR}')
+            major = int(__version__.split('.')[0])
+            reqfile = os.path.join(tmpdir1, 'requirements.txt')
+            with open(reqfile, encoding='utf8') as f:
+                self.assertEqual(
+                    f.read(),
+                    "xbot.framework>=%d,<%d; python_version >= '3.10'\n"
+                    % (major, major + 1)
+                )
+            with open(os.path.join(INIT_DIR, 'requirements.txt'), encoding='utf8') as f:
+                self.assertEqual(f.read(), "xbot.framework; python_version >= '3.10'\n")
             shutil.rmtree(tmpdir1)
         tmpdir2 = tempfile.mkdtemp()
         mockerr = StringIO()
@@ -65,6 +86,28 @@ class TestMain(unittest.TestCase):
             self.assertEqual(cm.exception.code, 1)
         self.assertIn(f'{tmpdir2} already exists', mockerr.getvalue())
         shutil.rmtree(tmpdir2)
+
+    def test_init_with_other_deps(self):
+        initdir = tempfile.mktemp()
+        shutil.copytree(INIT_DIR, initdir)
+        reqfile = os.path.join(initdir, 'requirements.txt')
+        with open(reqfile, 'w', encoding='utf8') as f:
+            f.write("jinja2\nxbot.framework; python_version >= '3.10'\njmespath\n")
+        tmpdir = tempfile.mktemp()
+        try:
+            with patch('sys.stdout', new_callable=StringIO):
+                with patch('xbot.framework.main.INIT_DIR', initdir):
+                    main.init(tmpdir)
+            major = int(__version__.split('.')[0])
+            with open(os.path.join(tmpdir, 'requirements.txt'), encoding='utf8') as f:
+                self.assertEqual(
+                    f.read(),
+                    "jinja2\nxbot.framework>=%d,<%d; python_version >= '3.10'\n"
+                    "jmespath\n" % (major, major + 1)
+                )
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+            shutil.rmtree(initdir, ignore_errors=True)
         
     def test_is_projdir(self):
         self.assertTrue(main.is_projdir(self.workdir))

@@ -48,6 +48,13 @@ def init(directory: str) -> None:
     if os.path.exists(directory):
         printerr('%s already exists' % directory)
     shutil.copytree(INIT_DIR, directory)
+    major = int(__version__.split('.')[0])
+    specifier = 'xbot.framework>=%d,<%d' % (major, major + 1)
+    reqfile = os.path.join(directory, 'requirements.txt')
+    with open(reqfile, encoding='utf8') as f:
+        content = f.read()
+    with open(reqfile, 'w', encoding='utf8') as f:
+        f.write(content.replace('xbot.framework', specifier, 1))
     xprint('Initialized %s' % directory)
 
 
